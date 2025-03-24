@@ -1,0 +1,19 @@
+/* Tailwind CSS Imports */
+@import "tailwindcss";
+/* Tailwind CSS Theme Config */
+@theme {
+  --font-inter: inter;
+  --color-primary: #2d9cdb;
+  --color-primary-light: #5bc3ff;
+  --color-gray-special: #514142;
+}
+/* Add Inter Font to use with Tailwind CSS */
+@font-face {
+  font-family: "inter";
+  src: url(/fonts/Inter.ttf) format("truetype");
+}
+/* Change Autocomplete styles in Chrome */
+input:-webkit-autofill {
+  -webkit-text-fill-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+}
