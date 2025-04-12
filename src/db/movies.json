@@ -1,6 +1,6 @@
 [
   {
-    "id": 589761,
+    "id": "589761",
     "title": "Chernóbil: La película",
     "image": "https://image.tmdb.org/t/p/w500/reWYM1d7F442Sg6D2tM6611G0dG.jpg",
     "genres": [
@@ -28,10 +28,11 @@
         "id": 9648,
         "name": "Misterio"
       }
-    ]
+    ],
+    "productionCompany": "Non-Stop Productions"
   },
   {
-    "id": 136795,
+    "id": "136795",
     "title": "Chicas Armadas y Peligrosas",
     "image": "https://image.tmdb.org/t/p/w500/lLIj0HJcGl0OCyEdGE3PjGz8tpn.jpg",
     "genres": [
@@ -47,10 +48,11 @@
         "id": 80,
         "name": "Crimen"
       }
-    ]
+    ],
+    "productionCompany": "Chernin Entertainment"
   },
   {
-    "id": 845781,
+    "id": "845781",
     "title": "Código: Traje rojo",
     "image": "https://image.tmdb.org/t/p/w500/dpskAcm71w5v8zQ8RmPmJiP31Om.jpg",
     "genres": [
@@ -59,17 +61,18 @@
         "name": "Acción"
       },
       {
-        "id": 14,
-        "name": "Fantasía"
-      },
-      {
         "id": 35,
         "name": "Comedia"
+      },
+      {
+        "id": 14,
+        "name": "Fantasía"
       }
-    ]
+    ],
+    "productionCompany": "Seven Bucks Productions"
   },
   {
-    "id": 1100795,
+    "id": "1100795",
     "title": "Mr. Monk's Last Case: A Monk Movie",
     "image": "https://image.tmdb.org/t/p/w500/gj74sUGsPMg5qDQooh8GTs4MvbP.jpg",
     "genres": [
@@ -89,10 +92,11 @@
         "id": 10770,
         "name": "Película de TV"
       }
-    ]
+    ],
+    "productionCompany": "UCP"
   },
   {
-    "id": 9502,
+    "id": "9502",
     "title": "Kung Fu Panda",
     "image": "https://image.tmdb.org/t/p/w500/zcORJ8s9zsBjvKxP0k4FASQSjpf.jpg",
     "genres": [
@@ -116,10 +120,11 @@
         "id": 35,
         "name": "Comedia"
       }
-    ]
+    ],
+    "productionCompany": "DreamWorks Animation"
   },
   {
-    "id": 49444,
+    "id": "49444",
     "title": "Kung Fu Panda 2",
     "image": "https://image.tmdb.org/t/p/w500/aNji9U9SPTecmoqGippQUBEyouy.jpg",
     "genres": [
@@ -135,10 +140,11 @@
         "id": 35,
         "name": "Comedia"
       }
-    ]
+    ],
+    "productionCompany": "DreamWorks Animation"
   },
   {
-    "id": 140300,
+    "id": "140300",
     "title": "Kung Fu Panda 3",
     "image": "https://image.tmdb.org/t/p/w500/t11f8palNbICK9Ip5QLrUfhLJYq.jpg",
     "genres": [
@@ -162,10 +168,11 @@
         "id": 10751,
         "name": "Familia"
       }
-    ]
+    ],
+    "productionCompany": "DreamWorks Animation"
   },
   {
-    "id": 1011985,
+    "id": "1011985",
     "title": "Kung Fu Panda 4",
     "image": "https://image.tmdb.org/t/p/w500/zS8BSQdbOesql0EWbs17kPvLoAT.jpg",
     "genres": [
@@ -193,12 +200,13 @@
         "id": 14,
         "name": "Fantasía"
       }
-    ]
+    ],
+    "productionCompany": "DreamWorks Animation"
   },
   {
-    "id": 533535,
+    "id": "533535",
     "title": "Deadpool & Wolverine",
-    "image": "https://image.tmdb.org/t/p/w500/347cCxyMXy8WkcHfsfaPaugCyPA.jpg",
+    "image": "https://image.tmdb.org/t/p/w500/9TFSqghEHrlBMRR63yTx80Orxva.jpg",
     "genres": [
       {
         "id": 28,
@@ -212,6 +220,7 @@
         "id": 878,
         "name": "Ciencia ficción"
       }
-    ]
+    ],
+    "productionCompany": "Marvel Studios"
   }
 ]

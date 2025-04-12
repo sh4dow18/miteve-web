@@ -1,9 +1,9 @@
+// Update Series Endpoint Requirements
+import { TMDB_API_KEY } from "@/lib/admin";
 import fs from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
-
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
-
+// Update Series Endpoint Ids List
 const SERIES_IDS_LIST: string[] = [
   "128839",
   "65930",
@@ -15,9 +15,12 @@ const SERIES_IDS_LIST: string[] = [
   "37585",
   "67230",
   "206586",
+  "44006",
+  "210879",
 ];
-
+// Update Series Endpoint Main Function
 export async function PUT() {
+  // Get all Series ID responses from the movie database (TMDB)
   const SERIES_RESPONSES = await Promise.all(
     SERIES_IDS_LIST.map((seriesId) =>
       fetch(
@@ -25,21 +28,24 @@ export async function PUT() {
       ).then((response) => response.json())
     )
   );
+  // Get only the necessary information from the Series
   const FILTERED_SERIES = SERIES_RESPONSES.map((series) => ({
-    id: series.id,
+    id: `${series.id}`,
     title: series.name,
     image: `https://image.tmdb.org/t/p/w500${series.poster_path}`,
     genres: series.genres,
-    origin_country: series.origin_country,
+    originCountry: series.origin_country[0],
   }));
+  // Get File Path to add information
   const FILE_PATH = path.join(process.cwd(), "src/db", "series.json");
+  // Update current Series information
   await fs.writeFile(
     FILE_PATH,
     JSON.stringify(FILTERED_SERIES, null, 2),
     "utf-8"
   );
+  // Return Next Response
   return NextResponse.json({
-    message: "Archivo JSON actualizado",
-    filePath: "/src/db/series.json",
+    message: "Archivo Series actualizado",
   });
 }

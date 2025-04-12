@@ -1,14 +1,14 @@
-// Mateory Logo Requirements
+// Main Logo Requirements
 import Image from "next/image";
-// Mateory Logo Props
+// Main Logo Props
 interface Props {
   width: number;
   height: number;
   className: string;
 }
-// Mateory Logo Main Function
+// Main Logo Main Function
 function MainLogo({ width, height, className }: Props) {
-  // Returns Mateory Logo Component
+  // Returns Main Logo Component
   return (
     <Image
       src="/logo.svg"

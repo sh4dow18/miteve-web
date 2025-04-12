@@ -1,6 +1,6 @@
 [
   {
-    "id": 128839,
+    "id": "128839",
     "title": "La Brea",
     "image": "https://image.tmdb.org/t/p/w500/jyHK7qFX2HvaAULSAO7aztdanyr.jpg",
     "genres": [
@@ -17,10 +17,10 @@
         "name": "Action & Adventure"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
   },
   {
-    "id": 65930,
+    "id": "65930",
     "title": "My Hero Academia",
     "image": "https://image.tmdb.org/t/p/w500/dmUuNVWAJumRkDNuauFaLSvga00.jpg",
     "genres": [
@@ -37,10 +37,10 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "origin_country": ["JP"]
+    "originCountry": "JP"
   },
   {
-    "id": 31356,
+    "id": "31356",
     "title": "Big Time Rush",
     "image": "https://image.tmdb.org/t/p/w500/9N61wXR7FqsuByDVSEjM6qcPhKH.jpg",
     "genres": [
@@ -53,10 +53,10 @@
         "name": "Kids"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
   },
   {
-    "id": 58841,
+    "id": "58841",
     "title": "Policías de Chicago",
     "image": "https://image.tmdb.org/t/p/w500/2nHdAW7MUMuXMJO6ev0mFMhEq8P.jpg",
     "genres": [
@@ -69,10 +69,10 @@
         "name": "Drama"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
   },
   {
-    "id": 83095,
+    "id": "83095",
     "title": "Tate no Yuusha no Nariagari",
     "image": "https://image.tmdb.org/t/p/w500/yX0d6aTjHrE5Sjp6gZ1dkPWCmIF.jpg",
     "genres": [
@@ -93,10 +93,10 @@
         "name": "Drama"
       }
     ],
-    "origin_country": ["JP"]
+    "originCountry": "JP"
   },
   {
-    "id": 94954,
+    "id": "94954",
     "title": "Hazbin Hotel",
     "image": "https://image.tmdb.org/t/p/w500/rXojaQcxVUubPLSrFV8PD4xdjrs.jpg",
     "genres": [
@@ -113,10 +113,10 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
   },
   {
-    "id": 95479,
+    "id": "95479",
     "title": "Jujutsu Kaisen",
     "image": "https://image.tmdb.org/t/p/w500/coMNNwjHY4BZTqMIsklanMf2Wp7.jpg",
     "genres": [
@@ -133,10 +133,10 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "origin_country": ["JP"]
+    "originCountry": "JP"
   },
   {
-    "id": 37585,
+    "id": "37585",
     "title": "KenIchi, el discípulo más fuerte de la historia",
     "image": "https://image.tmdb.org/t/p/w500/xSH1V0ms4e0Fd5qMKOHSXe2N347.jpg",
     "genres": [
@@ -153,10 +153,10 @@
         "name": "Comedia"
       }
     ],
-    "origin_country": ["JP"]
+    "originCountry": "JP"
   },
   {
-    "id": 67230,
+    "id": "67230",
     "title": "Silvana sin lana",
     "image": "https://image.tmdb.org/t/p/w500/xGNMFrPtGSM37a7FMcPczAzto8u.jpg",
     "genres": [
@@ -173,10 +173,10 @@
         "name": "Comedia"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
   },
   {
-    "id": 206586,
+    "id": "206586",
     "title": "The Walking Dead: Sobrevivientes",
     "image": "https://image.tmdb.org/t/p/w500/ywbacot78IuNhGW4uVZPxxxVTkm.jpg",
     "genres": [
@@ -189,6 +189,34 @@
         "name": "Drama"
       }
     ],
-    "origin_country": ["US"]
+    "originCountry": "US"
+  },
+  {
+    "id": "44006",
+    "title": "Chicago en llamas",
+    "image": "https://image.tmdb.org/t/p/w500/8IN24YxfyHMBhY1RNw7ctGUZ1JI.jpg",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "originCountry": "US"
+  },
+  {
+    "id": "210879",
+    "title": "Rurouni Kenshin",
+    "image": "https://image.tmdb.org/t/p/w500/zT77Y6iQGmYGBqbhQi0ySD60o9i.jpg",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animación"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      }
+    ],
+    "originCountry": "JP"
   }
 ]

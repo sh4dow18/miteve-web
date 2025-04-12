@@ -3,19 +3,13 @@
 // Nav Requirements
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import {
-  Bars3Icon,
-  MoonIcon,
-  SunIcon,
-  XMarkIcon,
-} from "@heroicons/react/16/solid";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
 import MainLogo from "./main-logo";
 // Nav Main Function
 function Nav() {
   // Nav Hooks
   const [open, SetOpen] = useState<boolean>(false);
-  const [darkTheme, SetDarkTheme] = useState<boolean>(false);
   const CURRENT_PAGE = usePathname();
   // Nav Pages List to use in Mobile Nav and Desktop Nav
   const NAV_PAGES_LIST = [
@@ -25,19 +19,11 @@ function Nav() {
   ];
   // Function that Sets the Opposite Value in Open Hook to Open and Close the Burger Menu
   const OnClickButton = () => {
-    document.startViewTransition
-      ? document.startViewTransition(() => SetOpen(!open))
-      : SetOpen(!open);
-  };
-  const onClickThemeChanger = () => {
-    const DOCUMENT_CLASS_LIST = document.documentElement.classList;
-    if (darkTheme) {
-      DOCUMENT_CLASS_LIST.remove("dark");
-      SetDarkTheme(false);
-      return;
+    if (document.startViewTransition) {
+      document.startViewTransition(() => SetOpen(!open));
+    } else {
+      SetOpen(!open);
     }
-    DOCUMENT_CLASS_LIST.add("dark");
-    SetDarkTheme(true);
   };
   // Returns Nav Component
   return (
@@ -92,9 +78,7 @@ function Nav() {
             href={page.href}
             onClick={() => SetOpen(false)}
             className={`mx-2 my-1 px-3 py-2 font-medium ${
-              CURRENT_PAGE === page.href
-                ? "bg-gray-700 rounded-md"
-                : ""
+              CURRENT_PAGE === page.href ? "bg-gray-700 rounded-md" : ""
             }`}
           >
             {page.name}
