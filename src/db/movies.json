@@ -29,7 +29,8 @@
         "name": "Misterio"
       }
     ],
-    "productionCompany": "Non-Stop Productions"
+    "productionCompany": "Non-Stop Productions",
+    "collection": null
   },
   {
     "id": "136795",
@@ -49,7 +50,8 @@
         "name": "Crimen"
       }
     ],
-    "productionCompany": "Chernin Entertainment"
+    "productionCompany": "Chernin Entertainment",
+    "collection": null
   },
   {
     "id": "845781",
@@ -69,7 +71,8 @@
         "name": "Fantasía"
       }
     ],
-    "productionCompany": "Seven Bucks Productions"
+    "productionCompany": "Seven Bucks Productions",
+    "collection": null
   },
   {
     "id": "1100795",
@@ -93,7 +96,8 @@
         "name": "Película de TV"
       }
     ],
-    "productionCompany": "UCP"
+    "productionCompany": "UCP",
+    "collection": null
   },
   {
     "id": "9502",
@@ -121,7 +125,8 @@
         "name": "Comedia"
       }
     ],
-    "productionCompany": "DreamWorks Animation"
+    "productionCompany": "DreamWorks Animation",
+    "collection": "Kung Fu Panda - Colección"
   },
   {
     "id": "49444",
@@ -141,7 +146,8 @@
         "name": "Comedia"
       }
     ],
-    "productionCompany": "DreamWorks Animation"
+    "productionCompany": "DreamWorks Animation",
+    "collection": "Kung Fu Panda - Colección"
   },
   {
     "id": "140300",
@@ -169,7 +175,8 @@
         "name": "Familia"
       }
     ],
-    "productionCompany": "DreamWorks Animation"
+    "productionCompany": "DreamWorks Animation",
+    "collection": "Kung Fu Panda - Colección"
   },
   {
     "id": "1011985",
@@ -201,7 +208,8 @@
         "name": "Fantasía"
       }
     ],
-    "productionCompany": "DreamWorks Animation"
+    "productionCompany": "DreamWorks Animation",
+    "collection": "Kung Fu Panda - Colección"
   },
   {
     "id": "533535",
@@ -221,6 +229,561 @@
         "name": "Ciencia ficción"
       }
     ],
-    "productionCompany": "Marvel Studios"
+    "productionCompany": "Marvel Studios",
+    "collection": "Deadpool - Colección"
+  },
+  {
+    "id": "95754",
+    "title": "Big Time Rush: La Película",
+    "image": "https://image.tmdb.org/t/p/w500/iReiFsO7dPJWS8t6FQIewhv8C1w.jpg",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 10770,
+        "name": "Película de TV"
+      },
+      {
+        "id": 10402,
+        "name": "Música"
+      },
+      {
+        "id": 9648,
+        "name": "Misterio"
+      }
+    ],
+    "productionCompany": "Pacific Bay Entertainment",
+    "collection": null
+  },
+  {
+    "id": "639720",
+    "title": "Amigos imaginarios",
+    "image": "https://image.tmdb.org/t/p/w500/8RgGuC7w8JxhykauzTC4bwha1J8.jpg",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 14,
+        "name": "Fantasía"
+      },
+      {
+        "id": 10751,
+        "name": "Familia"
+      }
+    ],
+    "productionCompany": "Paramount Pictures",
+    "collection": null
+  },
+  {
+    "id": "493529",
+    "title": "Calabozos & Dragones: Honor entre ladrones",
+    "image": "https://image.tmdb.org/t/p/w500/77XBzUUFX5aHI3Jz3ipJTtsDWzk.jpg",
+    "genres": [
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 14,
+        "name": "Fantasía"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      }
+    ],
+    "productionCompany": "Entertainment One",
+    "collection": null
+  },
+  {
+    "id": "822119",
+    "title": "Capitán América: Un nuevo mundo",
+    "image": "https://image.tmdb.org/t/p/w500/pVMSRyAiye7gZ8NtuCt1qgbspY9.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Marvel Studios",
+    "collection": "Capitán América - Colección"
+  },
+  {
+    "id": "447365",
+    "title": "Guardianes de la Galaxia volumen 3",
+    "image": "https://image.tmdb.org/t/p/w500/6GkKzdNosVAL7UGgwTtCHSxLQ67.jpg",
+    "genres": [
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      }
+    ],
+    "productionCompany": "Marvel Studios",
+    "collection": "Guardianes de la Galaxia - Colección"
+  },
+  {
+    "id": "912908",
+    "title": "Hijos de perra",
+    "image": "https://image.tmdb.org/t/p/w500/qR2yPQOGw402RJMScTg5jmxLTkR.jpg",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      }
+    ],
+    "productionCompany": "Universal Pictures",
+    "collection": null
+  },
+  {
+    "id": "335977",
+    "title": "Indiana Jones y el dial del destino",
+    "image": "https://image.tmdb.org/t/p/w500/mHbjhqR277tW0uiCOf5QZpJATGf.jpg",
+    "genres": [
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      }
+    ],
+    "productionCompany": "Lucasfilm Ltd.",
+    "collection": "Indiana Jones - Colección"
+  },
+  {
+    "id": "1022789",
+    "title": "IntensaMente 2",
+    "image": "https://image.tmdb.org/t/p/w500/lE3DCRI7bQgHSiIuEPcFiXpiuGV.jpg",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animación"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 10751,
+        "name": "Familia"
+      }
+    ],
+    "productionCompany": "Walt Disney Pictures",
+    "collection": "Intensa-Mente - Colección"
+  },
+  {
+    "id": "539972",
+    "title": "Kraven el cazador",
+    "image": "https://image.tmdb.org/t/p/w500/ytmJ11n9gm34D1v56myjTxMaEDJ.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      }
+    ],
+    "productionCompany": "Columbia Pictures",
+    "collection": null
+  },
+  {
+    "id": "762509",
+    "title": "Mufasa: El rey león",
+    "image": "https://image.tmdb.org/t/p/w500/dmw74cWIEKaEgl5Dv3kUTcCob6D.jpg",
+    "genres": [
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 10751,
+        "name": "Familia"
+      },
+      {
+        "id": 16,
+        "name": "Animación"
+      }
+    ],
+    "productionCompany": "Walt Disney Pictures",
+    "collection": "The Lion King (Reboot) Collection"
+  },
+  {
+    "id": "939243",
+    "title": "Sonic 3: La Película",
+    "image": "https://image.tmdb.org/t/p/w500/3aDWCRXLYOCuxjrjiPfLd79tcI6.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 10751,
+        "name": "Familia"
+      }
+    ],
+    "productionCompany": "Paramount Pictures",
+    "collection": "Sonic - Colección"
+  },
+  {
+    "id": "912649",
+    "title": "Venom: El último baile",
+    "image": "https://image.tmdb.org/t/p/w500/8F74DwgFxTIBNtbqSLjR7zWmnHh.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      }
+    ],
+    "productionCompany": "Columbia Pictures",
+    "collection": "Venom - Colección"
+  },
+  {
+    "id": "22538",
+    "title": "Scott Pilgrim vs. los ex de la chica de sus sueños",
+    "image": "https://image.tmdb.org/t/p/w500/n4CLPUJ956UpJif9vjPVg4b2Lyd.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 10749,
+        "name": "Romance"
+      }
+    ],
+    "productionCompany": "Marc Platt Productions",
+    "collection": null
+  },
+  {
+    "id": "374720",
+    "title": "Dunkerque",
+    "image": "https://image.tmdb.org/t/p/w500/3lc06ptVbouEaZyjdHfCzmIm6v7.jpg",
+    "genres": [
+      {
+        "id": 10752,
+        "name": "Bélica"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "productionCompany": "Warner Bros. Pictures",
+    "collection": null
+  },
+  {
+    "id": "616",
+    "title": "El Último Samurái",
+    "image": "https://image.tmdb.org/t/p/w500/DfwutbQodAsYxdqJu7Cme5jifC.jpg",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 10752,
+        "name": "Bélica"
+      }
+    ],
+    "productionCompany": "Warner Bros. Pictures",
+    "collection": null
+  },
+  {
+    "id": "550988",
+    "title": "Free Guy: Tomando el Control",
+    "image": "https://image.tmdb.org/t/p/w500/suaooqn1Mnv60V19MoGxneMupJs.jpg",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedia"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Berlanti Productions",
+    "collection": "Free Guy Collection"
+  },
+  {
+    "id": "64686",
+    "title": "47 Ronin: La Leyenda del Samurái",
+    "image": "https://image.tmdb.org/t/p/w500/8SR6ZXRh1gmuesCvcuuAiImnva5.jpg",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 14,
+        "name": "Fantasía"
+      }
+    ],
+    "productionCompany": "Mid Atlantic Films",
+    "collection": "47 Ronin - Colección"
+  },
+  {
+    "id": "603",
+    "title": "Matrix",
+    "image": "https://image.tmdb.org/t/p/w500/2P14LNK2zDBf84tF016blkz4Q4C.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Village Roadshow Pictures",
+    "collection": "Matrix - Colección"
+  },
+  {
+    "id": "604",
+    "title": "Matrix recargado",
+    "image": "https://image.tmdb.org/t/p/w500/ayZkaN2f3ASjWW8ooCfuJT3T8Va.jpg",
+    "genres": [
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Village Roadshow Pictures",
+    "collection": "Matrix - Colección"
+  },
+  {
+    "id": "605",
+    "title": "Matrix: Revoluciones",
+    "image": "https://image.tmdb.org/t/p/w500/zi1UMF9jIM2JnQz0u2AyUw8QFZi.jpg",
+    "genres": [
+      {
+        "id": 12,
+        "name": "Aventura"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Village Roadshow Pictures",
+    "collection": "Matrix - Colección"
+  },
+  {
+    "id": "624860",
+    "title": "Matrix resurrecciones",
+    "image": "https://image.tmdb.org/t/p/w500/NPLjpvhkDVTt8Gn3ITNQGABHhd.jpg",
+    "genres": [
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      },
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 12,
+        "name": "Aventura"
+      }
+    ],
+    "productionCompany": "Warner Bros. Pictures",
+    "collection": "Matrix - Colección"
+  },
+  {
+    "id": "245891",
+    "title": "John Wick: Otro Día para Matar",
+    "image": "https://image.tmdb.org/t/p/w500/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      }
+    ],
+    "productionCompany": "87Eleven",
+    "collection": "John Wick - Colección"
+  },
+  {
+    "id": "324552",
+    "title": "John Wick 2: Un Nuevo Día para Matar",
+    "image": "https://image.tmdb.org/t/p/w500/tAAikrL3kH3TopsDC2Bgo4ARUiP.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 80,
+        "name": "Crimen"
+      }
+    ],
+    "productionCompany": "Thunder Road",
+    "collection": "John Wick - Colección"
+  },
+  {
+    "id": "458156",
+    "title": "John Wick 3: Parabellum",
+    "image": "https://image.tmdb.org/t/p/w500/aKw7oqYdfn4pkKYvp18Gd1YhK6m.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 80,
+        "name": "Crimen"
+      }
+    ],
+    "productionCompany": "Thunder Road",
+    "collection": "John Wick - Colección"
+  },
+  {
+    "id": "603692",
+    "title": "John Wick 4",
+    "image": "https://image.tmdb.org/t/p/w500/mj2Z9HnRSIEk3n7yVPoOY4Uzzfh.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      },
+      {
+        "id": 80,
+        "name": "Crimen"
+      }
+    ],
+    "productionCompany": "Thunder Road",
+    "collection": "John Wick - Colección"
+  },
+  {
+    "id": "324786",
+    "title": "Hasta el Último Hombre",
+    "image": "https://image.tmdb.org/t/p/w500/m3jj8IJ7uP5p4MqMzgtGW5l4ECd.jpg",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 36,
+        "name": "Historia"
+      },
+      {
+        "id": 10752,
+        "name": "Bélica"
+      }
+    ],
+    "productionCompany": "Summit Entertainment",
+    "collection": null
   }
 ]

@@ -56,22 +56,6 @@
     "originCountry": "US"
   },
   {
-    "id": "58841",
-    "title": "Policías de Chicago",
-    "image": "https://image.tmdb.org/t/p/w500/2nHdAW7MUMuXMJO6ev0mFMhEq8P.jpg",
-    "genres": [
-      {
-        "id": 80,
-        "name": "Crimen"
-      },
-      {
-        "id": 18,
-        "name": "Drama"
-      }
-    ],
-    "originCountry": "US"
-  },
-  {
     "id": "83095",
     "title": "Tate no Yuusha no Nariagari",
     "image": "https://image.tmdb.org/t/p/w500/yX0d6aTjHrE5Sjp6gZ1dkPWCmIF.jpg",
@@ -218,5 +202,25 @@
       }
     ],
     "originCountry": "JP"
+  },
+  {
+    "id": "1399",
+    "title": "Juego de Tronos",
+    "image": "https://image.tmdb.org/t/p/w500/z9gCSwIObDOD2BEtmUwfasar3xs.jpg",
+    "genres": [
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      }
+    ],
+    "originCountry": "US"
   }
 ]

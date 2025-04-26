@@ -8,7 +8,6 @@ const SERIES_IDS_LIST: string[] = [
   "128839",
   "65930",
   "31356",
-  "58841",
   "83095",
   "94954",
   "95479",
@@ -17,6 +16,7 @@ const SERIES_IDS_LIST: string[] = [
   "206586",
   "44006",
   "210879",
+  "1399"
 ];
 // Update Series Endpoint Main Function
 export async function PUT() {

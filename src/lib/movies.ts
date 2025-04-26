@@ -18,6 +18,10 @@ export function FindMoviesTrailerById(id: string) {
   return moviesExtraList.find((movie) => `${movie.id}` === id)?.trailer;
 }
 // Find Movie by Prop Value
-export function FindMoviesByProp(prop: keyof Content, value: string) {
+export function FindMoviesByProp(prop: keyof Content, value: string): Content[] {
   return moviesList.filter((movie: Content) => movie[prop] === value);
+}
+// Find Movies by Collection
+export function FindMoviesByCollection(collection: string) {
+  return moviesList.filter((movie: Content) => movie.collection === collection)
 }

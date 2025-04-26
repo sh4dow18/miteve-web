@@ -2,7 +2,7 @@
 import seriesList from "@/db/series.json";
 import seriesExtraList from "@/db/series-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { Season, Series } from "./types";
+import { Season, Series, SeriesExtra } from "./types";
 // Find all the anime series
 export function FindAnimes() {
   return seriesList
@@ -44,5 +44,9 @@ export async function FindTMDBSeasonById(id: string, seasonId: string) {
 export function FindUncompleteSeason(id: string, seasonId: string) {
   return seriesExtraList
     .find((series) => series.id === id)
-    ?.uncompleteSeason?.find((season) => `${season.number}` === seasonId);
+    ?.uncompleteSeasons?.find((season) => `${season.number}` === seasonId);
+}
+// Find Series by Id
+export function FindSeriesById(id: string): SeriesExtra | undefined {
+  return seriesExtraList.find((series) => series.id === id);
 }

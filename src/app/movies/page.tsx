@@ -1,7 +1,7 @@
 // Movies Page Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Slider, UpdateContent } from "@/components";
-import { FindMoviesByIds, FindMoviesByProp } from "@/lib/movies";
+import { FindMoviesByCollection, FindMoviesByIds, FindMoviesByProp } from "@/lib/movies";
 import { Metadata } from "next";
 // Movies Page Metadata
 export const metadata: Metadata = {
@@ -13,19 +13,26 @@ function MoviesPage() {
   // Movies Page Sliders List Information
   const SLIDERS_LIST = [
     {
-      title: "Selección de Dreamworks",
-      contentList: FindMoviesByProp(
-        "productionCompany",
-        "DreamWorks Animation"
-      ),
+      title: "Para Disfrutar en Familia",
+      contentList: [
+        ...FindMoviesByProp(
+          "productionCompany",
+          "DreamWorks Animation"
+        ),
+        ...FindMoviesByIds(["95754", "1100795", "639720", "912908", "1022789", "762509", "939243"])
+      ],
     },
     {
       title: "Toda la Acción",
-      contentList: FindMoviesByIds(["136795", "845781", "533535"]),
+      contentList: FindMoviesByIds(["136795", "845781", "533535", "589761", "493529", "822119", "447365", "335977", "539972", "912649", "22538", "374720", "616", "550988", "324786"]),
     },
     {
-      title: "Dramas y Misterio",
-      contentList: FindMoviesByIds(["589761", "1100795"]),
+      title: "Lo Mejor de Keanu Reaves",
+      contentList: [
+        ...FindMoviesByIds(["64686"]),
+        ...FindMoviesByCollection("Matrix - Colección"),
+        ...FindMoviesByCollection("John Wick - Colección"),
+      ],
     },
   ];
   // Returns Movies Page

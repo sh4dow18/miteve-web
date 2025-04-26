@@ -14,6 +14,32 @@ const MOVIES_IDS_LIST: string[] = [
   "140300",
   "1011985",
   "533535",
+  "95754",
+  "639720",
+  "493529",
+  "822119",
+  "447365",
+  "912908",
+  "335977",
+  "1022789",
+  "539972",
+  "762509",
+  "939243",
+  "912649",
+  "22538",
+  "374720",
+  "616",
+  "550988",
+  "64686",
+  "603",
+  "604",
+  "605",
+  "624860",
+  "245891",
+  "324552",
+  "458156",
+  "603692",
+  "324786"
 ];
 // Update Movies Endpoint Main Function
 export async function PUT() {
@@ -31,7 +57,8 @@ export async function PUT() {
     title: movie.title,
     image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
     genres: movie.genres,
-    productionCompany: movie.production_companies[0].name
+    productionCompany: movie.production_companies[0].name,
+    collection: movie.belongs_to_collection ? movie.belongs_to_collection.name : null
   }));
   // Get File Path to add information
   const FILE_PATH = path.join(process.cwd(), "src/db", "movies.json");

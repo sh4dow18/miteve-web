@@ -39,7 +39,7 @@ async function SeasonPage({ params }: Props) {
           width={600}
           height={635}
           priority
-          className="rounded-lg w-full min-[600px]:w-30"
+          className="rounded-lg w-full min-[600px]:w-1/4 min-[719px]:w-1/5"
         />
         {/* Season Overview Main Information Section */}
         <section className="flex flex-col gap-3">
@@ -47,6 +47,7 @@ async function SeasonPage({ params }: Props) {
           <h1 className="text-2xl text-center leading-14 font-bold text-gray-300 min-[351px]:text-5xl min-[600px]:text-2xl min-[600px]:text-left min-[600px]:leading-8">
             {SEASON.name}
           </h1>
+          <p className="line-clamp-3">{SEASON.overview ? SEASON.overview : `No hay Información Disponible sobre la ${SEASON.name} de esta serie actualmente, favor volver a consultar en otro momento`}</p>
           {/* Season Overview Release Date */}
           <span className="font-semibold text-gray-300">
             Fecha de Emisión: {SEASON.air_date.split("-")[0]}
@@ -69,7 +70,7 @@ async function SeasonPage({ params }: Props) {
           Episodios
         </h2>
         {/* Season Episodes Display Cards Container */}
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-7 min-[600px]">
           {EPISODES_LIST.map((episode: Episode, index: number) => (
             // Season Episode Card Link Container
             <Link
@@ -79,7 +80,11 @@ async function SeasonPage({ params }: Props) {
             >
               {/* Season Episode Image */}
               <Image
-                src={`https://image.tmdb.org/t/p/w500/${episode.still_path}`}
+                src={
+                  episode.still_path
+                    ? `https://image.tmdb.org/t/p/w500/${episode.still_path}`
+                    : "/images/404.png"
+                }
                 alt={`Episodio ${episode.episode_number} Cover`}
                 width={520}
                 height={300}
@@ -93,7 +98,7 @@ async function SeasonPage({ params }: Props) {
                 </span>
                 {/* Season Episode Description */}
                 <p className="line-clamp-4">
-                  {episode.overview ? episode.overview : "Sin Información"}
+                  {episode.overview ? episode.overview : "No hay Información Disponible sobre este capítulo actualmente, favor volver a consultar en otro momento"}
                 </p>
               </section>
             </Link>

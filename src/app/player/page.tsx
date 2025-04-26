@@ -37,9 +37,7 @@ async function Player({ searchParams }: Props) {
       {/* Content Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover cursor-pointer"
-        src={`${
-          process.env.PRODUCTION === "true" ? "../public/" : ""
-        }/videos/${TYPE}/${ID}${
+        src={`/videos/${TYPE}/${ID}${
           TYPE === "movies"
             ? `.webm`
             : `/Temporada ${SEASON}/Episodio ${EPISODE}.webm`
