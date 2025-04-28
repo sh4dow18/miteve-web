@@ -97,16 +97,23 @@ export default function Home() {
         solo lugar y a través de internet`}
         </p>
         {/* Home Page Main CTA Section */}
-        <div className="flex flex-col gap-6 sm:flex-row">
-          {/* How it works Link */}
+        <div className="flex flex-col gap-6 justify-center min-[345px]:flex-row min-[345px]:flex-wrap">
+          {/* Begins Link */}
           <Link
             href="/movies"
             className="bg-primary text-white px-4 py-2 font-medium rounded-md text-center hover:bg-primary-light"
           >
             Empezar
           </Link>
+          {/* How it works Link */}
+          <Link
+            href="/how-it-works"
+            className="bg-gray-600 text-white px-4 py-2 rounded-md text-center hover:bg-gray-500"
+          >
+            ¿Como Funciona?
+          </Link>
           {/* View Docs Link Container */}
-          <div className="flex gap-1 sm:items-center hover:text-white">
+          <div className="flex gap-1 items-center hover:text-white">
             <Link
               href="https://github.com/sh4dow18/miteve-web"
               target="_blank"
