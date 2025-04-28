@@ -1,9 +1,16 @@
 // Home Page Requirements
 import MainLogo from "@/components/main-logo";
-import { ArrowRightIcon } from "@heroicons/react/16/solid";
+import {
+  ArrowRightIcon,
+  ComputerDesktopIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
+} from "@heroicons/react/16/solid";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { cloneElement, ReactElement } from "react";
 // Home Page Metadata
 export const metadata: Metadata = {
   title: "Miteve",
@@ -11,6 +18,7 @@ export const metadata: Metadata = {
 };
 // Home Page Main Function
 export default function Home() {
+  // Home Page Constants
   const IMAGES_LIST = [
     {
       name: "Kung Fu Panda",
@@ -43,10 +51,36 @@ export default function Home() {
       href: "/206586?type=series",
     },
   ];
+  const BENEFITS_LIST = [
+    {
+      image: <ComputerDesktopIcon />,
+      title: "Accede a todo tu contenido en un solo lugar",
+      description:
+        "Clasifica tus películas y series descargadas en un solo lugar, con un sistema que optimiza tu biblioteca multimedia",
+    },
+    {
+      image: <QuestionMarkCircleIcon />,
+      title: "Una Interfaz intuitiva y moderna",
+      description:
+        "Diseñado con Next.js, TailwindCSS y TypeScript, Miteve es de código abierto, personalizable y completamente gratuito.",
+    },
+    {
+      image: <UserGroupIcon />,
+      title: "Pensado para todos los usuarios",
+      description:
+        "Ideal para familias, cinéfilos o cualquier persona que quiera tener su propia plataforma de streaming en casa",
+    },
+    {
+      image: <ShieldCheckIcon />,
+      title: "Rápido y seguro",
+      description:
+        "Reproduce tu contenido en segundos, sin anuncios y sin necesidad de servicios de terceros ni configuraciones complicadas",
+    },
+  ];
   // Returns Home Page
   return (
     // Home Page Main Section
-    <div className="flex flex-col gap-6 my-5 px-7 max-w-5xl mx-auto">
+    <div className="flex flex-col gap-14 my-5 px-7 max-w-5xl mx-auto">
       <section className="flex flex-col items-center gap-6">
         {/* Home Page Main Title */}
         <h1 className="hidden">Miteve</h1>
@@ -84,15 +118,62 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Benefits Section */}
+      <section>
+        {/* Benefits Information Container */}
+        <div className="mb-10 md:text-center md:mx-auto">
+          {/* Mini Title */}
+          <span className="font-semibold text-primary mt-1">
+            Disfruta más Rápido
+          </span>
+          {/* Benefits Title */}
+          <h2 className="text-gray-300 text-3xl font-bold mb-5 min-[361px]:text-4xl md:text-5xl">
+            La forma más sencilla de tener tu propio "Netflix en casa"
+          </h2>
+          {/* Benefits Description */}
+          <p className="leading-8">
+            Creado por un programador con diplomado en aplicaciones
+            informáticas, Miteve transforma tu colección de videos descargados
+            en una plataforma accesible desde cualquier dispositivo conectado a
+            Internet, haciendo que tu entretenimiento sea más organizado,
+            accesible y fácil de disfrutar
+          </p>
+        </div>
+        {/* Benefits "Benefits" Container */}
+        <div className="flex flex-col gap-6 mt-5 min-[779px]:flex-row min-[779px]:flex-wrap min-[779px]:justify-center min-[779px]:gap-5">
+          {BENEFITS_LIST.map((benefit, index) => (
+            <section
+              key={index}
+              className="flex gap-3 min-[779px]:max-w-xs lg:max-w-sm xl:max-w-md"
+            >
+              <div>
+                {cloneElement(benefit.image as ReactElement<any>, {
+                  className: "w-10 p-2 bg-primary rounded-lg fill-gray-200",
+                })}
+              </div>
+              <section className="flex flex-col gap-2">
+                <span className="font-semibold text-gray-300">
+                  {benefit.title}
+                </span>
+                <p className="leading-7">{benefit.description}</p>
+              </section>
+            </section>
+          ))}
+        </div>
+      </section>
+      {/* The Best of the Content Section */}
       <section className="flex flex-col items-center gap-6">
+        {/* The Best of the Content Title */}
         <h2 className="text-3xl font-bold text-gray-300 min-[375px]:text-4xl min-[426px]:text-[2.7rem] min-[468px]:text-3xl md:text-4xl">
           Lo Mejor de Series y Películas
         </h2>
+        {/* The Best of the Content Description */}
         <p className="leading-7 min-[361px]:text-center">
           Miteve es el destino ideal para disfrutar de todo el contenido que se
           posea, como grandes relatos, dramas apasionantes y las comedias más
           destacadas
         </p>
+        {/* The Best of the Content Images */}
         <div className="flex flex-wrap gap-5 place-content-center">
           {IMAGES_LIST.map((image, index) => (
             <Link
