@@ -135,7 +135,7 @@ export default function Home() {
           </span>
           {/* Benefits Title */}
           <h2 className="text-gray-300 text-3xl font-bold mb-5 min-[361px]:text-4xl md:text-5xl">
-            La forma más sencilla de tener tu propio "Netflix en casa"
+            {`La forma más sencilla de tener tu propio "Netflix en casa"`}
           </h2>
           {/* Benefits Description */}
           <p className="leading-8">
@@ -154,9 +154,12 @@ export default function Home() {
               className="flex gap-3 min-[779px]:max-w-xs lg:max-w-sm xl:max-w-md"
             >
               <div>
-                {cloneElement(benefit.image as ReactElement<any>, {
-                  className: "w-10 p-2 bg-primary rounded-lg fill-gray-200",
-                })}
+                {cloneElement(
+                  benefit.image as ReactElement<{ className?: string }>,
+                  {
+                    className: "w-10 p-2 bg-primary rounded-lg fill-gray-200",
+                  }
+                )}
               </div>
               <section className="flex flex-col gap-2">
                 <span className="font-semibold text-gray-300">
