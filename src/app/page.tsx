@@ -1,7 +1,9 @@
 // Home Page Requirements
+import Accordion from "@/components/accordion";
 import MainLogo from "@/components/main-logo";
 import {
   ArrowRightIcon,
+  ChevronDownIcon,
   ComputerDesktopIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
@@ -75,6 +77,56 @@ export default function Home() {
       title: "Rápido y seguro",
       description:
         "Reproduce tu contenido en segundos, sin anuncios y sin necesidad de servicios de terceros ni configuraciones complicadas",
+    },
+  ];
+  const QUESTIONS_LIST = [
+    {
+      name: "¿Como me Registro?",
+      answer:
+        "Actualmente no existe un sistema de Usuarios en Miteve, por lo que no se puede registrar, pero esto cambiará en futuras versiones.",
+    },
+    {
+      name: "¿En qué dispositivos funciona Miteve?",
+      answer:
+        "Funciona en todos los dispositivos que cuenten con un navegador semimoderno, debido a que es una página web, por lo que funciona en computadoras, tables, móviles y hasta en televisores con navegador",
+    },
+    {
+      name: "¿Miteve tiene algún costo?",
+      answer:
+        "No, es una herramienta de código abierto y completamente gratuita.",
+    },
+    {
+      name: "¿Qué necesito para usar Miteve?",
+      answer:
+        "Solo necesita una computadora donde alojar su contenido descargado y una conexión a Internet para accederlo desde sus dispositivos.",
+    },
+    {
+      name: "¿Puedo acceder a Miteve fuera de mi casa?",
+      answer:
+        "Por si solo, Miteve no es capaz de acceder a este contenido fuera de la red local, pero se puede usar un servidor de Red Privada Virtual (VPN) propio para poder acceder a este de manera segura.",
+    },
+    {
+      name: "¿Miteve organiza automáticamente mis series y películas?",
+      answer:
+        "Por el momento, Miteve no organiza automaticamente el contenido, se debe hacer manual a través del gestor de archivos",
+    },
+    {
+      name: "¿Es necesario saber de programación para usar Miteve?",
+      answer: "No, Miteve está diseñado para ser intuitivo y fácil de usar.",
+    },
+    {
+      name: "¿Es necesario saber de programación para administrar Miteve?",
+      answer:
+        "Actualmente sí, debido a que hay que configurar algunos archivos para poder administrar Miteve, pero esto cambiará en futuras versiones.",
+    },
+    {
+      name: "¿Qué formatos de video soporta Miteve?",
+      answer:
+        "Actualmente solo es compatible con archivos WEBM, con el objetivo que funcione en la mayor cantidad de dispositivos y navegadores.",
+    },
+    {
+      name: "¿Puedo personalizar la apariencia de Miteve?",
+      answer: "Actualmente no, pero en futuras versiones esto puede cambiar",
     },
   ];
   // Returns Home Page
@@ -199,6 +251,23 @@ export default function Home() {
                 className="transition-all cursor-pointer hover:scale-110"
               />
             </Link>
+          ))}
+        </div>
+      </section>
+      {/* Questions Section */}
+      <section>
+        {/* Questions Title */}
+        <h2 className="text-gray-300 text-4xl font-bold mb-5 md:text-center">
+          ¿Aún tienes preguntas?
+        </h2>
+        {/* Questions Accordions */}
+        <div className="flex flex-col gap-5 mt-7">
+          {QUESTIONS_LIST.map((question, index) => (
+            <Accordion
+              key={index}
+              title={question.name}
+              content={question.answer}
+            />
           ))}
         </div>
       </section>

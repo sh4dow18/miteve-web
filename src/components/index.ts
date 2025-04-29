@@ -1,4 +1,5 @@
 // Components Barrel
+export { default as Accordion } from "./accordion"
 export { default as Light } from "./light";
 export { default as Logo } from "./logo";
 export { default as Nav } from "./nav";
