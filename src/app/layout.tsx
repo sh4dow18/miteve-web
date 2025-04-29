@@ -36,7 +36,7 @@ export default function RootLayout({
           <div className="flex gap-4 justify-center max-w-fit mx-auto mb-5 sm:order-3 sm:m-0">
             {/* Github Logo */}
             <Logo
-              href="https://github.com/sh4dow18/mateory"
+              href="https://github.com/sh4dow18/miteve-web"
               icon="github"
               width={24}
               height={24}
@@ -62,7 +62,7 @@ export default function RootLayout({
             . Todos los Derechos Reservados.
           </p>
           {/* Last Update */}
-          <p className="text-xs sm:order-1 md:text-sm">11 de Marzo del 2025</p>
+          <p className="text-xs sm:order-1 md:text-sm">28 de Abril del 2025</p>
         </footer>
       </body>
     </html>

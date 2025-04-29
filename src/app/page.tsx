@@ -3,7 +3,6 @@ import Accordion from "@/components/accordion";
 import MainLogo from "@/components/main-logo";
 import {
   ArrowRightIcon,
-  ChevronDownIcon,
   ComputerDesktopIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
