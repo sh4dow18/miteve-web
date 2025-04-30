@@ -13,21 +13,29 @@ interface Props {
   title: string;
   contentList: Content[] | Series[];
   type: "movies" | "series";
+  lessSlides?: boolean;
 }
 // Slider Main Function
-function Slider({ title, contentList, type }: Props) {
+function Slider({ title, contentList, type, lessSlides }: Props) {
   // Slider Hooks
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slides: { perView: 9.2, spacing: 7 },
-    breakpoints: {
-      "(max-width: 1500px)": { slides: { perView: 8.2, spacing: 10 } },
-      "(max-width: 1300px)": { slides: { perView: 7.2, spacing: 7 } },
-      "(max-width: 1100px)": { slides: { perView: 6.2, spacing: 7 } },
-      "(max-width: 800px)": { slides: { perView: 5.2, spacing: 7 } },
-      "(max-width: 600px)": { slides: { perView: 4.2, spacing: 7 } },
-      "(max-width: 400px)": { slides: { perView: 3.2, spacing: 7 } },
-    },
+    slides: lessSlides
+      ? { perView: 5.2, spacing: 7 }
+      : { perView: 9.2, spacing: 7 },
+    breakpoints: lessSlides
+      ? {
+          "(max-width: 600px)": { slides: { perView: 4.2, spacing: 7 } },
+          "(max-width: 400px)": { slides: { perView: 3.2, spacing: 7 } },
+        }
+      : {
+          "(max-width: 1500px)": { slides: { perView: 8.2, spacing: 10 } },
+          "(max-width: 1300px)": { slides: { perView: 7.2, spacing: 7 } },
+          "(max-width: 1100px)": { slides: { perView: 6.2, spacing: 7 } },
+          "(max-width: 800px)": { slides: { perView: 5.2, spacing: 7 } },
+          "(max-width: 600px)": { slides: { perView: 4.2, spacing: 7 } },
+          "(max-width: 400px)": { slides: { perView: 3.2, spacing: 7 } },
+        },
   });
   // Returs Slider Component
   return (

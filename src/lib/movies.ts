@@ -59,3 +59,20 @@ export async function FindCastFromMovie(id: string) {
     ? `${TOP_2.join(", ")}, más`
     : TOP_2.join(", ");
 }
+// Find the 10 First Recomendations From Movie Function
+export function FindRecomendationsByMovie(id: string) {
+  const MOVIE = moviesList.find((movie) => movie.id === id);
+  const COLLECTION = MOVIE?.collection;
+  const GENRE = MOVIE?.genres[0].name;
+  const MOVIES_BY_SAME_COLLECTION_LIST = moviesList
+    .filter((movie) => movie.collection === COLLECTION)
+    .filter((movie) => movie.id !== id);
+  const MOVIES_BY_GENRE_LIST = moviesList
+    .filter((movie) => movie.genres.some((genre) => genre.name === GENRE))
+    .filter((movie) => !MOVIES_BY_SAME_COLLECTION_LIST.includes(movie))
+    .filter((movie) => movie.id !== id);
+  return [...MOVIES_BY_SAME_COLLECTION_LIST, ...MOVIES_BY_GENRE_LIST].slice(
+    0,
+    10
+  );
+}

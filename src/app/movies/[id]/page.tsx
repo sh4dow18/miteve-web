@@ -1,9 +1,10 @@
 // Movie Content Page Requirements
-import { ContentOverview } from "@/components";
+import { ContentOverview, Slider } from "@/components";
 import {
   FindCastFromMovie,
   FindCertificationFromMovie,
   FindMoviesTrailerById,
+  FindRecomendationsByMovie,
   FindTMDBMovieById,
 } from "@/lib/movies";
 import { Metadata } from "next";
@@ -33,10 +34,11 @@ async function MovieContentPage({ params }: Props) {
   const CERTIFICATION = await FindCertificationFromMovie(id);
   const CREDITS = await FindCastFromMovie(id);
   const TRAILER = FindMoviesTrailerById(id);
+  const RECOMENDATIONS = FindRecomendationsByMovie(id);
   // Returns Movie Content Page
   return (
     // Movie Content Main Container
-    <div className="p-10 max-w-4xl mx-auto">
+    <div className="p-10 max-w-4xl min-[897px]:mx-auto">
       <ContentOverview
         title={CONTENT.title}
         image={CONTENT.poster_path}
@@ -52,6 +54,13 @@ async function MovieContentPage({ params }: Props) {
           href: `/movies/${id}/cast`,
         }}
         trailer={TRAILER}
+      />
+      {/* Recomendations Slider */}
+      <Slider
+        title="Recomendaciones"
+        contentList={RECOMENDATIONS}
+        type="movies"
+        lessSlides
       />
     </div>
   );
