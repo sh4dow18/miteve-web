@@ -15,9 +15,9 @@ interface Props {
   tagline: string | null;
   overview: string;
   rating: number;
-  certification: string;
+  certification: string | undefined;
   credits: {
-    names: string;
+    names: string | undefined;
     href: string;
   };
   trailer: string | undefined;
@@ -114,7 +114,7 @@ function ContentOverview({
             {/* Content Overview Extra Information Clasification Title */}
             <span className="font-semibold text-gray-300">Clasificación</span>
             {/* Content Overview Extra Information Clasification */}
-            <span>{certification}</span>
+            <span>{certification ? certification : "N/A"}</span>
           </section>
           {/* Content Overview Extra Information Rating Credits Section */}
           <section className="flex flex-col gap-2 min-[870px]:ml-5">
@@ -122,7 +122,7 @@ function ContentOverview({
             <span className="font-semibold text-gray-300">Créditos</span>
             {/* Content Overview Extra Information Credits */}
             <Link href={credits.href} className="hover:text-gray-100">
-              <span>{credits.names}</span>
+              <span>{credits.names ? credits.names : "N/A"}</span>
             </Link>
           </section>
         </div>

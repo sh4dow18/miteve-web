@@ -31,7 +31,8 @@
     ],
     "productionCompany": "Non-Stop Productions",
     "collection": null,
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Данила Козловский, Оксана Акиньшина, más"
   },
   {
     "id": "136795",
@@ -53,7 +54,8 @@
     ],
     "productionCompany": "Chernin Entertainment",
     "collection": null,
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Sandra Bullock, Melissa McCarthy, más"
   },
   {
     "id": "845781",
@@ -75,7 +77,8 @@
     ],
     "productionCompany": "Seven Bucks Productions",
     "collection": null,
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Dwayne Johnson, Chris Evans, más"
   },
   {
     "id": "1100795",
@@ -101,7 +104,8 @@
     ],
     "productionCompany": "UCP",
     "collection": null,
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Tony Shalhoub, Traylor Howard, más"
   },
   {
     "id": "9502",
@@ -131,7 +135,8 @@
     ],
     "productionCompany": "DreamWorks Animation",
     "collection": "Kung Fu Panda - Colección",
-    "certification": "Todo Público"
+    "certification": "Todo Público",
+    "credits": "Jack Black, Angelina Jolie, más"
   },
   {
     "id": "49444",
@@ -153,7 +158,8 @@
     ],
     "productionCompany": "DreamWorks Animation",
     "collection": "Kung Fu Panda - Colección",
-    "certification": "Todo Público"
+    "certification": "Todo Público",
+    "credits": "Jack Black, Angelina Jolie, más"
   },
   {
     "id": "140300",
@@ -183,7 +189,8 @@
     ],
     "productionCompany": "DreamWorks Animation",
     "collection": "Kung Fu Panda - Colección",
-    "certification": "Todo Público"
+    "certification": "Todo Público",
+    "credits": "Jack Black, Bryan Cranston, más"
   },
   {
     "id": "1011985",
@@ -217,7 +224,8 @@
     ],
     "productionCompany": "DreamWorks Animation",
     "collection": "Kung Fu Panda - Colección",
-    "certification": "Todo Público"
+    "certification": "Todo Público",
+    "credits": "Jack Black, Awkwafina, más"
   },
   {
     "id": "533535",
@@ -239,7 +247,8 @@
     ],
     "productionCompany": "Marvel Studios",
     "collection": "Deadpool - Colección",
-    "certification": "+18"
+    "certification": "+18",
+    "credits": "Ryan Reynolds, Hugh Jackman, más"
   },
   {
     "id": "95754",
@@ -265,7 +274,8 @@
     ],
     "productionCompany": "Pacific Bay Entertainment",
     "collection": null,
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Kendall Schmidt, James Maslow, más"
   },
   {
     "id": "639720",
@@ -287,7 +297,8 @@
     ],
     "productionCompany": "Paramount Pictures",
     "collection": null,
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Cailey Fleming, Ryan Reynolds, más"
   },
   {
     "id": "493529",
@@ -309,7 +320,8 @@
     ],
     "productionCompany": "Entertainment One",
     "collection": null,
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Chris Pine, Michelle Rodriguez, más"
   },
   {
     "id": "822119",
@@ -331,7 +343,8 @@
     ],
     "productionCompany": "Marvel Studios",
     "collection": "Capitán América - Colección",
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Anthony Mackie, Harrison Ford, más"
   },
   {
     "id": "447365",
@@ -357,7 +370,8 @@
     ],
     "productionCompany": "Marvel Studios",
     "collection": "Guardianes de la Galaxia - Colección",
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Chris Pratt, Zoe Saldaña, más"
   },
   {
     "id": "912908",
@@ -375,7 +389,8 @@
     ],
     "productionCompany": "Universal Pictures",
     "collection": null,
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Will Ferrell, Jamie Foxx, más"
   },
   {
     "id": "335977",
@@ -393,7 +408,8 @@
     ],
     "productionCompany": "Lucasfilm Ltd.",
     "collection": "Indiana Jones - Colección",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Harrison Ford, Phoebe Waller-Bridge, más"
   },
   {
     "id": "1022789",
@@ -419,7 +435,8 @@
     ],
     "productionCompany": "Walt Disney Pictures",
     "collection": "Intensa-Mente - Colección",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Amy Poehler, Maya Hawke, más"
   },
   {
     "id": "539972",
@@ -441,7 +458,8 @@
     ],
     "productionCompany": "Columbia Pictures",
     "collection": null,
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Aaron Taylor-Johnson, Ariana DeBose, más"
   },
   {
     "id": "762509",
@@ -463,7 +481,8 @@
     ],
     "productionCompany": "Walt Disney Pictures",
     "collection": "The Lion King (Reboot) Collection",
-    "certification": "Todo Público"
+    "certification": "Todo Público",
+    "credits": "Aaron Pierre, Kelvin Harrison, Jr., más"
   },
   {
     "id": "939243",
@@ -489,7 +508,8 @@
     ],
     "productionCompany": "Paramount Pictures",
     "collection": "Sonic - Colección",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Jim Carrey, Ben Schwartz, más"
   },
   {
     "id": "912649",
@@ -511,7 +531,8 @@
     ],
     "productionCompany": "Columbia Pictures",
     "collection": "Venom - Colección",
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Tom Hardy, Chiwetel Ejiofor, más"
   },
   {
     "id": "22538",
@@ -533,7 +554,8 @@
     ],
     "productionCompany": "Marc Platt Productions",
     "collection": null,
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Michael Cera, Mary Elizabeth Winstead, más"
   },
   {
     "id": "374720",
@@ -555,7 +577,8 @@
     ],
     "productionCompany": "Warner Bros. Pictures",
     "collection": null,
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Fionn Whitehead, Tom Hardy, más"
   },
   {
     "id": "616",
@@ -577,7 +600,8 @@
     ],
     "productionCompany": "Warner Bros. Pictures",
     "collection": null,
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Tom Cruise, 渡辺謙, más"
   },
   {
     "id": "550988",
@@ -599,7 +623,8 @@
     ],
     "productionCompany": "Berlanti Productions",
     "collection": "Free Guy Collection",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Ryan Reynolds, Jodie Comer, más"
   },
   {
     "id": "64686",
@@ -621,7 +646,8 @@
     ],
     "productionCompany": "Mid Atlantic Films",
     "collection": "47 Ronin - Colección",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Keanu Reeves, 真田広之, más"
   },
   {
     "id": "603",
@@ -639,7 +665,8 @@
     ],
     "productionCompany": "Village Roadshow Pictures",
     "collection": "Matrix - Colección",
-    "certification": "+12"
+    "certification": "+12",
+    "credits": "Keanu Reeves, Laurence Fishburne, más"
   },
   {
     "id": "604",
@@ -665,7 +692,8 @@
     ],
     "productionCompany": "Village Roadshow Pictures",
     "collection": "Matrix - Colección",
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Keanu Reeves, Laurence Fishburne, más"
   },
   {
     "id": "605",
@@ -691,7 +719,8 @@
     ],
     "productionCompany": "Village Roadshow Pictures",
     "collection": "Matrix - Colección",
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Keanu Reeves, Laurence Fishburne, más"
   },
   {
     "id": "624860",
@@ -713,7 +742,8 @@
     ],
     "productionCompany": "Warner Bros. Pictures",
     "collection": "Matrix - Colección",
-    "certification": "N/A"
+    "certification": "N/A",
+    "credits": "Keanu Reeves, Carrie-Anne Moss, más"
   },
   {
     "id": "245891",
@@ -731,7 +761,8 @@
     ],
     "productionCompany": "87Eleven",
     "collection": "John Wick - Colección",
-    "certification": "+18"
+    "certification": "+18",
+    "credits": "Keanu Reeves, Michael Nyqvist, más"
   },
   {
     "id": "324552",
@@ -753,7 +784,8 @@
     ],
     "productionCompany": "Thunder Road",
     "collection": "John Wick - Colección",
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Keanu Reeves, Common, más"
   },
   {
     "id": "458156",
@@ -775,7 +807,8 @@
     ],
     "productionCompany": "Thunder Road",
     "collection": "John Wick - Colección",
-    "certification": "+18"
+    "certification": "+18",
+    "credits": "Keanu Reeves, Halle Berry, más"
   },
   {
     "id": "603692",
@@ -797,7 +830,8 @@
     ],
     "productionCompany": "Thunder Road",
     "collection": "John Wick - Colección",
-    "certification": "+15"
+    "certification": "+15",
+    "credits": "Keanu Reeves, 甄子丹, más"
   },
   {
     "id": "324786",
@@ -819,6 +853,7 @@
     ],
     "productionCompany": "Summit Entertainment",
     "collection": null,
-    "certification": "+18"
+    "certification": "+18",
+    "credits": "Andrew Garfield, Sam Worthington, más"
   }
 ]

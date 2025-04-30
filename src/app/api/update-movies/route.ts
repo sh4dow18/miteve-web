@@ -68,6 +68,13 @@ export async function PUT() {
       ).then((response) => response.json())
     )
   );
+  const MOVIES_CAST_LIST = await Promise.all(
+    MOVIES_IDS_LIST.map((movieId) =>
+      fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+      ).then((response) => response.json())
+    )
+  );
   const MEXICO_RELEASE_DATEs_LIST = MOVIES_RELEASE_DATES_LIST.map((movie) =>
     movie.results.find(
       (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
@@ -76,11 +83,16 @@ export async function PUT() {
   // Get only the necessary information from the movies
   const FILTERED_MOVIES = MOVIES_RESPONSES.map((movie, index) => {
     const MEXICO_RELEASE_DATE = MEXICO_RELEASE_DATEs_LIST[index];
+    const CREDITS = MOVIES_CAST_LIST[index];
     const MEXICO_CERTIFICATION =
       MEXICO_RELEASE_DATE &&
       MEXICO_RELEASE_DATE.release_dates[0].certification !== ""
         ? MEXICO_RELEASE_DATE.release_dates[0].certification
         : "N/A";
+    const TOP_2 = `${CREDITS.cast
+      .slice(0, 2)
+      .map((actor: { name: string }) => actor.name)
+      .join(", ")}, más`;
     return {
       id: `${movie.id}`,
       title: movie.title,
@@ -91,6 +103,7 @@ export async function PUT() {
         ? movie.belongs_to_collection.name
         : null,
       certification: COSTA_RICA_CLASIFICATIONS[MEXICO_CERTIFICATION],
+      credits: TOP_2,
     };
   });
   // Get File Path to add information

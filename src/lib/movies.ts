@@ -3,17 +3,6 @@ import moviesList from "@/db/movies.json";
 import moviesExtraList from "@/db/movies-extra.json";
 import { TMDB_API_KEY } from "./admin";
 import { Content } from "./types";
-// Movies Library Constants
-const COSTA_RICA_CLASIFICATIONS: Record<string, string> = {
-  AA: "Todo Público",
-  A: "Todo Público",
-  B: "+12",
-  B15: "+15",
-  "B-15": "+15",
-  C: "+18",
-  D: "+18",
-  "N/A": "N/A",
-};
 // Find multiple movies by movie ID list
 export function FindMoviesByIds(moviesIdsList: string[]): Content[] {
   return moviesList.filter((movie) => moviesIdsList.includes(movie.id));
@@ -39,21 +28,13 @@ export function FindMoviesByProp(
 export function FindMoviesByCollection(collection: string) {
   return moviesList.filter((movie: Content) => movie.collection === collection);
 }
-// Find Certification From Movie of the Movie Database (TMDB)
+// Find Certification From Movie
 export async function FindCertificationFromMovie(id: string) {
   return moviesList.find((movie) => movie.id === id)?.certification;
 }
-// Find Cast From Movie of the Movie Database (TMDB)
+// Find Cast From Movie
 export async function FindCastFromMovie(id: string) {
-  const RESPONSE = await fetch(
-    `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
-  ).then((response) => response.json());
-  const TOP_2 = RESPONSE.cast
-    .slice(0, 2)
-    .map((actor: { name: string }) => actor.name);
-  return RESPONSE.cast.length > 2
-    ? `${TOP_2.join(", ")}, más`
-    : TOP_2.join(", ");
+  return moviesList.find((movie) => movie.id === id)?.credits;
 }
 // Find the 10 First Recomendations From Movie Function
 export function FindRecomendationsByMovie(id: string) {
