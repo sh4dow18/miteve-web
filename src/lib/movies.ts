@@ -3,13 +3,16 @@ import moviesList from "@/db/movies.json";
 import moviesExtraList from "@/db/movies-extra.json";
 import { TMDB_API_KEY } from "./admin";
 import { Content } from "./types";
+// Movies Library Constants
 const COSTA_RICA_CLASIFICATIONS: Record<string, string> = {
   AA: "Todo Público",
   A: "Todo Público",
   B: "+12",
   B15: "+15",
+  "B-15": "+15",
   C: "+18",
   D: "+18",
+  "N/A": "N/A",
 };
 // Find multiple movies by movie ID list
 export function FindMoviesByIds(moviesIdsList: string[]): Content[] {
@@ -41,10 +44,12 @@ export async function FindCertificationFromMovie(id: string) {
   const RESPONSE = await fetch(
     `https://api.themoviedb.org/3/movie/${id}/release_dates?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
   ).then((response) => response.json());
-  const MEXICO_CLASIFICATION =
-    RESPONSE.results.find(
-      (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
-    ).release_dates[0]?.certification || "N/A";
+  const MEXITO_RELEASE_DATE = RESPONSE.results.find(
+    (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
+  );
+  const MEXICO_CLASIFICATION = MEXITO_RELEASE_DATE
+    ? MEXITO_RELEASE_DATE.release_dates[0].certification
+    : "N/A";
   return COSTA_RICA_CLASIFICATIONS[MEXICO_CLASIFICATION];
 }
 // Find Cast From Movie of the Movie Database (TMDB)
