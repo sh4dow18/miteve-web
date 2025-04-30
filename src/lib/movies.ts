@@ -81,3 +81,7 @@ export function FindRecomendationsByMovie(id: string) {
     10
   );
 }
+// Find Movie by Id Function
+export function FindMovieById(id: string) {
+  return moviesList.find((movie) => movie.id === id);
+}
