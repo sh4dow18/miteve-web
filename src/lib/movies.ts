@@ -41,18 +41,7 @@ export function FindMoviesByCollection(collection: string) {
 }
 // Find Certification From Movie of the Movie Database (TMDB)
 export async function FindCertificationFromMovie(id: string) {
-  const RESPONSE = await fetch(
-    `https://api.themoviedb.org/3/movie/${id}/release_dates?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
-  ).then((response) => response.json());
-  const MEXICO_RELEASE_DATE = RESPONSE.results.find(
-    (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
-  );
-  const MEXICO_CLASIFICATION =
-    MEXICO_RELEASE_DATE &&
-    MEXICO_RELEASE_DATE.release_dates[0].certification !== ""
-      ? MEXICO_RELEASE_DATE.release_dates[0].certification
-      : "N/A";
-  return COSTA_RICA_CLASIFICATIONS[MEXICO_CLASIFICATION];
+  return moviesList.find((movie) => movie.id === id)?.certification;
 }
 // Find Cast From Movie of the Movie Database (TMDB)
 export async function FindCastFromMovie(id: string) {
