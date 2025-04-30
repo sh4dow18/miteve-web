@@ -24,7 +24,7 @@ function UpdateContent({ type }: Props) {
       onClick={OnClick}
       className="bg-gray-800 p-2 rounded-md cursor-pointer hover:bg-gray-700"
     >
-      <ArrowPathIcon className="w-7 h-7" />
+      <ArrowPathIcon className="w-5 h-5 md:w-7 md:h-7" />
     </button>
   );
 }

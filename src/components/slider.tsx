@@ -13,27 +13,38 @@ interface Props {
   title: string;
   contentList: Content[] | Series[];
   type: "movies" | "series";
+  lessSlides?: boolean;
 }
 // Slider Main Function
-function Slider({ title, contentList, type }: Props) {
+function Slider({ title, contentList, type, lessSlides }: Props) {
   // Slider Hooks
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slides: { perView: 8.5, spacing: 20 },
-    breakpoints: {
-      "(max-width: 1440px)": { slides: { perView: 7.5, spacing: 20 } },
-      "(max-width: 1200px)": { slides: { perView: 6.5, spacing: 20 } },
-      "(max-width: 920px)": { slides: { perView: 5.5, spacing: 20 } },
-      "(max-width: 620px)": { slides: { perView: 4.5, spacing: 20 } },
-      "(max-width: 480px)": { slides: { perView: 3.5, spacing: 20 } },
-    },
+    slides: lessSlides
+      ? { perView: 5.2, spacing: 7 }
+      : { perView: 9.2, spacing: 7 },
+    breakpoints: lessSlides
+      ? {
+          "(max-width: 600px)": { slides: { perView: 4.2, spacing: 7 } },
+          "(max-width: 400px)": { slides: { perView: 3.2, spacing: 7 } },
+        }
+      : {
+          "(max-width: 1500px)": { slides: { perView: 8.2, spacing: 10 } },
+          "(max-width: 1300px)": { slides: { perView: 7.2, spacing: 7 } },
+          "(max-width: 1100px)": { slides: { perView: 6.2, spacing: 7 } },
+          "(max-width: 800px)": { slides: { perView: 5.2, spacing: 7 } },
+          "(max-width: 600px)": { slides: { perView: 4.2, spacing: 7 } },
+          "(max-width: 400px)": { slides: { perView: 3.2, spacing: 7 } },
+        },
   });
   // Returs Slider Component
   return (
     // Slider Main Section
     <section className="flex flex-col gap-3">
       {/* Slider Title */}
-      <h2 className="font-semibold text-2xl text-gray-300">{title}</h2>
+      <h2 className="font-semibold text-xl text-gray-300 md:text-2xl">
+        {title}
+      </h2>
       {/* Slider Images Container */}
       <div className="flex items-center gap-2 relative">
         {/* Slider Left Button */}
@@ -49,7 +60,7 @@ function Slider({ title, contentList, type }: Props) {
             // Slider Card
             <Link
               key={content.id}
-              href={`/${content.id}?type=${type}`}
+              href={`/${type}/${content.id}`}
               className="keen-slider__slide rounded-md"
             >
               <Image
