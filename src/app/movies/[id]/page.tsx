@@ -38,7 +38,7 @@ async function MovieContentPage({ params }: Props) {
   // Returns Movie Content Page
   return (
     // Movie Content Main Container
-    <div className="p-10 max-w-4xl min-[897px]:mx-auto">
+    <div className="flex flex-col gap-3 p-10 max-w-4xl min-[897px]:mx-auto">
       <ContentOverview
         title={CONTENT.title}
         image={CONTENT.poster_path}
