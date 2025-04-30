@@ -34,7 +34,9 @@ function Slider({ title, contentList, type }: Props) {
     // Slider Main Section
     <section className="flex flex-col gap-3">
       {/* Slider Title */}
-      <h2 className="font-semibold text-xl text-gray-300 md:text-2xl">{title}</h2>
+      <h2 className="font-semibold text-xl text-gray-300 md:text-2xl">
+        {title}
+      </h2>
       {/* Slider Images Container */}
       <div className="flex items-center gap-2 relative">
         {/* Slider Left Button */}
@@ -50,7 +52,7 @@ function Slider({ title, contentList, type }: Props) {
             // Slider Card
             <Link
               key={content.id}
-              href={`/${content.id}?type=${type}`}
+              href={`/${type}/${content.id}`}
               className="keen-slider__slide rounded-md"
             >
               <Image
