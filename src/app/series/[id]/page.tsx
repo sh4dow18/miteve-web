@@ -1,5 +1,5 @@
 // Series Content Page Requirements
-import { ContentOverview, Slider } from "@/components";
+import { ContentOverview, Seasons, Slider } from "@/components";
 import {
   FindCastFromSeries,
   FindCertificationFromSeries,
@@ -44,7 +44,7 @@ async function SeriesContentPage({ params }: Props) {
   // Returns Series Content Page
   return EXISTING_MOVIE ? (
     // Series Content Main Container
-    <div className="flex flex-col gap-3 p-10 max-w-4xl min-[897px]:mx-auto">
+    <div className="flex flex-col gap-5 p-10 max-w-4xl min-[897px]:mx-auto">
       <ContentOverview
         title={CONTENT.name}
         image={CONTENT.poster_path}
@@ -61,6 +61,8 @@ async function SeriesContentPage({ params }: Props) {
         }}
         trailer={TRAILER}
       />
+      {/* Display Seasons Component */}
+      <Seasons seriesId={id} />
       {/* Recomendations Slider */}
       <Slider
         title="Recomendaciones"
