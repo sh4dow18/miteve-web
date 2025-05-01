@@ -17,7 +17,9 @@
         "name": "Action & Adventure"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "N/A",
+    "credits": "Eoin Macken, Chiké Okonkwo, más"
   },
   {
     "id": "65930",
@@ -37,7 +39,9 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "originCountry": "JP"
+    "originCountry": "JP",
+    "certification": "+12",
+    "credits": "N/A"
   },
   {
     "id": "31356",
@@ -53,7 +57,9 @@
         "name": "Kids"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "Todo Público",
+    "credits": "Kendall Schmidt, Logan Henderson, más"
   },
   {
     "id": "83095",
@@ -77,7 +83,9 @@
         "name": "Drama"
       }
     ],
-    "originCountry": "JP"
+    "originCountry": "JP",
+    "certification": "N/A",
+    "credits": "石川界人, 瀬戸麻沙美, más"
   },
   {
     "id": "94954",
@@ -97,7 +105,9 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "+18",
+    "credits": "Erika Henningsen, Stephanie Beatriz, más"
   },
   {
     "id": "95479",
@@ -117,7 +127,9 @@
         "name": "Sci-Fi & Fantasy"
       }
     ],
-    "originCountry": "JP"
+    "originCountry": "JP",
+    "certification": "N/A",
+    "credits": "N/A"
   },
   {
     "id": "37585",
@@ -137,7 +149,9 @@
         "name": "Comedia"
       }
     ],
-    "originCountry": "JP"
+    "originCountry": "JP",
+    "certification": "Todo Público",
+    "credits": "関智一, Rinko Kawakami, más"
   },
   {
     "id": "67230",
@@ -157,7 +171,9 @@
         "name": "Comedia"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "Todo Público",
+    "credits": "Sarah Mintz, Carlos Ponce, más"
   },
   {
     "id": "206586",
@@ -173,7 +189,9 @@
         "name": "Drama"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "+18",
+    "credits": "Andrew Lincoln, Danai Gurira, más"
   },
   {
     "id": "44006",
@@ -185,7 +203,9 @@
         "name": "Drama"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "+15",
+    "credits": "Taylor Kinney, David Eigenberg, más"
   },
   {
     "id": "210879",
@@ -201,7 +221,9 @@
         "name": "Action & Adventure"
       }
     ],
-    "originCountry": "JP"
+    "originCountry": "JP",
+    "certification": "N/A",
+    "credits": "斉藤壮馬, 高橋李依, más"
   },
   {
     "id": "1399",
@@ -221,6 +243,8 @@
         "name": "Action & Adventure"
       }
     ],
-    "originCountry": "US"
+    "originCountry": "US",
+    "certification": "+15",
+    "credits": "Peter Dinklage, Kit Harington, más"
   }
 ]

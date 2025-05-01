@@ -1,15 +1,11 @@
 // Content Page Requirements
 import Image from "next/image";
 import { FindMoviesTrailerById, FindTMDBMovieById } from "@/lib/movies";
-import {
-  FindSeasonsAvailable,
-  FindSeriesTrailerById,
-  FindTMDBSeriesById,
-} from "@/lib/series";
+import { FindSeriesTrailerById, FindTMDBSeriesById } from "@/lib/series";
 import { Stars, YoutubeVideo } from "@/components";
 import Link from "next/link";
 import { PlayIcon } from "@heroicons/react/16/solid";
-import { Genre, Season } from "@/lib/types";
+import { Genre } from "@/lib/types";
 import { Metadata } from "next";
 // Content Page Props
 interface Props {
@@ -113,31 +109,7 @@ async function ContentPage({ params, searchParams }: Props) {
             Temporadas
           </h2>
           {/* Content Page Seasons Cards Container */}
-          <div className="grid grid-cols-2 gap-5 mx-auto min-[490px]:grid-cols-3 min-[700px]:grid-cols-4 min-[870px]:grid-cols-5">
-            {FindSeasonsAvailable(id, CONTENT.seasons).map(
-              (season: Season, index: number) => (
-                // Content Page Season Card
-                <div key={index} className="flex flex-col gap-2">
-                  {/* Content Page Season Card Link */}
-                  <Link
-                    className="overflow-hidden"
-                    href={`/${CONTENT.id}/${season.season_number}`}
-                  >
-                    {/* Content Page Season Card Image */}
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w500/${season.poster_path}`}
-                      alt={`${season.name} Cover`}
-                      width={176}
-                      height={200}
-                      className="rounded-sm transition-all ease-in-out hover:scale-110"
-                    />
-                  </Link>
-                  {/* Content Page Season Card Name */}
-                  <span className="font-semibold">{season.name}</span>
-                </div>
-              )
-            )}
-          </div>
+          <div className="grid grid-cols-2 gap-5 mx-auto min-[490px]:grid-cols-3 min-[700px]:grid-cols-4 min-[870px]:grid-cols-5"></div>
         </div>
       ) : (
         // Content Page Movie Container
