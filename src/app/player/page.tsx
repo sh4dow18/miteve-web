@@ -1,8 +1,9 @@
 // Player Page Requirements
 import { Metadata } from "next";
-import Link from "next/link";
 import { promises as fs } from "fs";
 import path from "path";
+import { Player } from "@/components";
+import Link from "next/link";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   description: "Aqui se puede reproducir el contenido deseado",
 };
 // Player Page Main Function
-async function Player({ searchParams }: Props) {
+async function PlayerPage({ searchParams }: Props) {
   // Player Page Main Params
   const TYPE = (await searchParams).type;
   const ID = (await searchParams).id;
@@ -40,8 +41,7 @@ async function Player({ searchParams }: Props) {
       try {
         await fs.access(PATH_WITH_FILE);
         return true;
-      } catch (e) {
-        console.log(e);
+      } catch {
         return false;
       }
     }
@@ -71,20 +71,13 @@ async function Player({ searchParams }: Props) {
   };
   // Return Player Page
   return (await ValidFile()) ? (
-    // Player Page Main Container
-    <div className="flex-1 relative">
-      {/* Content Video */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover cursor-pointer"
-        src={`/videos/${TYPE}/${ID}${
-          TYPE === "movies"
-            ? `.webm`
-            : `/Temporada ${SEASON}/Episodio ${EPISODE}.webm`
-        }`}
-        controls
-        autoPlay
-      />
-    </div>
+    <Player
+      content={`/videos/${TYPE}/${ID}${
+        TYPE === "movies"
+          ? `.webm`
+          : `/Temporada ${SEASON}/Episodio ${EPISODE}.webm`
+      }`}
+    />
   ) : (
     // Not Found Container
     <div className="text-center px-10">
@@ -112,4 +105,4 @@ async function Player({ searchParams }: Props) {
   );
 }
 
-export default Player;
+export default PlayerPage;
