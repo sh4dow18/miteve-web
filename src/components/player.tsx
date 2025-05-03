@@ -2,6 +2,7 @@
 "use client";
 // Player Requirements
 import {
+  ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   BackwardIcon,
   ForwardIcon,
@@ -22,9 +23,11 @@ function Player({ content }: Props) {
     "w-12 h-12 fill-gray-300 transition-all cursor-pointer hover:scale-125 hover:fill-white";
   // Player Main Hooks
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [videoStates, SetVideoStates] = useState({
     paused: true,
     muted: false,
+    fullscreen: false,
   });
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
@@ -59,10 +62,30 @@ function Player({ content }: Props) {
       muted: NEW_STATE,
     });
   };
+  // Functions that allows to set fullscreen the video and controllers
+  const Fullscreen = () => {
+    const CONTAINER = containerRef.current;
+    if (CONTAINER === null) {
+      return;
+    }
+    if (!document.fullscreenElement) {
+      CONTAINER.requestFullscreen();
+      SetVideoStates({
+        ...videoStates,
+        fullscreen: true,
+      });
+      return;
+    }
+    document.exitFullscreen();
+    SetVideoStates({
+      ...videoStates,
+      fullscreen: false,
+    });
+  };
   // Returns Player Component
   return (
     // Player Page Main Container
-    <div className="h-full w-full relative">
+    <div ref={containerRef} className="h-full w-full relative">
       {/* Content Video */}
       <video
         ref={videoRef}
@@ -102,7 +125,16 @@ function Player({ content }: Props) {
           <div className="flex gap-7">
             <BackwardIcon className={ICONS_STYLE} />
             <ForwardIcon className={ICONS_STYLE} />
-            <ArrowsPointingOutIcon className={ICONS_STYLE} />
+            <ArrowsPointingOutIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={Fullscreen}
+              aria-disabled={videoStates.fullscreen}
+            />
+            <ArrowsPointingInIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={Fullscreen}
+              aria-disabled={!videoStates.fullscreen}
+            />
           </div>
         </div>
       </div>
