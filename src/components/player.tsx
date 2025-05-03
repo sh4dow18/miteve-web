@@ -16,6 +16,7 @@ import { useRef, useState } from "react";
 // Player Props
 interface Props {
   id: string;
+  name: string;
   series?: {
     season: string;
     episode: string;
@@ -23,7 +24,7 @@ interface Props {
   };
 }
 // Player Main Function
-function Player({ id, series }: Props) {
+function Player({ id, name, series }: Props) {
   // Player Main Constants
   const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
@@ -102,13 +103,12 @@ function Player({ id, series }: Props) {
             ? `.webm`
             : `/Temporada ${series?.season}/Episodio ${series?.episode}.webm`
         }`}
-        autoPlay
         playsInline
       />
       {/* Player Controlers Container */}
       <div className="absolute bottom-0 w-full">
         {/* Player Controlers Second Container */}
-        <div className="flex place-content-between py-4 px-5 bg-black">
+        <div className="flex place-content-between items-center py-4 px-5 bg-black">
           {/* Player First Controlers Container */}
           <div className="flex gap-7">
             <PauseIcon
@@ -132,6 +132,8 @@ function Player({ id, series }: Props) {
               aria-disabled={!videoStates.muted}
             />
           </div>
+          {/* Player Content Title */}
+          <h1 className="text-xl text-gray-300">{name}</h1>
           {/* Player Second Controlers Container */}
           <div className="flex gap-7">
             <Link href="#">

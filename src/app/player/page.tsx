@@ -4,6 +4,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import { Player } from "@/components";
 import Link from "next/link";
+import { FindMoviesByProp } from "@/lib/movies";
+import { FindSeriesByProp } from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -103,6 +105,11 @@ async function PlayerPage({ searchParams }: Props) {
   return (await ValidFile()) ? (
     <Player
       id={`${ID}`}
+      name={
+        TYPE === "movies"
+          ? FindMoviesByProp("id", `${ID}`)[0].title
+          : `${FindSeriesByProp("id", `${ID}`)[0].title}: T${SEASON} E${EPISODE}`
+      }
       series={
         TYPE === "series"
           ? {
