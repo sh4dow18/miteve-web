@@ -12,7 +12,7 @@ import {
   SpeakerXMarkIcon,
 } from "@heroicons/react/16/solid";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // Player Props
 interface Props {
   id: string;
@@ -37,6 +37,33 @@ function Player({ id, name, series }: Props) {
     muted: false,
     fullscreen: false,
   });
+  // Execute this use effect when the page is loading to know if can autoplay or not
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    const TryAutoplay = () => {
+      const PLAY = VIDEO.play();
+      if (PLAY !== undefined) {
+        PLAY.then(() =>
+          SetVideoStates({
+            ...videoStates,
+            paused: false,
+          })
+        ).catch(() =>
+          SetVideoStates({
+            ...videoStates,
+            paused: true,
+          })
+        );
+      }
+    };
+    VIDEO.addEventListener("canplay", TryAutoplay);
+    return () => {
+      VIDEO.removeEventListener("canplay", TryAutoplay);
+    };
+  }, []);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -103,6 +130,7 @@ function Player({ id, name, series }: Props) {
             ? `.webm`
             : `/Temporada ${series?.season}/Episodio ${series?.episode}.webm`
         }`}
+        autoPlay
         playsInline
       />
       {/* Player Controlers Container */}
