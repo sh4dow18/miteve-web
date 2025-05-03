@@ -19,6 +19,38 @@ async function PlayerPage({ searchParams }: Props) {
   const ID = (await searchParams).id;
   const SEASON = (await searchParams).season;
   const EPISODE = (await searchParams).episode;
+  // Function that Check if the File Exists in Project
+  async function FileExists(
+    plusEpisode?: number,
+    plusSeason?: number
+  ): Promise<boolean> {
+    if (typeof SEASON !== "string") {
+      return false;
+    }
+    if (typeof EPISODE !== "string") {
+      return false;
+    }
+    const SEASON_NUMBER = plusSeason
+      ? Number.parseInt(SEASON) + plusSeason
+      : SEASON;
+    const EPISODE_NUMBER = plusSeason
+      ? 1
+      : plusEpisode
+      ? Number.parseInt(EPISODE) + plusEpisode
+      : EPISODE;
+    const FILE = `/videos/${TYPE}/${ID}${
+      TYPE === "movies"
+        ? `.webm`
+        : `/Temporada ${SEASON_NUMBER}/Episodio ${EPISODE_NUMBER}.webm`
+    }`;
+    const PATH_WITH_FILE = path.join(process.cwd(), "public", FILE);
+    try {
+      await fs.access(PATH_WITH_FILE);
+      return true;
+    } catch {
+      return false;
+    }
+  }
   // Functions that Check if the params sent are a valid file
   const ValidFile = async (): Promise<boolean> => {
     // Function that Check if the Param Sent is a Valid Code Number
@@ -30,21 +62,6 @@ async function PlayerPage({ searchParams }: Props) {
       }
       return /^[0-9]+$/.test(param);
     };
-    // Function that Check if the File Exists in Project
-    async function FileExists(): Promise<boolean> {
-      const FILE = `/videos/${TYPE}/${ID}${
-        TYPE === "movies"
-          ? `.webm`
-          : `/Temporada ${SEASON}/Episodio ${EPISODE}.webm`
-      }`;
-      const PATH_WITH_FILE = path.join(process.cwd(), "public", FILE);
-      try {
-        await fs.access(PATH_WITH_FILE);
-        return true;
-      } catch {
-        return false;
-      }
-    }
     // Check if Type Exists and it is Movies or Series
     if (TYPE === undefined || !(TYPE === "movies" || TYPE === "series")) {
       return false;
@@ -62,6 +79,7 @@ async function PlayerPage({ searchParams }: Props) {
     ) {
       return false;
     }
+
     // If file does not exists, return false
     if ((await FileExists()) === false) {
       return false;
@@ -69,14 +87,34 @@ async function PlayerPage({ searchParams }: Props) {
     // If everything is ok, returns true
     return true;
   };
+  // Function that check if exists a Next Episode File
+  const NextEpisodeFile = async () => {
+    if (typeof SEASON !== "string") {
+      return 0;
+    }
+    if (typeof EPISODE !== "string") {
+      return 0;
+    }
+    if ((await FileExists(1, 0)) === true) {
+      return Number.parseInt(EPISODE) + 1;
+    } else if ((await FileExists(undefined, 1)) === true) {
+      return 1;
+    }
+    return 0;
+  };
   // Return Player Page
   return (await ValidFile()) ? (
     <Player
-      content={`/videos/${TYPE}/${ID}${
-        TYPE === "movies"
-          ? `.webm`
-          : `/Temporada ${SEASON}/Episodio ${EPISODE}.webm`
-      }`}
+      id={`${ID}`}
+      series={
+        TYPE === "series"
+          ? {
+              season: `${SEASON}`,
+              episode: `${EPISODE}`,
+              nextEpisode: await NextEpisodeFile(),
+            }
+          : undefined
+      }
     />
   ) : (
     // Not Found Container

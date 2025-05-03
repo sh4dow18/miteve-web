@@ -11,14 +11,21 @@ import {
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
 } from "@heroicons/react/16/solid";
+import Link from "next/link";
 import { useRef, useState } from "react";
 // Player Props
 interface Props {
-  content: string;
+  id: string;
+  series?: {
+    season: string;
+    episode: string;
+    nextEpisode: number;
+  };
 }
 // Player Main Function
-function Player({ content }: Props) {
+function Player({ id, series }: Props) {
   // Player Main Constants
+  const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
     "w-12 h-12 fill-gray-300 transition-all cursor-pointer hover:scale-125 hover:fill-white";
   // Player Main Hooks
@@ -90,7 +97,11 @@ function Player({ content }: Props) {
       <video
         ref={videoRef}
         className="h-full w-full -z-10"
-        src={content}
+        src={`/videos/${TYPE}/${id}${
+          TYPE === "movies"
+            ? `.webm`
+            : `/Temporada ${series?.season}/Episodio ${series?.episode}.webm`
+        }`}
         autoPlay
         playsInline
       />
@@ -123,8 +134,24 @@ function Player({ content }: Props) {
           </div>
           {/* Player Second Controlers Container */}
           <div className="flex gap-7">
-            <BackwardIcon className={ICONS_STYLE} />
-            <ForwardIcon className={ICONS_STYLE} />
+            <Link href="#">
+              <BackwardIcon
+                className={`${ICONS_STYLE} aria-disabled:hidden`}
+                aria-disabled={true}
+              />
+            </Link>
+            <Link
+              href={`player?type=series&id=${id}&season=${
+                series?.nextEpisode === 1 && series.season
+                  ? Number.parseInt(series.season) + 1
+                  : series?.season
+              }&episode=${series?.nextEpisode}`}
+            >
+              <ForwardIcon
+                className={`${ICONS_STYLE} aria-disabled:hidden`}
+                aria-disabled={!series?.nextEpisode}
+              />
+            </Link>
             <ArrowsPointingOutIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={Fullscreen}
