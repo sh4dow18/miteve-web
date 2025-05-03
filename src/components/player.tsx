@@ -36,6 +36,7 @@ function Player({ id, name, series }: Props) {
     paused: true,
     muted: false,
     fullscreen: false,
+    controlersHidden: false,
   });
   // Execute this use effect when the page is loading to know if can autoplay or not
   useEffect(() => {
@@ -64,6 +65,24 @@ function Player({ id, name, series }: Props) {
       VIDEO.removeEventListener("canplay", TryAutoplay);
     };
   }, []);
+  // Execute this use effect when the video is paused to hide or display the controllers
+  useEffect(() => {
+    if (videoStates.paused === false) {
+      const timer = setTimeout(() => {
+        SetVideoStates({
+          ...videoStates,
+          controlersHidden: true,
+        });
+      }, 5000); // 5 segundos
+
+      return () => clearTimeout(timer);
+    } else {
+      SetVideoStates({
+        ...videoStates,
+        controlersHidden: false,
+      });
+    }
+  }, [videoStates.paused === false]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -124,7 +143,7 @@ function Player({ id, name, series }: Props) {
       {/* Content Video */}
       <video
         ref={videoRef}
-        className="h-full w-full -z-10"
+        className="h-full w-full -z-10 cursor-pointer"
         src={`/videos/${TYPE}/${id}${
           TYPE === "movies"
             ? `.webm`
@@ -132,9 +151,13 @@ function Player({ id, name, series }: Props) {
         }`}
         autoPlay
         playsInline
+        onClick={PlayAndPause}
       />
       {/* Player Controlers Container */}
-      <div className="absolute bottom-0 w-full">
+      <div
+        className="absolute bottom-0 w-full transition-all duration-700 aria-hidden:opacity-0"
+        aria-hidden={videoStates.controlersHidden}
+      >
         {/* Player Controlers Second Container */}
         <div className="flex place-content-between items-center py-4 px-5 bg-black">
           {/* Player First Controlers Container */}
