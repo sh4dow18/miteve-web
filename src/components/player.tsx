@@ -8,6 +8,7 @@ import {
   PauseIcon,
   PlayIcon,
   SpeakerWaveIcon,
+  SpeakerXMarkIcon,
 } from "@heroicons/react/16/solid";
 import { useRef, useState } from "react";
 // Player Props
@@ -21,7 +22,10 @@ function Player({ content }: Props) {
     "w-12 h-12 fill-gray-300 transition-all cursor-pointer hover:scale-125 hover:fill-white";
   // Player Main Hooks
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [videoPaused, SetVideoPaused] = useState(true);
+  const [videoStates, SetVideoStates] = useState({
+    paused: true,
+    muted: false,
+  });
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -30,11 +34,30 @@ function Player({ content }: Props) {
     }
     if (VIDEO.paused) {
       VIDEO.play();
-      SetVideoPaused(false);
+      SetVideoStates({
+        ...videoStates,
+        paused: false,
+      });
       return;
     }
     VIDEO.pause();
-    SetVideoPaused(true);
+    SetVideoStates({
+      ...videoStates,
+      paused: true,
+    });
+  };
+  // Functions that allows to mute and unmute the video
+  const VolumeAndMute = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    const NEW_STATE = !VIDEO.muted;
+    VIDEO.muted = NEW_STATE;
+    SetVideoStates({
+      ...videoStates,
+      muted: NEW_STATE,
+    });
   };
   // Returns Player Component
   return (
@@ -57,14 +80,23 @@ function Player({ content }: Props) {
             <PauseIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
-              aria-disabled={videoPaused}
+              aria-disabled={videoStates.paused}
             />
             <PlayIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
-              aria-disabled={!videoPaused}
+              aria-disabled={!videoStates.paused}
             />
-            <SpeakerWaveIcon className={ICONS_STYLE} />
+            <SpeakerWaveIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={VolumeAndMute}
+              aria-disabled={videoStates.muted}
+            />
+            <SpeakerXMarkIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={VolumeAndMute}
+              aria-disabled={!videoStates.muted}
+            />
           </div>
           {/* Player Second Controlers Container */}
           <div className="flex gap-7">
