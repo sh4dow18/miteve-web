@@ -24,19 +24,17 @@ async function PlayerPage({ searchParams }: Props) {
     plusEpisode?: number,
     plusSeason?: number
   ): Promise<boolean> {
-    if (typeof SEASON !== "string") {
-      return false;
-    }
-    if (typeof EPISODE !== "string") {
-      return false;
-    }
     const SEASON_NUMBER = plusSeason
-      ? Number.parseInt(SEASON) + plusSeason
+      ? typeof SEASON === "string"
+        ? Number.parseInt(SEASON) + plusSeason
+        : SEASON
       : SEASON;
     const EPISODE_NUMBER = plusSeason
       ? 1
       : plusEpisode
-      ? Number.parseInt(EPISODE) + plusEpisode
+      ? typeof EPISODE === "string"
+        ? Number.parseInt(EPISODE) + plusEpisode
+        : EPISODE
       : EPISODE;
     const FILE = `/videos/${TYPE}/${ID}${
       TYPE === "movies"
@@ -79,7 +77,6 @@ async function PlayerPage({ searchParams }: Props) {
     ) {
       return false;
     }
-
     // If file does not exists, return false
     if ((await FileExists()) === false) {
       return false;
