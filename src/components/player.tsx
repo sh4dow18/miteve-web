@@ -31,7 +31,7 @@ function Player({ id, name, description, series }: Props) {
   // Player Main Constants
   const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
-    "w-12 h-12 fill-gray-300 transition-all cursor-pointer hover:scale-125 hover:fill-white";
+    "w-5 h-5 fill-gray-300 transition-all cursor-pointer hover:scale-125 hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12";
   // Player Main Hooks
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -78,7 +78,7 @@ function Player({ id, name, description, series }: Props) {
           ...videoStates,
           controlersHidden: true,
         });
-      }, 5000); // 5 segundos
+      }, 5000);
       return () => clearTimeout(timer);
     } else {
       SetVideoStates({
@@ -217,13 +217,17 @@ function Player({ id, name, description, series }: Props) {
         aria-hidden={!videoStates.paused}
       >
         {/* Player Content Information Container */}
-        <div className="absolute top-[45%] left-14">
+        <div className="absolute top-[45%] left-10 pr-10">
           {/* Player Content Second Information Container */}
           <div className="flex flex-col gap-3">
             {/* Player Content Name */}
-            <span className="text-5xl font-bold text-gray-200">{name}</span>
+            <span className="text-lg font-bold text-gray-200 min-[475px]:text-2xl min-[730px]:text-3xl min-[1000px]:text-5xl">
+              {name}
+            </span>
             {/* Player Content Description */}
-            <p className="leading-7 text-gray-300 text-lg">{description}</p>
+            <p className="line-clamp-2 leading-7 text-gray-300 max-[475px]:text-xs min-[475px]:line-clamp-2 min-[730px]:text-sm min-[1000px]:text-lg">
+              {description}
+            </p>
           </div>
         </div>
       </div>
@@ -269,15 +273,18 @@ function Player({ id, name, description, series }: Props) {
             className="w-full rounded-sm appearance-none bg-gray-400 accent-primary cursor-pointer hover:bg-gray-200"
           />
           {/* Player Time Container */}
-          <div className="text-sm px-3 pt-1 w-44 select-none">
-            {videoStates.currentTime} /{" "}
-            {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+          <div className="flex gap-1 w-20 text-xs px-3 pt-1 select-none min-[581px]:w-48 min-[1027px]:text-sm">
+            <span>{videoStates.currentTime}</span>
+            <span className="hidden min-[581px]:block">
+              {" / "}
+              {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+            </span>
           </div>
         </div>
         {/* Player Controlers Second Container */}
         <div className="flex place-content-between items-center py-4 px-5">
           {/* Player First Controlers Container */}
-          <div className="flex gap-7">
+          <div className="flex gap-4 min-[355px]:gap-7">
             <PauseIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
@@ -293,16 +300,20 @@ function Player({ id, name, description, series }: Props) {
               className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
               onClick={() => AddTime(-10)}
             >
-              <ArrowUturnLeftIcon className="w-12 h-12 fill-gray-300 group-hover:fill-white" />
-              <span className="text-xl font-semibold">-10</span>
+              <ArrowUturnLeftIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
+              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
+                -10
+              </span>
             </div>
             {/* Plus Ten Seconds Button */}
             <div
               className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
               onClick={() => AddTime(10)}
             >
-              <ArrowUturnRightIcon className="w-12 h-12 fill-gray-300 group-hover:fill-white" />
-              <span className="text-xl font-semibold">+10</span>
+              <ArrowUturnRightIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
+              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
+                +10
+              </span>
             </div>
             {/* Volume Buttons */}
             <SpeakerWaveIcon
@@ -317,7 +328,9 @@ function Player({ id, name, description, series }: Props) {
             />
           </div>
           {/* Player Content Title */}
-          <h1 className="text-xl text-gray-300">{name}</h1>
+          <h1 className="hidden text-gray-300 min-[615px]:block min-[865px]:text-xl">
+            {name}
+          </h1>
           {/* Player Second Controlers Container */}
           <div className="flex gap-4">
             {/* Back to Content Button */}
