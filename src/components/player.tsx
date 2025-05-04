@@ -49,26 +49,21 @@ function Player({ id, name, description, series }: Props) {
     if (VIDEO === null) {
       return;
     }
-    const TryAutoplay = () => {
-      const PLAY = VIDEO.play();
-      if (PLAY !== undefined) {
-        PLAY.then(() =>
-          SetVideoStates({
-            ...videoStates,
-            paused: false,
-          })
-        ).catch(() =>
-          SetVideoStates({
-            ...videoStates,
-            paused: true,
-          })
-        );
-      }
-    };
-    VIDEO.addEventListener("canplay", TryAutoplay);
-    return () => {
-      VIDEO.removeEventListener("canplay", TryAutoplay);
-    };
+    const PLAY = VIDEO.play();
+    if (PLAY === undefined) {
+      return;
+    }
+    PLAY.then(() =>
+      SetVideoStates({
+        ...videoStates,
+        paused: false,
+      })
+    ).catch(() =>
+      SetVideoStates({
+        ...videoStates,
+        paused: true,
+      })
+    );
   }, []);
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
