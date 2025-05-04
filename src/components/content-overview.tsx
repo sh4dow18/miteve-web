@@ -7,6 +7,13 @@ import { PlayIcon } from "@heroicons/react/16/solid";
 import YoutubeVideo from "./youtube-video";
 // Content Overview Props
 interface Props {
+  player: {
+    id: string;
+    series?: {
+      season: string;
+      episode: string;
+    };
+  };
   title: string;
   image: string;
   background: string;
@@ -24,6 +31,7 @@ interface Props {
 }
 // Content Overview Main Container
 function ContentOverview({
+  player,
   title,
   image,
   background,
@@ -65,7 +73,13 @@ function ContentOverview({
           <div className="mt-auto">
             {/* Content Overview Play Button */}
             <Link
-              href="#"
+              href={`/player?type=${
+                player.series === undefined ? "movies" : "series"
+              }&id=${player.id}${
+                player.series !== undefined
+                  ? `&season=${player.series.season}&episode=${player.series.episode}`
+                  : ""
+              }`}
               className="flex items-center justify-center bg-gray-300 text-xl py-2 px-5 rounded-sm text-gray-900 font-semibold hover:bg-gray-100"
             >
               <PlayIcon className="w-7 h-7 mr-1" />
