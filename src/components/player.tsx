@@ -20,6 +20,7 @@ import { useEffect, useRef, useState } from "react";
 interface Props {
   id: string;
   name: string;
+  description: string;
   series?: {
     season: string;
     episode: string;
@@ -27,7 +28,7 @@ interface Props {
   };
 }
 // Player Main Function
-function Player({ id, name, series }: Props) {
+function Player({ id, name, description, series }: Props) {
   // Player Main Constants
   const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
@@ -154,6 +155,22 @@ function Player({ id, name, series }: Props) {
   return (
     // Player Page Main Container
     <div ref={containerRef} className="h-full w-full relative">
+      {/* Player Content Information Background Container */}
+      <div
+        className="absolute top-0 h-full w-full bg-black/60 aria-hidden:hidden"
+        aria-hidden={!videoStates.paused}
+      >
+        {/* Player Content Information Container */}
+        <div className="absolute top-[45%] left-14">
+          {/* Player Content Second Information Container */}
+          <div className="flex flex-col gap-3">
+            {/* Player Content Name */}
+            <span className="text-5xl font-bold text-gray-200">{name}</span>
+            {/* Player Content Description */}
+            <p className="leading-7 text-gray-300 text-lg">{description}</p>
+          </div>
+        </div>
+      </div>
       {/* Content Video */}
       <video
         ref={videoRef}

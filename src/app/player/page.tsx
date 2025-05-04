@@ -4,8 +4,12 @@ import { promises as fs } from "fs";
 import path from "path";
 import { Player } from "@/components";
 import Link from "next/link";
-import { FindMoviesByProp } from "@/lib/movies";
-import { FindSeriesByProp } from "@/lib/series";
+import { FindMoviesByProp, FindTMDBMovieById } from "@/lib/movies";
+import {
+  FindSeriesByProp,
+  FindTMDBSeasonById,
+  FindTMDBSeriesById,
+} from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -108,7 +112,15 @@ async function PlayerPage({ searchParams }: Props) {
       name={
         TYPE === "movies"
           ? FindMoviesByProp("id", `${ID}`)[0].title
-          : `${FindSeriesByProp("id", `${ID}`)[0].title}: T${SEASON} E${EPISODE}`
+          : `${
+              FindSeriesByProp("id", `${ID}`)[0].title
+            }: T${SEASON} E${EPISODE}`
+      }
+      description={
+        TYPE === "movies"
+          ? (await FindTMDBMovieById(`${ID}`)).overview
+          : (await FindTMDBSeasonById(`${ID}`, `${SEASON}`)).episodes[0]
+              .overview
       }
       series={
         TYPE === "series"
