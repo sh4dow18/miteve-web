@@ -7,7 +7,6 @@ import {
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
-  BackwardIcon,
   ForwardIcon,
   PauseIcon,
   PlayIcon,
@@ -42,6 +41,7 @@ function Player({ id, name, description, series }: Props) {
     fullscreen: false,
     controlersHidden: false,
     currentTime: "00:00:00",
+    progress: 0,
   });
   // Execute this use effect when the page is loading to know if can autoplay or not
   useEffect(() => {
@@ -192,6 +192,21 @@ function Player({ id, name, description, series }: Props) {
       "0"
     )}:${String(SECONDS).padStart(2, "0")}`;
   };
+  // function that allows to handle the progress bar
+  const ChangeTimeInProgressBar = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null || !VIDEO.duration) {
+      return;
+    }
+    const NEW_TIME = (parseFloat(event.target.value) / 100) * VIDEO.duration;
+    VIDEO.currentTime = NEW_TIME;
+    SetVideoStates({
+      ...videoStates,
+      currentTime: FormatTime(NEW_TIME),
+    });
+  };
   // Returns Player Component
   return (
     // Player Page Main Container
@@ -230,6 +245,9 @@ function Player({ id, name, description, series }: Props) {
             currentTime: FormatTime(
               videoRef.current ? videoRef.current?.currentTime : 0
             ),
+            progress: videoRef.current
+              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
+              : 0,
           });
         }}
       />
@@ -238,10 +256,23 @@ function Player({ id, name, description, series }: Props) {
         className="absolute bottom-0 w-full bg-black aria-hidden:hidden"
         aria-hidden={videoStates.controlersHidden}
       >
-        {/* Player Time Container */}
-        <div className="text-sm pt-3 px-3">
-          {videoStates.currentTime} /{" "}
-          {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+        {/* Player Progress Container */}
+        <div className="flex items-center gap-3">
+          {/* Progress Bar */}
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            value={videoStates.progress}
+            onChange={ChangeTimeInProgressBar}
+            className="w-full rounded-sm appearance-none bg-gray-400 accent-primary cursor-pointer hover:bg-gray-200"
+          />
+          {/* Player Time Container */}
+          <div className="text-sm px-3 pt-1 w-44 select-none">
+            {videoStates.currentTime} /{" "}
+            {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+          </div>
         </div>
         {/* Player Controlers Second Container */}
         <div className="flex place-content-between items-center py-4 px-5">
