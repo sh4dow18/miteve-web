@@ -4,6 +4,8 @@
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
   BackwardIcon,
   ForwardIcon,
   PauseIcon,
@@ -136,6 +138,17 @@ function Player({ id, name, series }: Props) {
       fullscreen: false,
     });
   };
+  // Function that allows to Add Time to the Video
+  const AddTime = (seconds: number) => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    VIDEO.currentTime = Math.min(
+      Math.max(0, VIDEO.currentTime + seconds),
+      VIDEO.duration
+    );
+  };
   // Returns Player Component
   return (
     // Player Page Main Container
@@ -172,6 +185,22 @@ function Player({ id, name, series }: Props) {
               onClick={PlayAndPause}
               aria-disabled={!videoStates.paused}
             />
+            {/* Less Ten Seconds Button */}
+            <div
+              className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
+              onClick={() => AddTime(-10)}
+            >
+              <ArrowUturnLeftIcon className="w-12 h-12 fill-gray-300 group-hover:fill-white" />
+              <span className="text-xl font-semibold">-10</span>
+            </div>
+            {/* Plus Ten Seconds Button */}
+            <div
+              className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
+              onClick={() => AddTime(10)}
+            >
+              <ArrowUturnRightIcon className="w-12 h-12 fill-gray-300 group-hover:fill-white" />
+              <span className="text-xl font-semibold">+10</span>
+            </div>
             <SpeakerWaveIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={VolumeAndMute}
