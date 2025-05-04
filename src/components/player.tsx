@@ -168,7 +168,7 @@ function Player({ id, name, series }: Props) {
       />
       {/* Player Controlers Container */}
       <div
-        className="absolute bottom-0 w-full transition-all duration-700 aria-hidden:opacity-0"
+        className="absolute bottom-0 w-full aria-hidden:hidden"
         aria-hidden={videoStates.controlersHidden}
       >
         {/* Player Controlers Second Container */}
