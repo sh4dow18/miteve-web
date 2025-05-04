@@ -41,6 +41,7 @@ function Player({ id, name, description, series }: Props) {
     muted: false,
     fullscreen: false,
     controlersHidden: false,
+    currentTime: "00:00:00",
   });
   // Execute this use effect when the page is loading to know if can autoplay or not
   useEffect(() => {
@@ -78,7 +79,6 @@ function Player({ id, name, description, series }: Props) {
           controlersHidden: true,
         });
       }, 5000); // 5 segundos
-
       return () => clearTimeout(timer);
     } else {
       SetVideoStates({
@@ -86,6 +86,36 @@ function Player({ id, name, description, series }: Props) {
         controlersHidden: false,
       });
     }
+  }, [videoStates.paused === false]);
+  // Execute this use effect to hide or display the controllers
+  useEffect(() => {
+    const CONTAINER = containerRef.current;
+    if (CONTAINER === null) {
+      return;
+    }
+    let timeout: NodeJS.Timeout;
+    const MouseMove = () => {
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
+        controlersHidden: false,
+      }));
+      clearTimeout(timeout);
+      if (videoStates.paused === false) {
+        timeout = setTimeout(
+          () =>
+            SetVideoStates((prevVideoStates) => ({
+              ...prevVideoStates,
+              controlersHidden: true,
+            })),
+          5000
+        );
+      }
+    };
+    CONTAINER.addEventListener("mousemove", MouseMove);
+    return () => {
+      CONTAINER.removeEventListener("mousemove", MouseMove);
+      clearTimeout(timeout);
+    };
   }, [videoStates.paused === false]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
@@ -105,6 +135,7 @@ function Player({ id, name, description, series }: Props) {
     SetVideoStates({
       ...videoStates,
       paused: true,
+      controlersHidden: false,
     });
   };
   // Functions that allows to mute and unmute the video
@@ -151,6 +182,16 @@ function Player({ id, name, description, series }: Props) {
       VIDEO.duration
     );
   };
+  // Function that allows to Format Current and Duration Times from Video
+  const FormatTime = (time: number): string => {
+    const HOURS = Math.floor(time / 3600);
+    const MINUTES = Math.floor((time % 3600) / 60);
+    const SECONDS = Math.floor(time % 60);
+    return `${String(HOURS).padStart(2, "0")}:${String(MINUTES).padStart(
+      2,
+      "0"
+    )}:${String(SECONDS).padStart(2, "0")}`;
+  };
   // Returns Player Component
   return (
     // Player Page Main Container
@@ -183,14 +224,27 @@ function Player({ id, name, description, series }: Props) {
         autoPlay
         playsInline
         onClick={PlayAndPause}
+        onTimeUpdate={() => {
+          SetVideoStates({
+            ...videoStates,
+            currentTime: FormatTime(
+              videoRef.current ? videoRef.current?.currentTime : 0
+            ),
+          });
+        }}
       />
       {/* Player Controlers Container */}
       <div
-        className="absolute bottom-0 w-full aria-hidden:hidden"
+        className="absolute bottom-0 w-full bg-black aria-hidden:hidden"
         aria-hidden={videoStates.controlersHidden}
       >
+        {/* Player Time Container */}
+        <div className="text-sm pt-3 px-3">
+          {videoStates.currentTime} /{" "}
+          {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+        </div>
         {/* Player Controlers Second Container */}
-        <div className="flex place-content-between items-center py-4 px-5 bg-black">
+        <div className="flex place-content-between items-center py-4 px-5">
           {/* Player First Controlers Container */}
           <div className="flex gap-7">
             <PauseIcon
