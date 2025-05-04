@@ -45,6 +45,9 @@ async function MovieContentPage({ params }: Props) {
   return EXISTING_MOVIE ? ( // Movie Content Main Container
     <div className="flex flex-col gap-3 p-10 max-w-4xl min-[897px]:mx-auto">
       <ContentOverview
+        player={{
+          id: id,
+        }}
         title={CONTENT.title}
         image={CONTENT.poster_path}
         background={CONTENT.backdrop_path}

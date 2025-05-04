@@ -2,6 +2,7 @@
 "use client";
 // Player Requirements
 import {
+  ArrowLeftStartOnRectangleIcon,
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
@@ -201,6 +202,7 @@ function Player({ id, name, series }: Props) {
               <ArrowUturnRightIcon className="w-12 h-12 fill-gray-300 group-hover:fill-white" />
               <span className="text-xl font-semibold">+10</span>
             </div>
+            {/* Volume Buttons */}
             <SpeakerWaveIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={VolumeAndMute}
@@ -215,13 +217,12 @@ function Player({ id, name, series }: Props) {
           {/* Player Content Title */}
           <h1 className="text-xl text-gray-300">{name}</h1>
           {/* Player Second Controlers Container */}
-          <div className="flex gap-7">
-            <Link href="#">
-              <BackwardIcon
-                className={`${ICONS_STYLE} aria-disabled:hidden`}
-                aria-disabled={true}
-              />
+          <div className="flex gap-4">
+            {/* Back to Content Button */}
+            <Link href={`/${TYPE}/${id}`}>
+              <ArrowLeftStartOnRectangleIcon className={ICONS_STYLE} />
             </Link>
+            {/* Next Episode Button */}
             <Link
               href={`player?type=series&id=${id}&season=${
                 series?.nextEpisode === 1 && series.season
@@ -234,6 +235,7 @@ function Player({ id, name, series }: Props) {
                 aria-disabled={!series?.nextEpisode}
               />
             </Link>
+            {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={Fullscreen}

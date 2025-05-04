@@ -35,17 +35,30 @@ async function SeriesContentPage({ params }: Props) {
   // Series Content Page Constants
   const { id } = await params;
   // Series Content Page Constants
-  const EXISTING_MOVIE = FindSeriesById(id);
+  const EXISTING_SERIES = FindSeriesById(id);
   const CONTENT = await FindTMDBSeriesById(id);
   const CERTIFICATION = await FindCertificationFromSeries(id);
   const CREDITS = await FindCastFromSeries(id);
   const TRAILER = FindSeriesTrailerById(id);
   const RECOMENDATIONS = FindRecomendationsBySeries(id);
   // Returns Series Content Page
-  return EXISTING_MOVIE ? (
+  return EXISTING_SERIES ? (
     // Series Content Main Container
     <div className="flex flex-col gap-5 p-10 max-w-4xl min-[897px]:mx-auto">
       <ContentOverview
+        player={{
+          id: id,
+          series: {
+            season: `${EXISTING_SERIES.seasons[0]}`,
+            episode: `${
+              EXISTING_SERIES.uncompleteSeasons &&
+              EXISTING_SERIES.uncompleteSeasons[0].number ===
+                EXISTING_SERIES.seasons[0]
+                ? EXISTING_SERIES.uncompleteSeasons[0].from + 1
+                : 1
+            }`,
+          },
+        }}
         title={CONTENT.name}
         image={CONTENT.poster_path}
         background={CONTENT.backdrop_path}
