@@ -8,7 +8,6 @@ import { FindMoviesByProp, FindTMDBMovieById } from "@/lib/movies";
 import {
   FindSeriesByProp,
   FindTMDBSeasonById,
-  FindTMDBSeriesById,
 } from "@/lib/series";
 // Player Page Props
 interface Props {

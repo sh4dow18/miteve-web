@@ -64,6 +64,7 @@ function Player({ id, name, description, series }: Props) {
         paused: true,
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
@@ -81,6 +82,7 @@ function Player({ id, name, description, series }: Props) {
         controlersHidden: false,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoStates.paused === false]);
   // Execute this use effect to hide or display the controllers
   useEffect(() => {
@@ -111,6 +113,7 @@ function Player({ id, name, description, series }: Props) {
       CONTAINER.removeEventListener("mousemove", MouseMove);
       clearTimeout(timeout);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoStates.paused === false]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
