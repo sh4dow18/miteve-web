@@ -68,7 +68,11 @@ function Slider({ title, contentList, type, lessSlides }: Props) {
                 alt={`${content.title} Cover`}
                 width={300}
                 height={450}
-                className="rounded-md w-44 h-28 mx-auto transition-all ease-in-out hover:scale-110 min-[376px]:h-32 min-[481px]:h-36 min-[621px]:h-40 min-[920px]:h-44 min-[1440px]:h-64"
+                className={`rounded-md w-44 mx-auto transition-all ease-in-out hover:scale-110 ${
+                  lessSlides
+                    ? "h-28 min-[376px]:h-32 min-[481px]:h-36 min-[580px]:h-40 min-[800px]:h-44 min-[850px]:h-52"
+                    : "h-32 min-[481px]:h-36 min-[560px]:h-40 min-[730px]:h-44 min-[1000px]:h-56 min-[1440px]:h-64"
+                }`}
               />
             </Link>
           ))}
