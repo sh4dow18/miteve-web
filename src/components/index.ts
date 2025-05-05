@@ -3,6 +3,7 @@ export { default as Accordion } from "./accordion"
 export { default as ContentOverview } from "./content-overview"
 export { default as Light } from "./light";
 export { default as Logo } from "./logo";
+export { default as NotFound } from "./not-found";
 export { default as Nav } from "./nav";
 export { default as Player } from "./player";
 export { default as Seasons } from "./seasons";

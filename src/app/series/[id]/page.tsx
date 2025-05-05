@@ -1,5 +1,5 @@
 // Series Content Page Requirements
-import { ContentOverview, Seasons, Slider } from "@/components";
+import { ContentOverview, NotFound, Seasons, Slider } from "@/components";
 import {
   FindCastFromSeries,
   FindCertificationFromSeries,
@@ -85,29 +85,12 @@ async function SeriesContentPage({ params }: Props) {
       />
     </div>
   ) : (
-    // Not Found Container
-    <div className="text-center px-10">
-      {/* Not Found Code */}
-      <span className="text-primary-light font-semibold mb-2 text-center">
-        404
-      </span>
-      {/* Not Found information section */}
-      <section className="flex flex-col gap-5 items-center">
-        {/* Not Found Title */}
-        <h1 className="text-gray-300 text-[2.5rem] leading-none font-bold min-[351px]:text-5xl min-[420px]:text-6xl">
-          Página No Encontrada
-        </h1>
-        {/* Not Found Description */}
-        <p>Lo sentimos, no se pudo encontrar la página que está buscando.</p>
-        {/* Not Found Link */}
-        <Link
-          href="/series"
-          className="w-fit bg-primary text-white px-4 py-2 font-medium rounded-md text-center hover:bg-primary-light"
-        >
-          Volver a Series
-        </Link>
-      </section>
-    </div>
+    <NotFound
+      backTo={{
+        name: "Series",
+        href: "/series",
+      }}
+    />
   );
 }
 
