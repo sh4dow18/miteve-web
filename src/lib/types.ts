@@ -39,3 +39,8 @@ export type SeriesExtra = {
   seasons: number[];
   uncompleteSeasons?: UncompleteSeason[];
 };
+export type Actor = {
+  profile_path: string;
+  name: string;
+  character: string;
+}

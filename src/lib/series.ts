@@ -62,3 +62,9 @@ export function FindRecomendationsBySeries(id: string) {
     .filter((series) => series.id !== id);
   return MOVIES_BY_GENRE_LIST.slice(0, 10);
 }
+// Find All Series Cast From The Movie Database (TMDB) API
+export async function FindAllSeriesCastFromTMDB(id: string) {
+  return await fetch(
+    `https://api.themoviedb.org/3/tv/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+  ).then((response) => response.json());
+}
