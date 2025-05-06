@@ -13,6 +13,7 @@ import Link from "next/link";
 // Series Content Page  Props
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 // Generate Metadata Function
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -31,9 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 // Series Content Page Main Function
-async function SeriesContentPage({ params }: Props) {
+async function SeriesContentPage({ params, searchParams }: Props) {
   // Series Content Page Constants
   const { id } = await params;
+  const SEASON = (await searchParams).season;
   // Series Content Page Constants
   const EXISTING_SERIES = FindSeriesById(id);
   const CONTENT = await FindTMDBSeriesById(id);
@@ -75,7 +77,15 @@ async function SeriesContentPage({ params }: Props) {
         trailer={TRAILER}
       />
       {/* Display Seasons Component */}
-      <Seasons seriesId={id} />
+      <Seasons
+        seriesId={id}
+        displaySeason={
+          typeof SEASON === "string" &&
+          Number.isNaN(Number.parseInt(SEASON)) === false
+            ? Number.parseInt(SEASON)
+            : undefined
+        }
+      />
       {/* Recomendations Slider */}
       <Slider
         title="Recomendaciones"

@@ -9,9 +9,10 @@ import { ChangeEvent, useEffect, useState } from "react";
 // Seasons Props
 interface Props {
   seriesId: string;
+  displaySeason?: number;
 }
 // Seasons Main Function
-function Seasons({ seriesId }: Props) {
+function Seasons({ seriesId, displaySeason }: Props) {
   // Seasons Hooks
   const [selectedSeason, SetSelectedSeason] = useState<number>(1);
   const [episodesList, SetEpisodesList] = useState<Episode[]>([]);
@@ -26,7 +27,9 @@ function Seasons({ seriesId }: Props) {
       ).then((response) => response.json());
       // Set Seasons Available to Hook
       SetSeasonsAvailable(SEASONS_LIST);
-      const FIRST_SEASON = SEASONS_LIST[0];
+      const FIRST_SEASON = displaySeason
+        ? SEASONS_LIST.find((season: number) => season === displaySeason)
+        : SEASONS_LIST[0];
       // Set First Season Availabnle to Selected Season Hook
       SetSelectedSeason(FIRST_SEASON);
       // Get All Season Information
@@ -91,6 +94,7 @@ function Seasons({ seriesId }: Props) {
         <select
           name="seasons"
           onChange={ChangeSeason}
+          value={selectedSeason}
           className="w-full bg-gray-800 px-2 py-3 rounded-lg text-gray-300 cursor-pointer focus:outline-none min-[600px]:w-fit"
         >
           {seasonsAvailable.map((seasonNumber, index) => (

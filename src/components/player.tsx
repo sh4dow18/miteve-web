@@ -332,7 +332,9 @@ function Player({ id, name, description, series }: Props) {
           {/* Player Second Controlers Container */}
           <div className="flex gap-4">
             {/* Back to Content Button */}
-            <Link href={`/${TYPE}/${id}`}>
+            <Link
+              href={`/${TYPE}/${id}${series ? `?season=${series.season}` : ""}`}
+            >
               <ArrowLeftStartOnRectangleIcon className={ICONS_STYLE} />
             </Link>
             {/* Next Episode Button */}
