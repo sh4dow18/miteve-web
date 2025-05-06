@@ -89,6 +89,7 @@ function Seasons({ seriesId }: Props) {
         </h2>
         {/* Seasons Select that Changes Episodes to the Selected Season */}
         <select
+          name="seasons"
           onChange={ChangeSeason}
           className="w-full bg-gray-800 px-2 py-3 rounded-lg text-gray-300 cursor-pointer focus:outline-none min-[600px]:w-fit"
         >
