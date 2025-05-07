@@ -2,7 +2,7 @@
 import seriesList from "@/db/series.json";
 import seriesExtraList from "@/db/series-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { Season, Series, SeriesExtra } from "./types";
+import { Series, SeriesExtra } from "./types";
 // Find all the anime series
 export function FindAnimes() {
   return seriesList
@@ -26,13 +26,8 @@ export function FindSeriesTrailerById(id: string) {
   return seriesExtraList.find((series) => series.id === id)?.trailer;
 }
 // Find all seasons available in project
-export function FindSeasonsAvailable(id: string, seasons: Season[]) {
-  const SEASONS_AVAILABLE = seriesExtraList.find(
-    (series) => series.id === id
-  )?.seasons;
-  return seasons.filter((season) =>
-    SEASONS_AVAILABLE?.includes(season.season_number)
-  );
+export function FindSeasonsAvailable(id: string) {
+  return seriesExtraList.find((series) => series.id === id)?.seasons;
 }
 // Find information about a specific season of a specific series
 export async function FindTMDBSeasonById(id: string, seasonId: string) {
@@ -49,4 +44,31 @@ export function FindUncompleteSeason(id: string, seasonId: string) {
 // Find Series by Id
 export function FindSeriesById(id: string): SeriesExtra | undefined {
   return seriesExtraList.find((series) => series.id === id);
+}
+// Find Certification From Series
+export async function FindCertificationFromSeries(id: string) {
+  return seriesList.find((series) => series.id === id)?.certification;
+}
+// Find Cast From Series
+export async function FindCastFromSeries(id: string) {
+  return seriesList.find((series) => series.id === id)?.credits;
+}
+// Find the 10 First Recomendations From Series Function
+export function FindRecomendationsBySeries(id: string) {
+  const SERIES = seriesList.find((movie) => movie.id === id);
+  const GENRE = SERIES?.genres[0].name;
+  const MOVIES_BY_GENRE_LIST = seriesList
+    .filter((series) => series.genres.some((genre) => genre.name === GENRE))
+    .filter((series) => series.id !== id);
+  return MOVIES_BY_GENRE_LIST.slice(0, 10);
+}
+// Find All Series Cast From The Movie Database (TMDB) API
+export async function FindAllSeriesCastFromTMDB(id: string) {
+  return await fetch(
+    `https://api.themoviedb.org/3/tv/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+  ).then((response) => response.json());
+}
+// Find All Series Function
+export function FindAllSeries(): Series[] {
+  return seriesList;
 }
