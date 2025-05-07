@@ -232,7 +232,7 @@ function Player({ id, name, description, series }: Props) {
       {/* Content Video */}
       <video
         ref={videoRef}
-        className="h-full w-full -z-10 cursor-pointer object-cover"
+        className="h-full w-full -z-10 cursor-pointer max-[1024px]:object-cover"
         src={`/videos/${TYPE}/${id}${
           TYPE === "movies"
             ? `.webm`
