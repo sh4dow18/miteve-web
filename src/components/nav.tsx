@@ -14,6 +14,7 @@ function Nav() {
   // Nav Pages List to use in Mobile Nav and Desktop Nav
   const NAV_PAGES_LIST = [
     { href: "/", name: "Inicio" },
+    { href: "/how-it-works", name: "¿Cómo Funciona?" },
     { href: "/movies", name: "Películas" },
     { href: "/series", name: "Series" },
   ];
