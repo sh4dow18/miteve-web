@@ -17,9 +17,11 @@ function Picture({ src, alt, caption }: Props) {
   // Picture Image Handler Function
   const OpenAndCloseImage = () => {
     // If the browser does not support view transitions, do not do it, else do it
-    document.startViewTransition
-      ? document.startViewTransition(() => SetOpen(!open))
-      : SetOpen(!open);
+    if (document.startViewTransition) {
+      document.startViewTransition(() => SetOpen(!open));
+      return;
+    }
+    SetOpen(!open);
   };
   // Returns Picture Component
   return (

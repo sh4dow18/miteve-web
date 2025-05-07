@@ -9,7 +9,6 @@ import {
   FindTMDBSeriesById,
 } from "@/lib/series";
 import { Metadata } from "next";
-import Link from "next/link";
 // Series Content Page  Props
 interface Props {
   params: Promise<{ id: string }>;
