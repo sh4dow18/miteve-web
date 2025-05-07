@@ -1,5 +1,5 @@
 // Series Content Page Requirements
-import { ContentOverview, Seasons, Slider } from "@/components";
+import { ContentOverview, NotFound, Seasons, Slider } from "@/components";
 import {
   FindCastFromSeries,
   FindCertificationFromSeries,
@@ -9,10 +9,10 @@ import {
   FindTMDBSeriesById,
 } from "@/lib/series";
 import { Metadata } from "next";
-import Link from "next/link";
 // Series Content Page  Props
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 // Generate Metadata Function
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -31,9 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 // Series Content Page Main Function
-async function SeriesContentPage({ params }: Props) {
+async function SeriesContentPage({ params, searchParams }: Props) {
   // Series Content Page Constants
   const { id } = await params;
+  const SEASON = (await searchParams).season;
   // Series Content Page Constants
   const EXISTING_SERIES = FindSeriesById(id);
   const CONTENT = await FindTMDBSeriesById(id);
@@ -75,7 +76,15 @@ async function SeriesContentPage({ params }: Props) {
         trailer={TRAILER}
       />
       {/* Display Seasons Component */}
-      <Seasons seriesId={id} />
+      <Seasons
+        seriesId={id}
+        displaySeason={
+          typeof SEASON === "string" &&
+          Number.isNaN(Number.parseInt(SEASON)) === false
+            ? Number.parseInt(SEASON)
+            : undefined
+        }
+      />
       {/* Recomendations Slider */}
       <Slider
         title="Recomendaciones"
@@ -85,29 +94,12 @@ async function SeriesContentPage({ params }: Props) {
       />
     </div>
   ) : (
-    // Not Found Container
-    <div className="text-center px-10">
-      {/* Not Found Code */}
-      <span className="text-primary-light font-semibold mb-2 text-center">
-        404
-      </span>
-      {/* Not Found information section */}
-      <section className="flex flex-col gap-5 items-center">
-        {/* Not Found Title */}
-        <h1 className="text-gray-300 text-[2.5rem] leading-none font-bold min-[351px]:text-5xl min-[420px]:text-6xl">
-          Página No Encontrada
-        </h1>
-        {/* Not Found Description */}
-        <p>Lo sentimos, no se pudo encontrar la página que está buscando.</p>
-        {/* Not Found Link */}
-        <Link
-          href="/series"
-          className="w-fit bg-primary text-white px-4 py-2 font-medium rounded-md text-center hover:bg-primary-light"
-        >
-          Volver a Series
-        </Link>
-      </section>
-    </div>
+    <NotFound
+      backTo={{
+        name: "Series",
+        href: "/series",
+      }}
+    />
   );
 }
 

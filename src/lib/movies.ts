@@ -57,3 +57,13 @@ export function FindRecomendationsByMovie(id: string) {
 export function FindMovieById(id: string) {
   return moviesList.find((movie) => movie.id === id);
 }
+// Find All Movie Cast From The Movie Database (TMDB) API
+export async function FindAllMovieCastFromTMDB(id: string) {
+  return await fetch(
+    `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+  ).then((response) => response.json());
+}
+// Find All Movies Function
+export function FindAllMovies(): Content[] {
+  return moviesList;
+}

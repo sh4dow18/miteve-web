@@ -2,13 +2,9 @@
 import { Metadata } from "next";
 import { promises as fs } from "fs";
 import path from "path";
-import { Player } from "@/components";
-import Link from "next/link";
+import { NotFound, Player } from "@/components";
 import { FindMoviesByProp, FindTMDBMovieById } from "@/lib/movies";
-import {
-  FindSeriesByProp,
-  FindTMDBSeasonById,
-} from "@/lib/series";
+import { FindSeriesByProp, FindTMDBSeasonById } from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -132,29 +128,12 @@ async function PlayerPage({ searchParams }: Props) {
       }
     />
   ) : (
-    // Not Found Container
-    <div className="text-center px-10">
-      {/* Not Found Code */}
-      <span className="text-primary-light font-semibold mb-2 text-center">
-        404
-      </span>
-      {/* Not Found information section */}
-      <section className="flex flex-col gap-5 items-center">
-        {/* Not Found Title */}
-        <h1 className="text-gray-300 text-[2.5rem] leading-none font-bold min-[351px]:text-5xl min-[420px]:text-6xl">
-          Contenido No Encontrado
-        </h1>
-        {/* Not Found Description */}
-        <p>Lo sentimos, no se pudo encontrar el contenido que está buscando.</p>
-        {/* Not Found Link */}
-        <Link
-          href="/"
-          className="w-fit bg-primary text-white px-4 py-2 font-medium rounded-md text-center hover:bg-primary-light"
-        >
-          Volver al Inicio
-        </Link>
-      </section>
-    </div>
+    <NotFound
+      backTo={{
+        name: "Inicio",
+        href: "/",
+      }}
+    />
   );
 }
 

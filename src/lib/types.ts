@@ -5,6 +5,8 @@ export type Content = {
   genres: Genre[];
   productionCompany: string;
   collection: string | null;
+  certification: string;
+  credits: string;
 };
 export type Genre = {
   id: number;
@@ -27,6 +29,8 @@ export type Series = {
   image: string;
   genres: Genre[];
   originCountry: string;
+  certification: string;
+  credits: string;
 };
 export type UncompleteSeason = {
   number: number;
@@ -39,3 +43,8 @@ export type SeriesExtra = {
   seasons: number[];
   uncompleteSeasons?: UncompleteSeason[];
 };
+export type Actor = {
+  profile_path: string;
+  name: string;
+  character: string;
+}

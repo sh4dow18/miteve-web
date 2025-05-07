@@ -128,16 +128,20 @@ function ContentOverview({
             {/* Content Overview Extra Information Clasification Title */}
             <span className="font-semibold text-gray-300">Clasificación</span>
             {/* Content Overview Extra Information Clasification */}
-            <span>{certification ? certification : "N/A"}</span>
+            <span>{certification}</span>
           </section>
           {/* Content Overview Extra Information Rating Credits Section */}
           <section className="flex flex-col gap-2 min-[870px]:ml-5">
             {/* Content Overview Extra Information Credits Title */}
             <span className="font-semibold text-gray-300">Créditos</span>
             {/* Content Overview Extra Information Credits */}
-            <Link href={credits.href} className="hover:text-gray-100">
-              <span>{credits.names ? credits.names : "N/A"}</span>
-            </Link>
+            {credits.names !== "N/A" ? (
+              <Link href={credits.href} className="hover:text-gray-100">
+                <span>{credits.names}</span>
+              </Link>
+            ) : (
+              <span>{credits.names}</span>
+            )}
           </section>
         </div>
       </section>
