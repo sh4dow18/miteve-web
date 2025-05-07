@@ -8,6 +8,7 @@ export { default as Nav } from "./nav";
 export { default as NotFound } from "./not-found";
 export { default as Picture } from "./picture";
 export { default as Player } from "./player";
+export { default as Search } from "./search";
 export { default as Seasons } from "./seasons";
 export { default as Slider } from "./slider";
 export { default as Stars } from "./stars";

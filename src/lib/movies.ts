@@ -63,3 +63,7 @@ export async function FindAllMovieCastFromTMDB(id: string) {
     `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
   ).then((response) => response.json());
 }
+// Find All Movies Function
+export function FindAllMovies(): Content[] {
+  return moviesList;
+}
