@@ -9,53 +9,23 @@ import { ChangeEvent, useEffect, useState } from "react";
 // Seasons Props
 interface Props {
   seriesId: string;
+  seasonsAvailableList: number[];
   displaySeason?: number;
 }
 // Seasons Main Function
-function Seasons({ seriesId, displaySeason }: Props) {
+function Seasons({ seriesId, seasonsAvailableList, displaySeason }: Props) {
   // Seasons Hooks
-  const [selectedSeason, SetSelectedSeason] = useState<number>(1);
+  const [selectedSeason, SetSelectedSeason] = useState<number>(
+    displaySeason
+      ? seasonsAvailableList.find(
+          (season: number) => season === displaySeason
+        ) || seasonsAvailableList[0]
+      : seasonsAvailableList[0]
+  );
   const [episodesList, SetEpisodesList] = useState<Episode[]>([]);
-  const [seasonsAvailable, SetSeasonsAvailable] = useState<number[]>([1]);
-  // Execute this use effect when the page is loading
+  // Execute this use effect when the page is loading or when the user change the selected season
   useEffect(() => {
-    // Get all Seasons Available in Miteve Project
-    const GetSeasonsAvailable = async () => {
-      // Get All Seasons Available
-      const SEASONS_LIST = await fetch(
-        `/api/get-seasons-available?id=${seriesId}&season=${selectedSeason}`
-      ).then((response) => response.json());
-      // Set Seasons Available to Hook
-      SetSeasonsAvailable(SEASONS_LIST);
-      const FIRST_SEASON = displaySeason
-        ? SEASONS_LIST.find((season: number) => season === displaySeason)
-        : SEASONS_LIST[0];
-      // Set First Season Availabnle to Selected Season Hook
-      SetSelectedSeason(FIRST_SEASON);
-      // Get All Season Information
-      const SEASON = await fetch(
-        `/api/get-episodes?id=${seriesId}&season=${FIRST_SEASON}`
-      ).then((response) => response.json());
-      // Check that the season is not complete
-      const UNCOMPLETE_SEASON = FindUncompleteSeason(
-        seriesId,
-        `${FIRST_SEASON}`
-      );
-      // Get the Episodes Information that are available
-      const EPISODES_LIST =
-        UNCOMPLETE_SEASON === undefined
-          ? SEASON.episodes
-          : SEASON.episodes.slice(UNCOMPLETE_SEASON.from, UNCOMPLETE_SEASON.to);
-      // Set Episodes List to Hook
-      SetEpisodesList(EPISODES_LIST);
-    };
-    GetSeasonsAvailable();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seriesId]);
-  // Execute this use effect when the user change the selected season
-  useEffect(() => {
-    const GetEpisodesFromSeason = async () => {
-      // Get All Episodes from the Selected Season
+    const GetEpisodes = async () => {
       // Get All Season Information
       const SEASON = await fetch(
         `/api/get-episodes?id=${seriesId}&season=${selectedSeason}`
@@ -73,9 +43,9 @@ function Seasons({ seriesId, displaySeason }: Props) {
       // Set Episodes List to Hook
       SetEpisodesList(EPISODES_LIST);
     };
-    GetEpisodesFromSeason();
+    GetEpisodes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSeason]);
+  }, [seriesId, selectedSeason]);
   // Change Season Function to Select "onChange"
   const ChangeSeason = (event: ChangeEvent<HTMLSelectElement>) => {
     SetSelectedSeason(Number.parseInt(event.target.value));
@@ -97,7 +67,7 @@ function Seasons({ seriesId, displaySeason }: Props) {
           value={selectedSeason}
           className="w-full bg-gray-800 px-2 py-3 rounded-lg text-gray-300 cursor-pointer focus:outline-none min-[600px]:w-fit"
         >
-          {seasonsAvailable.map((seasonNumber, index) => (
+          {seasonsAvailableList.map((seasonNumber, index) => (
             <option key={index} className="text-gray-300" value={seasonNumber}>
               Temporada {seasonNumber}
             </option>

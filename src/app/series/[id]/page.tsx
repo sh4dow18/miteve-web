@@ -4,6 +4,7 @@ import {
   FindCastFromSeries,
   FindCertificationFromSeries,
   FindRecomendationsBySeries,
+  FindSeasonsAvailable,
   FindSeriesById,
   FindSeriesTrailerById,
   FindTMDBSeriesById,
@@ -42,6 +43,7 @@ async function SeriesContentPage({ params, searchParams }: Props) {
   const CREDITS = await FindCastFromSeries(id);
   const TRAILER = FindSeriesTrailerById(id);
   const RECOMENDATIONS = FindRecomendationsBySeries(id);
+  const SEASONS_AVAILABLE_LIST = FindSeasonsAvailable(id);
   // Returns Series Content Page
   return EXISTING_SERIES ? (
     // Series Content Main Container
@@ -78,6 +80,9 @@ async function SeriesContentPage({ params, searchParams }: Props) {
       {/* Display Seasons Component */}
       <Seasons
         seriesId={id}
+        seasonsAvailableList={
+          SEASONS_AVAILABLE_LIST ? SEASONS_AVAILABLE_LIST : [1]
+        }
         displaySeason={
           typeof SEASON === "string" &&
           Number.isNaN(Number.parseInt(SEASON)) === false
