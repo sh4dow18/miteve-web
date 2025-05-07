@@ -25,31 +25,31 @@ export default function Home() {
       name: "Kung Fu Panda",
       cover: "d1RHScaZc7I8j0lDke1c4AxI435",
       type: "Para Disfrutar en Familia",
-      href: "/9502?type=movies",
+      href: "/movies/9502",
     },
     {
       name: "Deadpool & Wolverine",
       cover: "by8z9Fe8y7p4jo2YlW2SZDnptyT",
       type: "Toda la Acción",
-      href: "/533535?type=movies",
+      href: "/movies/533535",
     },
     {
       name: "Matrix",
       cover: "icmmSD4vTTDKOq2vvdulafOGw93",
       type: "Lo Mejor de Keanu Reaves",
-      href: "/603?type=movies",
+      href: "/movies/603",
     },
     {
       name: "My Hero Academia",
       cover: "6wSSyRNeF9vBJ1h29nuw3vG9hZI",
       type: "Series Imaginativas",
-      href: "/65930?type=series",
+      href: "/series/65930",
     },
     {
       name: "The Walking Dead",
       cover: "5PCKxpFcCTDFT3b1olJGPaAIM9e",
       type: "Series de Estados Unidos",
-      href: "/206586?type=series",
+      href: "/series/206586",
     },
   ];
   const BENEFITS_LIST = [
