@@ -44,7 +44,6 @@ function Seasons({ seriesId, seasonsAvailableList, displaySeason }: Props) {
       SetEpisodesList(EPISODES_LIST);
     };
     GetEpisodes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seriesId, selectedSeason]);
   // Change Season Function to Select "onChange"
   const ChangeSeason = (event: ChangeEvent<HTMLSelectElement>) => {

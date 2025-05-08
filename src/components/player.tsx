@@ -3,6 +3,7 @@
 // Player Requirements
 import {
   ArrowLeftStartOnRectangleIcon,
+  ArrowPathIcon,
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
@@ -42,6 +43,7 @@ function Player({ id, name, description, series }: Props) {
     controlersHidden: false,
     currentTime: "00:00:00",
     progress: 0,
+    waiting: false,
   });
   // Execute this use effect when the page is loading to know if can autoplay or not
   useEffect(() => {
@@ -220,7 +222,7 @@ function Player({ id, name, description, series }: Props) {
           <div className="flex flex-col gap-3">
             {/* Player Content Name */}
             <span className="text-lg font-bold text-gray-200 min-[475px]:text-2xl min-[730px]:text-3xl min-[1000px]:text-5xl">
-              {name}
+              {videoStates.waiting}
             </span>
             {/* Player Content Description */}
             <p className="line-clamp-2 leading-7 text-gray-300 max-[475px]:text-xs min-[475px]:line-clamp-2 min-[730px]:text-sm min-[1000px]:text-lg">
@@ -228,6 +230,13 @@ function Player({ id, name, description, series }: Props) {
             </p>
           </div>
         </div>
+      </div>
+      {/* Loading Container */}
+      <div
+        className="absolute top-0 h-full w-full aria-hidden:hidden"
+        aria-hidden={!videoStates.waiting}
+      >
+        <ArrowPathIcon className="w-20 absolute top-[50%] left-[50%] -translate-[50%] animate-spin drop-shadow drop-shadow-black" />
       </div>
       {/* Content Video */}
       <video
@@ -241,6 +250,24 @@ function Player({ id, name, description, series }: Props) {
         autoPlay
         playsInline
         onClick={PlayAndPause}
+        onSeeking={() => {
+          SetVideoStates({
+            ...videoStates,
+            waiting: true,
+          });
+        }}
+        onCanPlay={() => {
+          SetVideoStates({
+            ...videoStates,
+            currentTime: FormatTime(
+              videoRef.current ? videoRef.current?.currentTime : 0
+            ),
+            progress: videoRef.current
+              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
+              : 0,
+            waiting: false,
+          });
+        }}
         onTimeUpdate={() => {
           SetVideoStates({
             ...videoStates,
