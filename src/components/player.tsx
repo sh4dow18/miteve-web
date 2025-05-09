@@ -256,6 +256,12 @@ function Player({ id, name, description, series }: Props) {
             waiting: true,
           });
         }}
+        onPlaying={() => {
+          SetVideoStates({
+            ...videoStates,
+            waiting: false,
+          });
+        }}
         onCanPlay={() => {
           SetVideoStates({
             ...videoStates,
