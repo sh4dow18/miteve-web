@@ -114,8 +114,11 @@ async function PlayerPage({ searchParams }: Props) {
       description={
         TYPE === "movies"
           ? (await FindTMDBMovieById(`${ID}`)).overview
-          : (await FindTMDBSeasonById(`${ID}`, `${SEASON}`)).episodes[0]
-              .overview
+          : EPISODE && typeof EPISODE === "string"
+          ? (await FindTMDBSeasonById(`${ID}`, `${SEASON}`)).episodes[
+              Number.parseInt(EPISODE) - 1
+            ].overview
+          : "No Hay Información Disponible"
       }
       series={
         TYPE === "series"
