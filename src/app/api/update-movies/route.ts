@@ -40,6 +40,10 @@ const MOVIES_IDS_LIST: string[] = [
   "458156",
   "603692",
   "324786",
+  "9319",
+  "9798",
+  "8656",
+  "10779"
 ];
 const COSTA_RICA_CLASIFICATIONS: Record<string, string> = {
   AA: "Todo Público",

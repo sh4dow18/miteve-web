@@ -195,7 +195,7 @@
   {
     "id": "1011985",
     "title": "Kung Fu Panda 4",
-    "image": "https://image.tmdb.org/t/p/w500/zS8BSQdbOesql0EWbs17kPvLoAT.jpg",
+    "image": "https://image.tmdb.org/t/p/w500/7JspmokDnpm8SEg28wtstfGps0K.jpg",
     "genres": [
       {
         "id": 16,
@@ -652,7 +652,7 @@
   {
     "id": "603",
     "title": "Matrix",
-    "image": "https://image.tmdb.org/t/p/w500/tpW2X2DvxtTHJ61iJ7zNYYrJihs.jpg",
+    "image": "https://image.tmdb.org/t/p/w500/plYYSxZ9Wdq4thyVSkhJjbjYtVG.jpg",
     "genres": [
       {
         "id": 28,
@@ -855,5 +855,89 @@
     "collection": null,
     "certification": "+18",
     "credits": "Andrew Garfield, Sam Worthington, más"
+  },
+  {
+    "id": "9319",
+    "title": "El Último Boy Scout",
+    "image": "https://image.tmdb.org/t/p/w500/cQ5k3KFbe5rgpLOvoIiPzJZdZiQ.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      }
+    ],
+    "productionCompany": "Geffen Pictures",
+    "collection": null,
+    "certification": "+18",
+    "credits": "Bruce Willis, Damon Wayans, más"
+  },
+  {
+    "id": "9798",
+    "title": "Enemigo Público",
+    "image": "https://image.tmdb.org/t/p/w500/pHLraZnPPAchPFQqbdZcNcNudKz.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 53,
+        "name": "Suspense"
+      }
+    ],
+    "productionCompany": "Touchstone Pictures",
+    "collection": null,
+    "certification": "N/A",
+    "credits": "Will Smith, Gene Hackman, más"
+  },
+  {
+    "id": "8656",
+    "title": "Impacto profundo",
+    "image": "https://image.tmdb.org/t/p/w500/oQrMiYdcb3ErGuJEo8Ld6q8x0Bd.jpg",
+    "genres": [
+      {
+        "id": 28,
+        "name": "Acción"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 878,
+        "name": "Ciencia ficción"
+      }
+    ],
+    "productionCompany": "Paramount Pictures",
+    "collection": null,
+    "certification": "N/A",
+    "credits": "Robert Duvall, Téa Leoni, más"
+  },
+  {
+    "id": "10779",
+    "title": "Muertos de miedo",
+    "image": "https://image.tmdb.org/t/p/w500/1v7Z2fCo7cg78S4Q4BhFYyhg0yF.jpg",
+    "genres": [
+      {
+        "id": 27,
+        "name": "Terror"
+      },
+      {
+        "id": 35,
+        "name": "Comedia"
+      }
+    ],
+    "productionCompany": "WingNut Films",
+    "collection": null,
+    "certification": "N/A",
+    "credits": "Michael J. Fox, Trini Alvarado, más"
   }
 ]
