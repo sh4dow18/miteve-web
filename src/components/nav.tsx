@@ -17,6 +17,7 @@ function Nav() {
     { href: "/how-it-works", name: "¿Cómo Funciona?" },
     { href: "/movies", name: "Películas" },
     { href: "/series", name: "Series" },
+    { href: "/admin", name: "Administración" },
   ];
   // Function that Sets the Opposite Value in Open Hook to Open and Close the Burger Menu
   const OnClickButton = () => {
