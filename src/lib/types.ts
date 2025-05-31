@@ -8,6 +8,11 @@ export type Content = {
   certification: string;
   credits: string;
 };
+export type MinimalContent = {
+  id: string;
+  title: string;
+  cover: string;
+};
 export type Genre = {
   id: number;
   name: string;
@@ -31,6 +36,11 @@ export type Series = {
   originCountry: string;
   certification: string;
   credits: string;
+};
+export type MinimalSeries = {
+  id: string;
+  title: string;
+  cover: string;
 };
 export type UncompleteSeason = {
   number: number;

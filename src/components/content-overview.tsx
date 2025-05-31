@@ -18,7 +18,7 @@ interface Props {
   image: string;
   background: string;
   date: string;
-  genresList: Genre[];
+  genres: string;
   tagline: string | null;
   overview: string;
   rating: number;
@@ -36,7 +36,7 @@ function ContentOverview({
   image,
   background,
   date,
-  genresList,
+  genres,
   tagline,
   overview,
   rating,
@@ -95,9 +95,7 @@ function ContentOverview({
           {title} ({date})
         </h1>
         {/* Content Overview Description Genres */}
-        <span className="text-center min-[600px]:text-left">
-          {genresList.map((genre: Genre) => genre.name).join(", ")}
-        </span>
+        <span className="text-center min-[600px]:text-left">{genres}</span>
         {/* Content Overview Description Tagline */}
         {tagline && (
           <span className="italic text-center min-[600px]:text-left">{`"${tagline}"`}</span>
@@ -117,9 +115,9 @@ function ContentOverview({
             <span className="font-semibold text-gray-300">Valoración</span>
             {/* Content Overview Extra Information Rating Stars */}
             <div className="flex items-center">
-              <Stars count={5} size={30} value={rating / 2} />
+              <Stars count={5} size={30} value={rating} />
               <span className="hidden text-lg font-semibold ml-2 mt-1 min-[352px]:block">
-                ({(rating / 2).toPrecision(2)} / 5)
+                ({rating})
               </span>
             </div>
           </section>
