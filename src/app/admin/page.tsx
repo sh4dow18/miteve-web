@@ -16,6 +16,7 @@ function Admin() {
   const [genresList, SetGenresList] = useState([]);
   const contentRef = useRef<HTMLInputElement | null>(null);
   const [contentInfo, SetContentInfo] = useState({
+    id: "No hay Información",
     title: "No hay Información",
     year: "No hay Información",
     tagline: "No hay Información",
@@ -61,6 +62,7 @@ function Admin() {
     const RATING = Number.parseFloat(MOVIE.vote_average);
     // Set all Movie Information
     SetContentInfo({
+      id: MOVIE.id,
       title: MOVIE.title,
       year: MOVIE.release_date.split("-")[0],
       tagline: MOVIE.tagline,
@@ -102,7 +104,7 @@ function Admin() {
     ).map((option) => option.value);
     // Set Body to Send the Request
     const BODY = {
-      tmdbId: contentRef.current?.value,
+      id: contentInfo.id,
       title: contentInfo.title,
       year: contentInfo.year,
       tagline: contentInfo.tagline,
