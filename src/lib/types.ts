@@ -57,4 +57,13 @@ export type Actor = {
   profile_path: string;
   name: string;
   character: string;
+};
+
+export interface NavigatorConnection {
+  connection?: {
+    downlink: number;
+    effectiveType: "slow-2g" | "2g" | "3g" | "4g";
+    rtt: number;
+    saveData: boolean;
+  };
 }

@@ -1,6 +1,7 @@
 // Set this component as a client component
 "use client";
 // Player Requirements
+import { NavigatorConnection } from "@/lib/types";
 import {
   ArrowLeftStartOnRectangleIcon,
   ArrowPathIcon,
@@ -8,6 +9,7 @@ import {
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
+  FilmIcon,
   ForwardIcon,
   PauseIcon,
   PlayIcon,
@@ -21,6 +23,7 @@ interface Props {
   id: string;
   name: string;
   description: string;
+  changeQuality: boolean;
   series?: {
     season: string;
     episode: string;
@@ -28,7 +31,7 @@ interface Props {
   };
 }
 // Player Main Function
-function Player({ id, name, description, series }: Props) {
+function Player({ id, name, description, changeQuality, series }: Props) {
   // Player Main Constants
   const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
@@ -44,30 +47,9 @@ function Player({ id, name, description, series }: Props) {
     currentTime: "00:00:00",
     progress: 0,
     waiting: false,
+    resolution: "HD",
+    canChangeResolution: false,
   });
-  // Execute this use effect when the page is loading to know if can autoplay or not
-  useEffect(() => {
-    const VIDEO = videoRef.current;
-    if (VIDEO === null) {
-      return;
-    }
-    const PLAY = VIDEO.play();
-    if (PLAY === undefined) {
-      return;
-    }
-    PLAY.then(() =>
-      SetVideoStates({
-        ...videoStates,
-        paused: false,
-      })
-    ).catch(() =>
-      SetVideoStates({
-        ...videoStates,
-        paused: true,
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
     if (videoStates.paused === false) {
@@ -117,6 +99,74 @@ function Player({ id, name, description, series }: Props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoStates.paused === false]);
+  // Execute this use effect when the page is loading to know if can autoplay or not
+  // Also, check if needs the HD version or low quality version
+  useEffect(() => {
+    if (videoRef.current === null) {
+      return;
+    }
+    const VIDEO = videoRef.current;
+    const CURRENT_TIME = VIDEO.currentTime;
+    // Get Navigation Connection to now network speed test
+    const CONNECTION = (navigator as NavigatorConnection).connection;
+    // Check if it an Slow Internet
+    const IS_CONNECTION_SLOW =
+      CONNECTION && ["slow-2g", "2g", "3g"].includes(CONNECTION.effectiveType);
+    // Set it would be use the low quality version
+    const LOW_QUALITY =
+      videoStates.resolution === "SD" || IS_CONNECTION_SLOW === true;
+    // Set API URL
+    const API = `api/movies/stream/${id}${LOW_QUALITY ? "?quality=low" : ""}`;
+    // Set Resolution Video States with the New Resolution
+    SetVideoStates((prevVideoStates) => ({
+      ...prevVideoStates,
+      resolution: LOW_QUALITY ? "SD" : "HD",
+    }));
+    // Create new Source Element
+    const SOURCE = document.createElement("source");
+    // Set a Timeout to Check the IPs to get the content
+    const CONTROLLER = new AbortController();
+    const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
+    // Check if the main IP is available
+    fetch(`http://10.0.0.1:8080/${API}`, {
+      method: "HEAD",
+      signal: CONTROLLER.signal,
+    })
+      .then(() => {
+        // If it is, set the main IP
+        SOURCE.src = `http://10.0.0.1:8080/${API}`;
+      })
+      .catch(() => {
+        // If it is not, set the secondary IP
+        SOURCE.src = `http://192.168.0.254:8080/${API}`;
+      })
+      .finally(() => {
+        // Clear the Timeout to clear memory
+        clearTimeout(TIMEOUT);
+        // Set Source Type to WEBM Videos
+        SOURCE.type = "video/webm";
+        // Remove all source elements from video
+        VIDEO.innerHTML = "";
+        // Add the New Source
+        VIDEO.appendChild(SOURCE);
+        // Reload Content
+        VIDEO.load();
+        const PLAY = VIDEO.play();
+        PLAY.then(() =>
+          SetVideoStates({
+            ...videoStates,
+            paused: false,
+          })
+        ).catch(() =>
+          SetVideoStates({
+            ...videoStates,
+            paused: true,
+          })
+        );
+        VIDEO.currentTime = CURRENT_TIME;
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoStates.resolution]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -181,6 +231,24 @@ function Player({ id, name, description, series }: Props) {
       Math.max(0, VIDEO.currentTime + seconds),
       VIDEO.duration
     );
+  };
+  // Function that allows to change resolution
+  const ChangeResolution = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (videoStates.resolution === "HD") {
+      SetVideoStates({
+        ...videoStates,
+        resolution: "SD",
+      });
+      return;
+    }
+    SetVideoStates({
+      ...videoStates,
+      resolution: "HD",
+    });
   };
   // Function that allows to Format Current and Duration Times from Video
   const FormatTime = (time: number): string => {
@@ -280,17 +348,7 @@ function Player({ id, name, description, series }: Props) {
               : 0,
           });
         }}
-      >
-        <source
-          src={`http://10.0.0.1:8080/api/movies/stream/${id}`}
-          type="video/webm"
-        />
-        <source
-          src={`http://192.168.0.254:8080/api/movies/stream/${id}`}
-          type="video/webm"
-        />
-        Tu navegador no soporta el video
-      </video>
+      />
       {/* Player Controlers Container */}
       <div
         className="absolute bottom-0 w-full bg-black aria-hidden:hidden"
@@ -320,7 +378,7 @@ function Player({ id, name, description, series }: Props) {
         {/* Player Controlers Second Container */}
         <div className="flex place-content-between items-center py-4 px-5">
           {/* Player First Controlers Container */}
-          <div className="flex gap-4 min-[355px]:gap-7">
+          <div className="flex gap-2 min-[355px]:gap-4 min-[475px]:gap-7">
             <PauseIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
@@ -362,6 +420,31 @@ function Player({ id, name, description, series }: Props) {
               onClick={VolumeAndMute}
               aria-disabled={!videoStates.muted}
             />
+            {/* Change Resolution Buttons */}
+            <div
+              className="group flex gap-1 transition-all cursor-pointer select-none hover:scale-125 hover:text-white aria-disabled:hidden"
+              onClick={ChangeResolution}
+              aria-disabled={
+                videoStates.resolution === "SD" || changeQuality === false
+              }
+            >
+              <FilmIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
+              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
+                SD
+              </span>
+            </div>
+            <div
+              className="group flex gap-1 transition-all cursor-pointer select-none hover:scale-125 hover:text-white aria-disabled:hidden"
+              onClick={ChangeResolution}
+              aria-disabled={
+                videoStates.resolution === "HD" || changeQuality === false
+              }
+            >
+              <FilmIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
+              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
+                HD
+              </span>
+            </div>
           </div>
           {/* Player Content Title */}
           <h1 className="hidden text-gray-300 min-[615px]:block min-[865px]:text-xl">
