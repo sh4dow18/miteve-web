@@ -242,11 +242,6 @@ function Player({ id, name, description, series }: Props) {
       <video
         ref={videoRef}
         className="h-full w-full -z-10 cursor-pointer max-[1024px]:object-cover"
-        src={`/videos/${TYPE}/${id}${
-          TYPE === "movies"
-            ? `.webm`
-            : `/Temporada ${series?.season}/Episodio ${series?.episode}.webm`
-        }`}
         autoPlay
         playsInline
         onClick={PlayAndPause}
@@ -285,7 +280,17 @@ function Player({ id, name, description, series }: Props) {
               : 0,
           });
         }}
-      />
+      >
+        <source
+          src={`http://10.0.0.1:8080/api/movies/stream/${id}`}
+          type="video/webm"
+        />
+        <source
+          src={`http://192.168.0.254:8080/api/movies/stream/${id}`}
+          type="video/webm"
+        />
+        Tu navegador no soporta el video
+      </video>
       {/* Player Controlers Container */}
       <div
         className="absolute bottom-0 w-full bg-black aria-hidden:hidden"

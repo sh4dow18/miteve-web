@@ -1,5 +1,4 @@
 // Content Overview Requirements
-import { Genre } from "@/lib/types";
 import Image from "next/image";
 import Stars from "./stars";
 import Link from "next/link";

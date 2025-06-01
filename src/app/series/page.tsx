@@ -1,6 +1,5 @@
 // Series Page Requirements
-import { Slider, UpdateContent } from "@/components";
-import { FindAnimes, FindSeriesByProp } from "@/lib/series";
+import { UpdateContent } from "@/components";
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -13,16 +12,16 @@ export const metadata: Metadata = {
 // Series Page Main Function
 function SeriesPage() {
   // Series Page Sliders List Information
-  const SLIDERS_LIST = [
-    {
-      title: "Series Imaginativas",
-      contentList: FindAnimes(),
-    },
-    {
-      title: "Series de Estados Unidos",
-      contentList: FindSeriesByProp("originCountry", "US"),
-    },
-  ];
+  // const SLIDERS_LIST = [
+  //   {
+  //     title: "Series Imaginativas",
+  //     contentList: FindAnimes(),
+  //   },
+  //   {
+  //     title: "Series de Estados Unidos",
+  //     contentList: FindSeriesByProp("originCountry", "US"),
+  //   },
+  // ];
   // Returns Series Page
   return (
     // Series Page Main Container
@@ -48,14 +47,14 @@ function SeriesPage() {
       </div>
       {/* Series Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
-        {SLIDERS_LIST.map((slider, index) => (
+        {/* {SLIDERS_LIST.map((slider, index) => (
           <Slider
             key={index}
             title={slider.title}
             contentList={slider.contentList}
             type="series"
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );

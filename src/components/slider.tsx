@@ -7,7 +7,7 @@ import { useKeenSlider } from "keen-slider/react";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
-import { Content, MinimalSeries, MinimalContent, Series } from "@/lib/types";
+import { MinimalSeries, MinimalContent } from "@/lib/types";
 // Slider Props
 interface Props {
   title: string;

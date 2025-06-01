@@ -16,7 +16,7 @@ async function MoviesPage() {
   const SLIDERS_LIST = [
     {
       title: "Para Disfrutar en Familia",
-      contentList: [...(await FindMoviesByIds(["1", "2", "3", "4", "5", "6"]))],
+      contentList: [...(await FindMoviesByIds(["9502"]))],
     },
   ];
   // Returns Movies Page

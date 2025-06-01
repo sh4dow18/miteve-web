@@ -51,13 +51,15 @@ async function MovieContentPage({ params }: Props) {
         }}
         trailer={CONTENT.trailer}
       />
-      {/* Recomendations Slider */}
-      <Slider
-        title="Recomendaciones"
-        contentList={RECOMENDATIONS}
-        type="movies"
-        lessSlides
-      />
+      {RECOMENDATIONS.length > 0 && (
+        // Recomendations Slider
+        <Slider
+          title="Recomendaciones"
+          contentList={RECOMENDATIONS}
+          type="movies"
+          lessSlides
+        />
+      )}
     </div>
   ) : (
     <NotFound
