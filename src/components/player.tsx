@@ -9,6 +9,8 @@ import {
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
+  ChatBubbleBottomCenterIcon,
+  ChatBubbleBottomCenterTextIcon,
   FilmIcon,
   ForwardIcon,
   PauseIcon,
@@ -49,6 +51,7 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     waiting: false,
     resolution: "HD",
     canChangeResolution: false,
+    subtitlesOn: true,
   });
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
@@ -127,20 +130,18 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     // Set a Timeout to Check the IPs to get the content
     const CONTROLLER = new AbortController();
     const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
+    let availableIP = "http://10.0.0.1:8080";
     // Check if the main IP is available
-    fetch(`http://10.0.0.1:8080/${API}`, {
+    fetch(`${availableIP}/${API}`, {
       method: "HEAD",
       signal: CONTROLLER.signal,
     })
-      .then(() => {
-        // If it is, set the main IP
-        SOURCE.src = `http://10.0.0.1:8080/${API}`;
-      })
       .catch(() => {
         // If it is not, set the secondary IP
-        SOURCE.src = `http://192.168.0.254:8080/${API}`;
+        availableIP = "http://192.168.0.254:8080";
       })
       .finally(() => {
+        SOURCE.src = `${availableIP}/${API}`;
         // Clear the Timeout to clear memory
         clearTimeout(TIMEOUT);
         // Set Source Type to WEBM Videos
@@ -149,6 +150,14 @@ function Player({ id, name, description, changeQuality, series }: Props) {
         VIDEO.innerHTML = "";
         // Add the New Source
         VIDEO.appendChild(SOURCE);
+        // Add Subtitles
+        const SUBTITLES = document.createElement("track");
+        SUBTITLES.src = `/api/subtitles?id=${id}`;
+        SUBTITLES.kind = "subtitles";
+        SUBTITLES.srclang = "es";
+        SUBTITLES.label = "Español";
+        SUBTITLES.default = true;
+        VIDEO.appendChild(SUBTITLES);
         // Reload Content
         VIDEO.load();
         const PLAY = VIDEO.play();
@@ -248,6 +257,26 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     SetVideoStates({
       ...videoStates,
       resolution: "HD",
+    });
+  };
+  // Function that put subtitles in video
+  const PutSubtitles = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (videoStates.subtitlesOn === true) {
+      VIDEO.textTracks[0].mode = "disabled";
+      SetVideoStates({
+        ...videoStates,
+        subtitlesOn: false,
+      });
+      return;
+    }
+    VIDEO.textTracks[0].mode = "showing";
+    SetVideoStates({
+      ...videoStates,
+      subtitlesOn: true,
     });
   };
   // Function that allows to Format Current and Duration Times from Video
@@ -452,6 +481,17 @@ function Player({ id, name, description, changeQuality, series }: Props) {
           </h1>
           {/* Player Second Controlers Container */}
           <div className="flex gap-4">
+            {/* Subtitles Buttons */}
+            <ChatBubbleBottomCenterTextIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={PutSubtitles}
+              aria-disabled={videoStates.subtitlesOn === false}
+            />
+            <ChatBubbleBottomCenterIcon
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={PutSubtitles}
+              aria-disabled={videoStates.subtitlesOn === true}
+            />
             {/* Back to Content Button */}
             <Link
               href={`/${TYPE}/${id}${series ? `?season=${series.season}` : ""}`}
@@ -465,11 +505,10 @@ function Player({ id, name, description, changeQuality, series }: Props) {
                   ? Number.parseInt(series.season) + 1
                   : series?.season
               }&episode=${series?.nextEpisode}`}
+              className="aria-disabled:hidden"
+              aria-disabled={!series?.nextEpisode}
             >
-              <ForwardIcon
-                className={`${ICONS_STYLE} aria-disabled:hidden`}
-                aria-disabled={!series?.nextEpisode}
-              />
+              <ForwardIcon className={ICONS_STYLE} />
             </Link>
             {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
