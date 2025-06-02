@@ -8,6 +8,11 @@ export type Content = {
   certification: string;
   credits: string;
 };
+export type MinimalContent = {
+  id: string;
+  title: string;
+  cover: string;
+};
 export type Genre = {
   id: number;
   name: string;
@@ -32,6 +37,11 @@ export type Series = {
   certification: string;
   credits: string;
 };
+export type MinimalSeries = {
+  id: string;
+  title: string;
+  cover: string;
+};
 export type UncompleteSeason = {
   number: number;
   from: number;
@@ -47,4 +57,13 @@ export type Actor = {
   profile_path: string;
   name: string;
   character: string;
+};
+
+export interface NavigatorConnection {
+  connection?: {
+    downlink: number;
+    effectiveType: "slow-2g" | "2g" | "3g" | "4g";
+    rtt: number;
+    saveData: boolean;
+  };
 }

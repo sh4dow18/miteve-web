@@ -1,12 +1,8 @@
 // Series Content Page Requirements
-import { ContentOverview, NotFound, Seasons, Slider } from "@/components";
+import { NotFound, Seasons } from "@/components";
 import {
-  FindCastFromSeries,
-  FindCertificationFromSeries,
-  FindRecomendationsBySeries,
   FindSeasonsAvailable,
   FindSeriesById,
-  FindSeriesTrailerById,
   FindTMDBSeriesById,
 } from "@/lib/series";
 import { Metadata } from "next";
@@ -38,17 +34,12 @@ async function SeriesContentPage({ params, searchParams }: Props) {
   const SEASON = (await searchParams).season;
   // Series Content Page Constants
   const EXISTING_SERIES = FindSeriesById(id);
-  const CONTENT = await FindTMDBSeriesById(id);
-  const CERTIFICATION = await FindCertificationFromSeries(id);
-  const CREDITS = await FindCastFromSeries(id);
-  const TRAILER = FindSeriesTrailerById(id);
-  const RECOMENDATIONS = FindRecomendationsBySeries(id);
   const SEASONS_AVAILABLE_LIST = FindSeasonsAvailable(id);
   // Returns Series Content Page
   return EXISTING_SERIES ? (
     // Series Content Main Container
     <div className="flex flex-col gap-5 p-10 max-w-4xl min-[897px]:mx-auto">
-      <ContentOverview
+      {/* <ContentOverview
         player={{
           id: id,
           series: {
@@ -76,7 +67,7 @@ async function SeriesContentPage({ params, searchParams }: Props) {
           href: `/series/${id}/cast`,
         }}
         trailer={TRAILER}
-      />
+      /> */}
       {/* Display Seasons Component */}
       <Seasons
         seriesId={id}
@@ -91,12 +82,12 @@ async function SeriesContentPage({ params, searchParams }: Props) {
         }
       />
       {/* Recomendations Slider */}
-      <Slider
+      {/* <Slider
         title="Recomendaciones"
         contentList={RECOMENDATIONS}
         type="series"
         lessSlides
-      />
+      /> */}
     </div>
   ) : (
     <NotFound

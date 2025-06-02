@@ -7,11 +7,11 @@ import { useKeenSlider } from "keen-slider/react";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
-import { Content, Series } from "@/lib/types";
+import { MinimalSeries, MinimalContent } from "@/lib/types";
 // Slider Props
 interface Props {
   title: string;
-  contentList: Content[] | Series[];
+  contentList: MinimalContent[] | MinimalSeries[];
   type: "movies" | "series";
   lessSlides?: boolean;
 }
@@ -64,7 +64,7 @@ function Slider({ title, contentList, type, lessSlides }: Props) {
               className="keen-slider__slide rounded-md"
             >
               <Image
-                src={content.image}
+                src={`https://image.tmdb.org/t/p/w500/${content.cover}`}
                 alt={`${content.title} Cover`}
                 width={300}
                 height={450}
