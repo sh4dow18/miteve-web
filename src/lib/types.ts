@@ -67,3 +67,18 @@ export interface NavigatorConnection {
     saveData: boolean;
   };
 }
+export type TMBD_CONTENT = {
+  id: string;
+  title: string;
+  year: string;
+  tagline: string;
+  description: string;
+  rating: string;
+  originCountry?: string;
+  classification: string;
+  cast: string;
+  company?: string;
+  collection?: string;
+  cover: string;
+  background: string;
+};
