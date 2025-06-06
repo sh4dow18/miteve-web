@@ -12,6 +12,7 @@ function Admin() {
     { id: 1, name: "Géneros" },
     { id: 2, name: "Películas" },
     { id: 3, name: "Series" },
+    { id: 4, name: "Temporadas" },
   ];
   const DEFAULT_CONTENT_INFO = {
     id: "No hay Información",
@@ -201,6 +202,24 @@ function Admin() {
       trailer: FORM.trailer.value,
     };
     return await fetch("http://localhost:8080/api/series", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Seasons Form On Submit Function
+  const SeasonsSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    const BODY = {
+      id: FORM.seriesId.value,
+      firstSeason: FORM.firstSeason.value,
+      firstEpisode: FORM.firstEpisode.value,
+      lastSeason: FORM.lastSeason.value,
+      lastEpisode: FORM.lastEpisode.value,
+    };
+    return await fetch("/api/seasons", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -514,6 +533,63 @@ function Admin() {
             validation="text"
             maxLength={20}
           />
+        </Form>
+      )}
+      {selectedModel === 4 && (
+        <Form
+          className="flex flex-col gap-4 w-full max-w-xl"
+          submitButton="Agregar Serie"
+          OnSubmit={SeasonsSubmit}
+        >
+          {/* Series Id Input */}
+          <Input
+            label="Identificador de Serie"
+            placeholder="1399"
+            name="seriesId"
+            help="Identificador de la Serie Existente"
+            validation="int"
+            maxLength={10}
+          />
+          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+            {/* First Season Input */}
+            <Input
+              label="Temporada Inicial"
+              placeholder="1"
+              name="firstSeason"
+              help="Número de Primera Temporada Disponible de la Serie"
+              validation="int"
+              maxLength={2}
+            />
+            {/* First Episode Input */}
+            <Input
+              label="Episodio Inicial"
+              placeholder="1"
+              name="firstEpisode"
+              help="Número de Primer Episodio Disponible de la Serie"
+              validation="int"
+              maxLength={4}
+            />
+          </div>
+          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+            {/* Last Season Input */}
+            <Input
+              label="Temporada Final"
+              placeholder="8"
+              name="lastSeason"
+              help="Número de Última Temporada Disponible de la Serie"
+              validation="int"
+              maxLength={2}
+            />
+            {/* Last Episode Input */}
+            <Input
+              label="Episodio Final"
+              placeholder="8"
+              name="lastEpisode"
+              help="Número de Último Episodio Disponible de la Serie"
+              validation="int"
+              maxLength={4}
+            />
+          </div>
         </Form>
       )}
     </div>

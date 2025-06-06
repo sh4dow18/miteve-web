@@ -9,12 +9,12 @@ interface Props {
   placeholder: string;
   name: string;
   help: string;
-  validation: string;
+  validation: "float" | "text" | "int" | "name" | "file";
   disabled?: boolean;
   autoComplete?: string;
   maxLength?: number;
   optional?: boolean;
-  reference?: Ref<HTMLInputElement>
+  reference?: Ref<HTMLInputElement>;
 }
 // Input Regular Expressions to use in Validations
 const REGEX: Record<string, RegExp> = {
@@ -32,7 +32,7 @@ const REGEX: Record<string, RegExp> = {
   name: /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ']+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ']+)*$/,
   // Only Files Names
   // Example: Kung Fu Panda.webm or Astralopitecus.mp4
-  file: /^[\w\s\-()\[\]]+\.[a-zA-Z0-9]{1,5}$/
+  file: /^[\w\s\-()\[\]]+\.[a-zA-Z0-9]{1,5}$/,
 };
 // Input Main Function
 function Input({
@@ -45,7 +45,7 @@ function Input({
   autoComplete,
   maxLength,
   optional,
-  reference
+  reference,
 }: Props) {
   // Input Hooks
   const [state, SetState] = useState<"Valid" | "Neutral" | "Invalid">(
@@ -89,7 +89,7 @@ function Input({
       >
         {/* Main Input */}
         <input
-        ref={reference}
+          ref={reference}
           id={name}
           name={optional ? `${name} (Opcional)` : name}
           type="text"
