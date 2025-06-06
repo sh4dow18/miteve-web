@@ -9,7 +9,7 @@ interface Props {
   placeholder: string;
   name: string;
   help: string;
-  validation: "float" | "text" | "int" | "name" | "file";
+  validation: "float" | "text" | "int" | "name" | "file" | "time";
   disabled?: boolean;
   autoComplete?: string;
   maxLength?: number;
@@ -33,6 +33,7 @@ const REGEX: Record<string, RegExp> = {
   // Only Files Names
   // Example: Kung Fu Panda.webm or Astralopitecus.mp4
   file: /^[\w\s\-()\[\]]+\.[a-zA-Z0-9]{1,5}$/,
+  time: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
 };
 // Input Main Function
 function Input({
