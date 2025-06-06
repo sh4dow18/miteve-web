@@ -96,7 +96,7 @@ function ContentOverview({
         {/* Content Overview Description Genres */}
         <span className="text-center min-[600px]:text-left">{genres}</span>
         {/* Content Overview Description Tagline */}
-        {tagline && (
+        {tagline && tagline !== "N/A" && (
           <span className="italic text-center min-[600px]:text-left">{`"${tagline}"`}</span>
         )}
         {/* Content Overview Description Second Container */}

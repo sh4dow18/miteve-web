@@ -18,10 +18,10 @@ export type Genre = {
   name: string;
 };
 export type Episode = {
-  episode_number: number;
-  still_path: string;
-  name: string;
-  overview: string;
+  episodeNumber: number;
+  cover: string;
+  title: string;
+  description: string;
 };
 export type Season = {
   season_number: number;
