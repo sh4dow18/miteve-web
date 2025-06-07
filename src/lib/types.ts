@@ -82,3 +82,9 @@ export type TMBD_CONTENT = {
   cover: string;
   background: string;
 };
+export type TMDB_EPISODE = {
+  episode_number: string;
+  name: string;
+  overview: string;
+  still_path: string;
+};

@@ -89,3 +89,13 @@ export async function FindSeasonByNumber(id: string, seasonNumber: number) {
     `http://localhost:8080/api/series/${id}/season/${seasonNumber}`
   ).then((response) => response.json());
 }
+// Find Next Episode by Episode Number, Season Number and Series Id
+export async function FindNextEpisodeByNumber(
+  id: string,
+  seasonNumber: string,
+  episodeNumber: string
+) {
+  return await fetch(
+    `http://localhost:8080/api/series/next/${id}/season/${seasonNumber}/episode/${episodeNumber}`
+  ).then((response) => response.json());
+}

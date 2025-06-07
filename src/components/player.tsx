@@ -29,7 +29,10 @@ interface Props {
   series?: {
     season: string;
     episode: string;
-    nextEpisode: number;
+    nextEpisode?: {
+      season: string;
+      episode: string;
+    };
   };
 }
 // Player Main Function
@@ -119,7 +122,13 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     const LOW_QUALITY =
       videoStates.resolution === "SD" || IS_CONNECTION_SLOW === true;
     // Set API URL
-    const API = `api/movies/stream/${id}${LOW_QUALITY ? "?quality=low" : ""}`;
+    const API = `api/${
+      series === undefined ? "movies" : "series"
+    }/stream/${id}${
+      series !== undefined
+        ? `/season/${series.season}/episode/${series.episode}`
+        : ""
+    }${LOW_QUALITY ? "?quality=low" : ""}`;
     // Set Resolution Video States with the New Resolution
     SetVideoStates((prevVideoStates) => ({
       ...prevVideoStates,
@@ -152,7 +161,11 @@ function Player({ id, name, description, changeQuality, series }: Props) {
         VIDEO.appendChild(SOURCE);
         // Add Subtitles
         const SUBTITLES = document.createElement("track");
-        SUBTITLES.src = `/api/subtitles?id=${id}`;
+        SUBTITLES.src = `/api/subtitles?id=${id}&type=${
+          series === undefined
+            ? "movies"
+            : `series&season=${series.season}&episode=${series.episode}`
+        }`;
         SUBTITLES.kind = "subtitles";
         SUBTITLES.srclang = "es";
         SUBTITLES.label = "Español";
@@ -498,18 +511,16 @@ function Player({ id, name, description, changeQuality, series }: Props) {
             >
               <ArrowLeftStartOnRectangleIcon className={ICONS_STYLE} />
             </Link>
-            {/* Next Episode Button */}
-            <Link
-              href={`player?type=series&id=${id}&season=${
-                series?.nextEpisode === 1 && series.season
-                  ? Number.parseInt(series.season) + 1
-                  : series?.season
-              }&episode=${series?.nextEpisode}`}
-              className="aria-disabled:hidden"
-              aria-disabled={!series?.nextEpisode}
-            >
-              <ForwardIcon className={ICONS_STYLE} />
-            </Link>
+            {series?.nextEpisode && (
+              // Next Episode Button
+              <a
+                href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
+                className="aria-disabled:hidden"
+                aria-disabled={!series?.nextEpisode}
+              >
+                <ForwardIcon className={ICONS_STYLE} />
+              </a>
+            )}
             {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}

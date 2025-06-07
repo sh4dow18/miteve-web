@@ -1,5 +1,6 @@
 // Insert Seasons from Series Endpoint Requirements
 import { TMDB_API_KEY } from "@/lib/admin";
+import { TMDB_EPISODE } from "@/lib/types";
 // Insert Seasons from Series Endpoint Main Function
 export async function POST(request: Request) {
   // Insert Seasons from Series Endpoint Main Constants
@@ -31,31 +32,33 @@ export async function POST(request: Request) {
   );
   // Filter out null responses and type-guard the remaining items
   const FILTERES_SEASON_DATA_LIST = SEASON_RESPONSES.filter(
-    (season): season is { seasonNumber: number; episodes: any[] } =>
+    (season): season is { seasonNumber: number; episodes: TMDB_EPISODE[] } =>
       season !== null
   )
     // Map each valid season response to the desired structure
     .map(({ seasonNumber, episodes }) => {
       // Filter episodes based on season and episode numbers
-      const FILTERED_EPISODES_LIST = episodes.filter((episode: any) => {
-        const EPISODE_NUMBER = episode.episode_number;
-        // If all episodes are from the same season
-        if (firstSeason === lastSeason) {
-          return (
-            EPISODE_NUMBER >= firstEpisode && EPISODE_NUMBER <= lastEpisode
-          );
+      const FILTERED_EPISODES_LIST = episodes.filter(
+        (episode: TMDB_EPISODE) => {
+          const EPISODE_NUMBER = episode.episode_number;
+          // If all episodes are from the same season
+          if (firstSeason === lastSeason) {
+            return (
+              EPISODE_NUMBER >= firstEpisode && EPISODE_NUMBER <= lastEpisode
+            );
+          }
+          // If it's the first season, filter episodes starting from first episode
+          if (seasonNumber === firstSeason) {
+            return EPISODE_NUMBER >= firstEpisode;
+          }
+          // If it's the last season, filter episodes up to last episode
+          if (seasonNumber === lastSeason) {
+            return EPISODE_NUMBER <= lastEpisode;
+          }
+          // Else, include all episodes
+          return true;
         }
-        // If it's the first season, filter episodes starting from first episode
-        if (seasonNumber === firstSeason) {
-          return EPISODE_NUMBER >= firstEpisode;
-        }
-        // If it's the last season, filter episodes up to last episode
-        if (seasonNumber === lastSeason) {
-          return EPISODE_NUMBER <= lastEpisode;
-        }
-        // Else, include all episodes
-        return true;
-      });
+      );
       // If no episodes matched, return null
       if (FILTERED_EPISODES_LIST.length === 0) {
         return null;
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
       // Return the season object with filtered episodes in the desired format
       return {
         seasonNumber,
-        episodesList: FILTERED_EPISODES_LIST.map((episode: any) => ({
+        episodesList: FILTERED_EPISODES_LIST.map((episode: TMDB_EPISODE) => ({
           episodeNumber: episode.episode_number,
           title: episode.name,
           description: episode.overview,
