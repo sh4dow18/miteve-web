@@ -1,6 +1,7 @@
 // Player Page Requirements
 import { Metadata } from "next";
 import { NotFound, Player } from "@/components";
+import { FindNextEpisodeByNumber, FindSeasonByNumber } from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,27 +13,118 @@ export const metadata: Metadata = {
 // Player Page Main Function
 async function PlayerPage({ searchParams }: Props) {
   // Player Page Main Params
-  const ID = (await searchParams).id;
-  // Check if the content exists
-  const EXISTS = await fetch(`http://localhost:8080/api/movies/stream/${ID}`, {
-    method: "HEAD",
-  });
-  const CONTENT = await fetch(`http://localhost:8080/api/movies/${ID}`).then(
-    (response) => response.json()
-  );
-  // Check if exists a low quality version
-  const LOW_RESOLUTION = await fetch(
-    `http://localhost:8080/api/movies/stream/${ID}?quality=low`,
+  const PARAM_ID = (await searchParams).id;
+  const PARAM_TYPE = (await searchParams).type;
+  const PARAM_SEASON = (await searchParams).season;
+  const PARAM_EPISODE = (await searchParams).episode;
+  const ID = typeof PARAM_ID === "string" ? PARAM_ID : "";
+  const TYPE = typeof PARAM_TYPE === "string" ? PARAM_TYPE : "";
+  const SEASON = typeof PARAM_SEASON === "string" ? PARAM_SEASON : "";
+  const EPISODE = typeof PARAM_EPISODE === "string" ? PARAM_EPISODE : "";
+  // Function that check if the param submitted is valid
+  const ValidNumberParam = (param: string): boolean => {
+    if (param === "") {
+      return false;
+    }
+    return /^[0-9]+$/.test(param);
+  };
+  // Function that check if the information submitted could get a valid file
+  const ValidFile = (): boolean => {
+    // Check if Type Exists and it is Movies or Series
+    if (TYPE === "" || !(TYPE === "movies" || TYPE === "series")) {
+      return false;
+    }
+    // If Type is Movies and ID is not a Valid Code Number, return false
+    if (TYPE === "movies" && !ValidNumberParam(ID)) {
+      return false;
+    }
+    // If Type is Series and if ID, SEASON or EPISODE are not a Valid Code Numbers, return false
+    if (
+      TYPE === "series" &&
+      (!ValidNumberParam(ID) ||
+        !ValidNumberParam(SEASON) ||
+        !ValidNumberParam(EPISODE))
+    ) {
+      return false;
+    }
+    // If everything is ok, return true
+    return true;
+  };
+  // If is an invalid file, return Not Found
+  if (ValidFile() === false) {
+    return (
+      <NotFound
+        backTo={{
+          name: "Inicio",
+          href: "/",
+        }}
+      />
+    );
+  }
+  // Check if the content file exists
+  const EXISTS = await fetch(
+    `http://localhost:8080/api/${TYPE}/stream/${ID}${
+      TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
+    }`,
     {
       method: "HEAD",
     }
   );
-  return EXISTS.ok ? (
+  // Get Content Information
+  const CONTENT = await fetch(`http://localhost:8080/api/${TYPE}/${ID}`).then(
+    (response) => response.json()
+  );
+  // Check if exists a low quality version file
+  const LOW_RESOLUTION = await fetch(
+    `http://localhost:8080/api/${TYPE}/stream/${ID}${
+      TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
+    }?quality=low`,
+    {
+      method: "HEAD",
+    }
+  );
+  // If the content is a series, Find the Season by Number
+  const SEASONS_LIST =
+    TYPE === "series"
+      ? await FindSeasonByNumber(ID, Number.parseInt(SEASON))
+      : undefined;
+  // If the content is a series, find the next episode by episode number
+  const NEXT_EPISODE =
+    TYPE === "series"
+      ? await FindNextEpisodeByNumber(ID, SEASON, EPISODE)
+      : undefined;
+  return EXISTS.ok === true ? (
     <Player
       id={`${ID}`}
-      name={CONTENT.title}
-      description={CONTENT.description}
+      name={
+        TYPE === "movies"
+          ? CONTENT.title
+          : `${CONTENT.title}: T${SEASON} E${EPISODE}`
+      }
+      description={
+        TYPE === "movies"
+          ? CONTENT.description
+          : SEASONS_LIST.episodesList.find(
+              (episode: { episodeNumber: number }) =>
+                episode.episodeNumber === Number.parseInt(EPISODE)
+            ).description
+      }
       changeQuality={LOW_RESOLUTION.ok === true}
+      series={
+        TYPE === "series"
+          ? {
+              season: SEASON,
+              episode: EPISODE,
+              nextEpisode:
+                NEXT_EPISODE !== undefined && NEXT_EPISODE.status === undefined
+                  ? {
+                      season: NEXT_EPISODE.seasonNumber,
+                      episode: NEXT_EPISODE.episodeNumber,
+                    }
+                  : undefined,
+            }
+          : undefined
+      }
     />
   ) : (
     <NotFound

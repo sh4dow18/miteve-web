@@ -1,9 +1,9 @@
 // Series Content Page Requirements
-import { NotFound, Seasons } from "@/components";
+import { ContentOverview, NotFound, Seasons, Slider } from "@/components";
 import {
-  FindSeasonsAvailable,
+  FindRecomendationsBySeries,
+  FindSeasonByNumber,
   FindSeriesById,
-  FindTMDBSeriesById,
 } from "@/lib/series";
 import { Metadata } from "next";
 // Series Content Page  Props
@@ -16,13 +16,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Generate Metadata Main Params
   const { id } = await params;
   // Generate Metadata Constants
-  const EXISTING_SERIES = FindSeriesById(id);
-  const CONTENT = await FindTMDBSeriesById(id);
-  const TITLE = CONTENT.name;
+  const CONTENT = await FindSeriesById(id);
+  const TITLE = CONTENT.title;
   // Returns Metadata Generated
   return {
-    title: EXISTING_SERIES ? TITLE : "No Encontrado",
-    description: EXISTING_SERIES
+    title: CONTENT ? TITLE : "No Encontrado",
+    description: CONTENT
       ? `Aqui se pueden encontrar toda la información referente a la película '${TITLE}'`
       : "No Encontrado",
   };
@@ -33,61 +32,62 @@ async function SeriesContentPage({ params, searchParams }: Props) {
   const { id } = await params;
   const SEASON = (await searchParams).season;
   // Series Content Page Constants
-  const EXISTING_SERIES = FindSeriesById(id);
-  const SEASONS_AVAILABLE_LIST = FindSeasonsAvailable(id);
+  const CONTENT = await FindSeriesById(id);
+  const RECOMENDATIONS = await FindRecomendationsBySeries(id);
+  const FIRST_SEASON =
+    CONTENT.seasonsList.length > 0
+      ? await FindSeasonByNumber(id, CONTENT.seasonsList[0])
+      : { seasonNumber: 1, episodesList: [{ episodeNumber: 1 }] };
+  const FIRST_EPISODE = FIRST_SEASON.episodesList[0].episodeNumber;
   // Returns Series Content Page
-  return EXISTING_SERIES ? (
+  return CONTENT.id !== undefined ? (
     // Series Content Main Container
     <div className="flex flex-col gap-5 p-10 max-w-4xl min-[897px]:mx-auto">
-      {/* <ContentOverview
+      <ContentOverview
         player={{
           id: id,
           series: {
-            season: `${EXISTING_SERIES.seasons[0]}`,
-            episode: `${
-              EXISTING_SERIES.uncompleteSeasons &&
-              EXISTING_SERIES.uncompleteSeasons[0].number ===
-                EXISTING_SERIES.seasons[0]
-                ? EXISTING_SERIES.uncompleteSeasons[0].from + 1
-                : 1
-            }`,
+            season: `${FIRST_SEASON.seasonNumber}`,
+            episode: `${FIRST_EPISODE}`,
           },
         }}
-        title={CONTENT.name}
-        image={CONTENT.poster_path}
-        background={CONTENT.backdrop_path}
-        date={CONTENT.last_air_date.split("-")[0]}
-        genresList={CONTENT.genres}
+        title={CONTENT.title}
+        image={CONTENT.cover}
+        background={CONTENT.background}
+        date={CONTENT.year}
+        genres={CONTENT.genres}
         tagline={CONTENT.tagline}
-        overview={CONTENT.overview}
-        rating={CONTENT.vote_average}
-        certification={CERTIFICATION}
+        overview={CONTENT.description}
+        rating={CONTENT.rating}
+        certification={CONTENT.classification}
         credits={{
-          names: CREDITS,
+          names: CONTENT.cast,
           href: `/series/${id}/cast`,
         }}
-        trailer={TRAILER}
-      /> */}
-      {/* Display Seasons Component */}
-      <Seasons
-        seriesId={id}
-        seasonsAvailableList={
-          SEASONS_AVAILABLE_LIST ? SEASONS_AVAILABLE_LIST : [1]
-        }
-        displaySeason={
-          typeof SEASON === "string" &&
-          Number.isNaN(Number.parseInt(SEASON)) === false
-            ? Number.parseInt(SEASON)
-            : undefined
-        }
+        trailer={CONTENT.trailer}
       />
-      {/* Recomendations Slider */}
-      {/* <Slider
-        title="Recomendaciones"
-        contentList={RECOMENDATIONS}
-        type="series"
-        lessSlides
-      /> */}
+      {CONTENT.seasonsList.length > 0 && (
+        // Display Seasons Component
+        <Seasons
+          seriesId={id}
+          seasonsList={CONTENT.seasonsList}
+          displaySeason={
+            typeof SEASON === "string" &&
+            Number.isNaN(Number.parseInt(SEASON)) === false
+              ? Number.parseInt(SEASON)
+              : undefined
+          }
+        />
+      )}
+      {RECOMENDATIONS.length > 0 && (
+        // Recomendations Slider
+        <Slider
+          title="Recomendaciones"
+          contentList={RECOMENDATIONS}
+          type="series"
+          lessSlides
+        />
+      )}
     </div>
   ) : (
     <NotFound

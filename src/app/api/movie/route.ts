@@ -1,4 +1,4 @@
-// Get Episodes Endpoint Requirements
+// Get Content from The Movie Database Endpoint Requirements
 import { TMDB_API_KEY } from "@/lib/admin";
 const COSTA_RICA_CLASIFICATIONS: Record<string, string> = {
   AA: "Todo Público",
@@ -8,39 +8,59 @@ const COSTA_RICA_CLASIFICATIONS: Record<string, string> = {
   "B-15": "+15",
   C: "+18",
   D: "+18",
+  "N/A": "N/A",
 };
-// Get Episodes Endpoint Main Function
+// Get Content from The Movie Database Endpoint Main Function
 export async function GET(request: Request) {
-  // Get Episodes Endpoint Main Constants
+  // Get Content from The Movie Database Endpoint Main Constants
   const { searchParams } = new URL(request.url);
   const ID = searchParams.get("id");
-  // Get all Episodes from a Specific Season from a Specific Series
-  const MOVIE = await fetch(
-    `https://api.themoviedb.org/3/movie/${ID}?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+  const SERIES = searchParams.get("series");
+  // Get all Content Information
+  const CONTENT = await fetch(
+    `https://api.themoviedb.org/3/${
+      SERIES === null ? "movie" : "tv"
+    }/${ID}?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
   ).then((response) => response.json());
-  const MOVIES_RELEASE_DATES = await fetch(
-    `https://api.themoviedb.org/3/movie/${ID}/release_dates?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+  // Get all Certifications from the Content
+  const CERTIFICATIONS = await fetch(
+    `https://api.themoviedb.org/3/${SERIES === null ? "movie" : "tv"}/${ID}/${
+      SERIES === null ? "release_dates" : "content_ratings"
+    }?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
   ).then((response) => response.json());
+  // Get all Credits from Content
   const CREDITS = await fetch(
-    `https://api.themoviedb.org/3/movie/${ID}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
+    `https://api.themoviedb.org/3/${
+      SERIES === null ? "movie" : "tv"
+    }/${ID}/credits?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`
   ).then((response) => response.json());
-  const MEXICO_RELEASE_DATE = MOVIES_RELEASE_DATES.results.find(
-    (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
-  );
+  // Get all Mexico Certifications
+  const MEXICO_CERTIFICATIONS = CERTIFICATIONS.results
+    ? CERTIFICATIONS.results.find(
+        (movie: { iso_3166_1: string }) => movie.iso_3166_1 === "MX"
+      )
+    : null;
+  // Get First Mexico Certification
   const CERTIFICATION =
-    MEXICO_RELEASE_DATE &&
-    MEXICO_RELEASE_DATE.release_dates[0].certification !== ""
-      ? COSTA_RICA_CLASIFICATIONS[
-          MEXICO_RELEASE_DATE.release_dates[0].certification
-        ]
+    SERIES === null
+      ? MEXICO_CERTIFICATIONS &&
+        MEXICO_CERTIFICATIONS.release_dates[0].certification !== ""
+        ? MEXICO_CERTIFICATIONS.release_dates[0].certification
+        : "N/A"
+      : MEXICO_CERTIFICATIONS && MEXICO_CERTIFICATIONS.rating !== ""
+      ? MEXICO_CERTIFICATIONS.rating
       : "N/A";
-  // Returns Episodes List
+  // Get First 2 Cast Actors
+  const CAST = CREDITS.cast
+    ? `${CREDITS.cast
+        .slice(0, 2)
+        .map((actor: { name: string }) => actor.name)
+        .join(", ")}, más`
+    : null;
+  // Returns Content Information
   return Response.json({
-    ...MOVIE,
-    classification: CERTIFICATION,
-    cast: `${CREDITS.cast
-      .slice(0, 2)
-      .map((actor: { name: string }) => actor.name)
-      .join(", ")}, más`,
+    ...CONTENT,
+    classification: COSTA_RICA_CLASIFICATIONS[CERTIFICATION],
+    cast: CAST !== ", más" && CAST !== null ? CAST : "N/A",
   });
 }

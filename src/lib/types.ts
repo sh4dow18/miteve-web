@@ -18,10 +18,10 @@ export type Genre = {
   name: string;
 };
 export type Episode = {
-  episode_number: number;
-  still_path: string;
-  name: string;
-  overview: string;
+  episodeNumber: number;
+  cover: string;
+  title: string;
+  description: string;
 };
 export type Season = {
   season_number: number;
@@ -67,3 +67,24 @@ export interface NavigatorConnection {
     saveData: boolean;
   };
 }
+export type TMBD_CONTENT = {
+  id: string;
+  title: string;
+  year: string;
+  tagline: string;
+  description: string;
+  rating: string;
+  originCountry?: string;
+  classification: string;
+  cast: string;
+  company?: string;
+  collection?: string;
+  cover: string;
+  background: string;
+};
+export type TMDB_EPISODE = {
+  episode_number: string;
+  name: string;
+  overview: string;
+  still_path: string;
+};

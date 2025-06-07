@@ -2,7 +2,7 @@
 import seriesList from "@/db/series.json";
 import seriesExtraList from "@/db/series-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { Series, SeriesExtra } from "./types";
+import { MinimalContent, Series } from "./types";
 // Find all the anime series
 export function FindAnimes() {
   return seriesList
@@ -42,8 +42,10 @@ export function FindUncompleteSeason(id: string, seasonId: string) {
     ?.uncompleteSeasons?.find((season) => `${season.number}` === seasonId);
 }
 // Find Series by Id
-export function FindSeriesById(id: string): SeriesExtra | undefined {
-  return seriesExtraList.find((series) => series.id === id);
+export async function FindSeriesById(id: string) {
+  return await fetch(`http://localhost:8080/api/series/${id}`).then(
+    (response) => response.json()
+  );
 }
 // Find Certification From Series
 export async function FindCertificationFromSeries(id: string) {
@@ -53,14 +55,11 @@ export async function FindCertificationFromSeries(id: string) {
 export async function FindCastFromSeries(id: string) {
   return seriesList.find((series) => series.id === id)?.credits;
 }
-// Find the 10 First Recomendations From Series Function
-export function FindRecomendationsBySeries(id: string) {
-  const SERIES = seriesList.find((movie) => movie.id === id);
-  const GENRE = SERIES?.genres[0].name;
-  const MOVIES_BY_GENRE_LIST = seriesList
-    .filter((series) => series.genres.some((genre) => genre.name === GENRE))
-    .filter((series) => series.id !== id);
-  return MOVIES_BY_GENRE_LIST.slice(0, 10);
+// Find the Recomendations From Series Function
+export async function FindRecomendationsBySeries(id: string) {
+  return await fetch(
+    `http://localhost:8080/api/series/recommendations/${id}`
+  ).then((response) => response.json());
 }
 // Find All Series Cast From The Movie Database (TMDB) API
 export async function FindAllSeriesCastFromTMDB(id: string) {
@@ -71,4 +70,32 @@ export async function FindAllSeriesCastFromTMDB(id: string) {
 // Find All Series Function
 export function FindAllSeries(): Series[] {
   return seriesList;
+}
+// Find multiple movies by series ID list
+export async function FindSeriesByIds(
+  seriesIdList: string[]
+): Promise<MinimalContent[]> {
+  return await Promise.all(
+    seriesIdList.map((seriesId) =>
+      fetch(`http://localhost:8080/api/series/minimal/${seriesId}`).then(
+        (response) => response.json()
+      )
+    )
+  );
+}
+// Find Season by Season Number and Series Id
+export async function FindSeasonByNumber(id: string, seasonNumber: number) {
+  return await fetch(
+    `http://localhost:8080/api/series/${id}/season/${seasonNumber}`
+  ).then((response) => response.json());
+}
+// Find Next Episode by Episode Number, Season Number and Series Id
+export async function FindNextEpisodeByNumber(
+  id: string,
+  seasonNumber: string,
+  episodeNumber: string
+) {
+  return await fetch(
+    `http://localhost:8080/api/series/next/${id}/season/${seasonNumber}/episode/${episodeNumber}`
+  ).then((response) => response.json());
 }
