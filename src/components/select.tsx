@@ -7,10 +7,12 @@ interface Props {
   name: string;
   label: string;
   optionsList: { name: string; value: string }[];
+  help: string;
   multiple?: boolean;
+  disabled?: boolean;
 }
 // Select Main Function
-function Select({ name, label, optionsList, multiple }: Props) {
+function Select({ name, label, optionsList, help, multiple, disabled }: Props) {
   // Select hooks
   const selectRef = useRef<HTMLSelectElement | null>(null);
   const [state, SetState] = useState<"Valid" | "Neutral">("Neutral");
@@ -31,7 +33,8 @@ function Select({ name, label, optionsList, multiple }: Props) {
       {/* Select Label */}
       <label
         htmlFor={name}
-        className="text-black font-medium dark:text-white lowContrast:text-gray-500"
+        aria-disabled={disabled}
+        className="font-medium text-white aria-disabled:text-gray-500"
       >
         {label}
       </label>
@@ -44,8 +47,17 @@ function Select({ name, label, optionsList, multiple }: Props) {
           name={name}
           multiple={multiple}
           onChange={OnChange}
-          aria-invalid={state === "Valid" ? false : undefined}
-          className="w-full appearance-none bg-gray-50 text-black rounded-md outline-2 py-2 pl-1 outline-gray-300 focus-within:outline-mateoryPurple dark:bg-gray-800 dark:text-white dark:outline-gray-800 highContrast:bg-white highContrast:outline-black lowContrast:bg-gray-100 lowContrast:outline-gray-300 lowContrast:text-gray-500 min-[344px]:pl-3"
+          aria-invalid={
+            disabled !== true
+              ? multiple
+                ? state === "Valid"
+                  ? false
+                  : undefined
+                : false
+              : true
+          }
+          disabled={disabled}
+          className="w-full appearance-none rounded-md outline-2 py-2 pl-1 bg-gray-800 text-white outline-gray-800 focus-within:outline-mateoryPurple aria-disabled:bg-gray-900 min-[344px]:pl-3"
         >
           {optionsList.map((option, index) => (
             <option key={index} value={option.value}>
@@ -60,6 +72,12 @@ function Select({ name, label, optionsList, multiple }: Props) {
           </div>
         )}
       </div>
+      <small
+        aria-disabled={disabled}
+        className="aria-disabled:text-gray-700"
+      >{`${help}${
+        multiple ? ". Puede usar Ctrl + Clíc para seleccionar varios" : ""
+      }`}</small>
     </div>
   );
 }

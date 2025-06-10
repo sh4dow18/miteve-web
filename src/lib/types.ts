@@ -88,3 +88,8 @@ export type TMDB_EPISODE = {
   overview: string;
   still_path: string;
 };
+export type CONTAINER = {
+  id: number;
+  name: string;
+  type: string;
+};
