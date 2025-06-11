@@ -104,7 +104,7 @@ function ContentOverview({
           {/* Content Overview Description Title */}
           <span className="font-semibold text-gray-300">Descripción</span>
           {/* Content Overview Description Paragraph */}
-          <p className="leading-7 text-justify hyphens-auto">{overview}</p>
+          <p className="leading-7 hyphens-auto">{overview}</p>
         </section>
         {/* Content Overview Extra Information Container */}
         <div className="flex flex-col gap-3 min-[477px]:flex-row min-[477px]:flex-wrap min-[477px]:items-center">
