@@ -54,6 +54,12 @@ function Player({ id, name, description, series }: Props) {
     resolution: "HD",
     subtitlesOn: true,
   });
+  const [rangeStates, SetRangeStates] = useState({
+    hoverTime: 0,
+    isHovering: false,
+    hoverX: 0,
+    buffered: 0,
+  });
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
     if (videoStates.paused === false) {
@@ -186,6 +192,27 @@ function Player({ id, name, description, series }: Props) {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoStates.resolution]);
+  // Execute this use effect when the page is loading to set the buffered video
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    const UpdateBuffered = () => {
+      if (VIDEO.buffered.length > 0) {
+        const END = VIDEO.buffered.end(VIDEO.buffered.length - 1);
+        const DURATION = VIDEO.duration || 1;
+        SetRangeStates({
+          ...rangeStates,
+          buffered: (END / DURATION) * 100,
+        });
+      }
+    };
+    VIDEO.addEventListener("progress", UpdateBuffered);
+    return () => {
+      VIDEO.removeEventListener("progress", UpdateBuffered);
+    };
+  }, [rangeStates]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -389,16 +416,65 @@ function Player({ id, name, description, series }: Props) {
       >
         {/* Player Progress Container */}
         <div className="flex items-center gap-3">
-          {/* Progress Bar */}
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="0.1"
-            value={videoStates.progress}
-            onChange={ChangeTimeInProgressBar}
-            className="w-full rounded-sm appearance-none bg-gray-400 accent-primary cursor-pointer hover:bg-gray-200"
-          />
+          {/* Progress Bar Container */}
+          <div className="relative w-full h-7 group">
+            {/* Base Time Line */}
+            <div className="absolute top-1/2 left-0 w-full h-1.5 bg-gray-400 rounded-full transform -translate-y-1/2 z-0 group-hover:h-2.5" />
+            {/* Buffered Video Time Line */}
+            <div
+              className="absolute top-1/2 left-0 h-1.5 bg-primary-light rounded-full transform -translate-y-1/2 z-10 group-hover:h-2.5"
+              style={{ width: `${rangeStates.buffered}%` }}
+            />
+            {/* Progress Bar */}
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value={videoStates.progress}
+              onChange={ChangeTimeInProgressBar}
+              onMouseMove={(event) => {
+                // Get the size and position of the element relative to the viewport
+                const rect = event.currentTarget.getBoundingClientRect();
+                // Calculate the horizontal mouse position inside the element in pixels
+                const x = event.clientX - rect.left;
+                // Convert the position to a percentage of the element's width
+                const percent = x / rect.width;
+                SetRangeStates({
+                  ...rangeStates,
+                  hoverTime:
+                    (videoRef.current ? videoRef.current.duration : 100) *
+                    percent,
+                  isHovering: true,
+                  hoverX: x,
+                });
+              }}
+              onMouseLeave={() =>
+                SetRangeStates({
+                  ...rangeStates,
+                  isHovering: false,
+                })
+              }
+              className="w-full h-2 appearance-none bg-transparent cursor-pointer range-thumb relative z-20"
+            />
+            {rangeStates.isHovering && (
+              // Show Time In Progress Bar Container
+              <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-20">
+                {/* Show Time in Progress Bar Line */}
+                <div
+                  className="absolute top-2 h-3 w-0.5 bg-yellow-400"
+                  style={{ left: `${rangeStates.hoverX}px` }}
+                />
+                {/* Show Time in Progress Bar Time */}
+                <div
+                  className="absolute -top-6 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded"
+                  style={{ left: `${rangeStates.hoverX}px` }}
+                >
+                  {FormatTime(rangeStates.hoverTime)}
+                </div>
+              </div>
+            )}
+          </div>
           {/* Player Time Container */}
           <div className="flex gap-1 w-20 text-xs px-3 pt-1 select-none min-[581px]:w-48 min-[1027px]:text-sm">
             <span>{videoStates.currentTime}</span>
