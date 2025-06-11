@@ -1,7 +1,7 @@
 // Movies Page Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Slider, UpdateContent } from "@/components";
-import { FindMoviesByIds } from "@/lib/movies";
+import { FindMoviesContainers } from "@/lib/movies";
 import { Metadata } from "next";
 import Link from "next/link";
 // Movies Page Metadata
@@ -12,13 +12,8 @@ export const metadata: Metadata = {
 };
 // Movies Page Main Function
 async function MoviesPage() {
-  // Movies Page Sliders List Information
-  const SLIDERS_LIST = [
-    {
-      title: "Para Disfrutar en Familia",
-      contentList: [...(await FindMoviesByIds(["9502"]))],
-    },
-  ];
+  // Movies Page Containers List Information
+  const CONTAINERS_LIST = await FindMoviesContainers();
   // Returns Movies Page
   return (
     // Movies Page Main Container
@@ -44,11 +39,11 @@ async function MoviesPage() {
       </div>
       {/* Movies Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
-        {SLIDERS_LIST.map((slider, index) => (
+        {CONTAINERS_LIST.map((container) => (
           <Slider
-            key={index}
-            title={slider.title}
-            contentList={slider.contentList}
+            key={container.id}
+            title={container.name}
+            contentList={container.contentList}
             type="movies"
           />
         ))}

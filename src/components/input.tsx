@@ -9,7 +9,7 @@ interface Props {
   placeholder: string;
   name: string;
   help: string;
-  validation: "float" | "text" | "int" | "name" | "file" | "time";
+  validation: "float" | "text" | "int" | "intNoCero" | "name" | "file" | "time";
   disabled?: boolean;
   autoComplete?: string;
   maxLength?: number;
@@ -27,6 +27,9 @@ const REGEX: Record<string, RegExp> = {
   // Only Integer Numbers
   // Example: 8000 or 9502
   int: /^\d+$/,
+  // Only Integer Numbers without 0
+  // Example: 8000 or 9502
+  intNoCero: /^[1-9]\d*$/,
   // Only Names
   // Example: John Doe or Mario Bros
   name: /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ']+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ']+)*$/,
@@ -121,7 +124,7 @@ function Input({
       {/* Input Help Message */}
       <small
         aria-disabled={disabled}
-        className={`aria-disabled:text-gray-300 dark:aria-disabled:text-gray-600 ${
+        className={`aria-disabled:text-gray-600 ${
           state !== "Neutral"
             ? state === "Invalid"
               ? "text-red-500"

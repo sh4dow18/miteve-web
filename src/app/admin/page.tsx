@@ -2,7 +2,7 @@
 "use client";
 // Admin Page Requirements
 import { Form, Input, Select } from "@/components";
-import { TMBD_CONTENT } from "@/lib/types";
+import { CONTAINER, TMBD_CONTENT } from "@/lib/types";
 import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 // Admin Page Main Function
@@ -14,6 +14,7 @@ function Admin() {
     { id: 3, name: "Series" },
     { id: 4, name: "Temporadas" },
     { id: 5, name: "Episodios" },
+    { id: 6, name: "Contenedores" },
   ];
   const DEFAULT_CONTENT_INFO = {
     id: "No hay Información",
@@ -30,9 +31,17 @@ function Admin() {
     cover: "404.png",
     background: "404.png",
   };
+  const CONTAINER_TYPES_LIST = [
+    { name: "Series", value: "series" },
+    { name: "Peliculas", value: "movies" },
+  ];
   // Admin Page Hooks
   const [selectedModel, SetSelectedModel] = useState<number>(1);
   const [genresList, SetGenresList] = useState([]);
+  const [containers, SetContainers] = useState({
+    movies: [],
+    series: [],
+  });
   const contentRef = useRef<HTMLInputElement | null>(null);
   const [contentInfo, SetContentInfo] =
     useState<TMBD_CONTENT>(DEFAULT_CONTENT_INFO);
@@ -49,7 +58,30 @@ function Admin() {
         }))
       );
     };
+    // Function used to get containers from API
+    const GetContainers = async () => {
+      const RESPONSE = await fetch("/api/container").then((response) =>
+        response.json()
+      );
+      const MOVIES_CONTAINERS_LIST = RESPONSE.filter(
+        (container: CONTAINER) => container.type === "movies"
+      ).map((container: CONTAINER) => ({
+        name: container.name,
+        value: `${container.id}`,
+      }));
+      const SERIES_CONTAINERS_LIST = RESPONSE.filter(
+        (container: CONTAINER) => container.type === "series"
+      ).map((container: CONTAINER) => ({
+        name: container.name,
+        value: `${container.id}`,
+      }));
+      SetContainers({
+        movies: MOVIES_CONTAINERS_LIST,
+        series: SERIES_CONTAINERS_LIST,
+      });
+    };
     GetGenres();
+    GetContainers();
   }, []);
   // Function that allows to get Movie Info from The Movie Database API
   const GetMovieInfo = async () => {
@@ -169,7 +201,8 @@ function Admin() {
       background: contentInfo.background,
       genresList: GENRES_LIST,
       trailer: FORM.trailer.value,
-      content: FORM.content.value,
+      containerId: FORM.container.value,
+      orderInContainer: FORM.orderNumber.value,
     };
     return await fetch("http://localhost:8080/api/movies", {
       method: "POST",
@@ -201,6 +234,8 @@ function Admin() {
       background: contentInfo.background,
       genresList: GENRES_LIST,
       trailer: FORM.trailer.value,
+      containerId: FORM.container.value,
+      orderInContainer: FORM.orderNumber.value,
     };
     return await fetch("http://localhost:8080/api/series", {
       method: "POST",
@@ -243,6 +278,21 @@ function Admin() {
     };
     return await fetch("/api/update-episode", {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Containers Form On Submit Function
+  const ContainersSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    const BODY = {
+      name: FORM.containerName.value,
+      type: FORM.containerType.value,
+    };
+    return await fetch("/api/container", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -304,7 +354,7 @@ function Admin() {
       {selectedModel === 2 && (
         <Form
           className="flex flex-col gap-4 w-full max-w-xl"
-          submitButton="Agregar Contenido"
+          submitButton="Agregar Película"
           extraValidation={contentInfo.title !== "No hay Información"}
           OnSubmit={MovieSubmit}
         >
@@ -312,7 +362,7 @@ function Admin() {
             label="The Movie Database Id"
             placeholder="123456"
             name="tmdbId"
-            help="Identificador del Contenido de TMBD"
+            help="Identificador de la Película en TMBD"
             validation="int"
             reference={contentRef}
           />
@@ -322,7 +372,7 @@ function Admin() {
             type="button"
             onClick={GetMovieInfo}
           >
-            Buscar Información
+            Buscar Película
           </button>
           {/* Movie Information Section */}
           <section className="flex flex-col gap-4">
@@ -412,9 +462,28 @@ function Admin() {
             label="Géneros"
             name="genresList"
             optionsList={genresList}
+            help="Géneros Disponibles para las películas"
+            disabled={genresList.length === 0}
             multiple
           />
-          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+          {/* Containers List Select */}
+          <Select
+            label="Contenedor"
+            name="container"
+            optionsList={containers.movies}
+            help="Géneros Disponibles para las películas"
+            disabled={containers.movies.length === 0}
+          />
+          <div className="flex flex-col gap-3 min-[530px]:flex-row">
+            {/* Order Input */}
+            <Input
+              label="Orden en Contenedor"
+              placeholder="3"
+              name="orderNumber"
+              help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+              validation="intNoCero"
+              maxLength={2}
+            />
             {/* Trailer Input */}
             <Input
               label="Trailer"
@@ -423,15 +492,6 @@ function Admin() {
               help="Código de Trailer de Youtube"
               validation="text"
               maxLength={20}
-            />
-            {/* Content Input */}
-            <Input
-              label="Archivo de Película"
-              placeholder="Kung Fu Panda.webm"
-              name="content"
-              help="Nombre del Archivo de la Película"
-              validation="file"
-              maxLength={40}
             />
           </div>
         </Form>
@@ -544,17 +604,38 @@ function Admin() {
             label="Géneros"
             name="genresList"
             optionsList={genresList}
+            help="Géneros Disponibles para las películas"
+            disabled={genresList.length === 0}
             multiple
           />
-          {/* Trailer Input */}
-          <Input
-            label="Trailer"
-            placeholder="PXi3Mv6KMzY"
-            name="trailer"
-            help="Código de Trailer de Youtube"
-            validation="text"
-            maxLength={20}
+          {/* Containers List Select */}
+          <Select
+            label="Contenedor"
+            name="container"
+            optionsList={containers.series}
+            help="Géneros Disponibles para las películas"
+            disabled={containers.series.length === 0}
           />
+          <div className="flex flex-col gap-3 min-[530px]:flex-row">
+            {/* Order Input */}
+            <Input
+              label="Orden en Contenedor"
+              placeholder="3"
+              name="orderNumber"
+              help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+              validation="intNoCero"
+              maxLength={2}
+            />
+            {/* Trailer Input */}
+            <Input
+              label="Trailer"
+              placeholder="PXi3Mv6KMzY"
+              name="trailer"
+              help="Código de Trailer de Youtube"
+              validation="text"
+              maxLength={20}
+            />
+          </div>
         </Form>
       )}
       {/* Admin Page Season Form */}
@@ -699,6 +780,31 @@ function Admin() {
             help="Tiempo en el que empiezan los créditos del capitulo"
             validation="time"
             maxLength={8}
+          />
+        </Form>
+      )}
+      {/* Admin Page Container Form */}
+      {selectedModel === 6 && (
+        <Form
+          className="flex flex-col gap-4 w-full max-w-xl"
+          submitButton="Agregar Contenedor"
+          OnSubmit={ContainersSubmit}
+        >
+          {/* Container's Name Input */}
+          <Input
+            label="Nombre"
+            placeholder="Para Disfrutar en Familia"
+            name="containerName"
+            help="Nombre del Contenedor de Contenido"
+            validation="text"
+            maxLength={30}
+          />
+          {/* Container Types List Select */}
+          <Select
+            label="Tipos de Contenedor"
+            name="containerType"
+            optionsList={CONTAINER_TYPES_LIST}
+            help="Tipos de Contenedores Disponibles. Este permite conocer en que espacio se va a agregar el contenedor"
           />
         </Form>
       )}

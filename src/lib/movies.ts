@@ -2,20 +2,22 @@
 import moviesList from "@/db/movies.json";
 import moviesExtraList from "@/db/movies-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { Content, MinimalContent } from "./types";
-// Find multiple movies by movie ID list
-export async function FindMoviesByIds(
-  moviesIdsList: string[]
-): Promise<MinimalContent[]> {
-  // return moviesList.filter((movie) => moviesIdsList.includes(movie.id));
-  const RESPONSE = await Promise.all(
-    moviesIdsList.map((movieId) =>
-      fetch(`http://localhost:8080/api/movies/minimal/${movieId}`).then(
-        (response) => response.json()
-      )
-    )
-  );
-  return RESPONSE;
+import { Content, MinimalContainer, MovieContainer, MovieContainerElement } from "./types";
+// Find all movies containers
+export async function FindMoviesContainers(): Promise<MinimalContainer[]> {
+  const RESPONSE = await fetch(
+    "http://localhost:8080/api/containers/movies"
+  ).then((response) => response.json());
+  return RESPONSE.filter(
+    (container: { containerElementsList: { id: number }[] }) =>
+      container.containerElementsList.length > 0
+  ).map((container: MovieContainer) => ({
+    id: container.id,
+    name: container.name,
+    contentList: container.containerElementsList.map(
+      (element: MovieContainerElement) => element.movie
+    ),
+  }));
 }
 // Find Movie Information from The Movie Database (TMDB)
 export async function FindTMDBMovieById(id: string) {
@@ -54,9 +56,9 @@ export async function FindRecomendationsByMovie(id: string) {
 }
 // Find Movie by Id Function
 export async function FindMovieById(id: string) {
-  return await fetch(
-    `http://localhost:8080/api/movies/${id}`
-  ).then((response) => response.json());
+  return await fetch(`http://localhost:8080/api/movies/${id}`).then(
+    (response) => response.json()
+  );
 }
 // Find All Movie Cast From The Movie Database (TMDB) API
 export async function FindAllMovieCastFromTMDB(id: string) {

@@ -2,7 +2,12 @@
 import seriesList from "@/db/series.json";
 import seriesExtraList from "@/db/series-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { MinimalContent, Series } from "./types";
+import {
+  MinimalContainer,
+  Series,
+  SeriesContainer,
+  SeriesContainerElement,
+} from "./types";
 // Find all the anime series
 export function FindAnimes() {
   return seriesList
@@ -71,17 +76,21 @@ export async function FindAllSeriesCastFromTMDB(id: string) {
 export function FindAllSeries(): Series[] {
   return seriesList;
 }
-// Find multiple movies by series ID list
-export async function FindSeriesByIds(
-  seriesIdList: string[]
-): Promise<MinimalContent[]> {
-  return await Promise.all(
-    seriesIdList.map((seriesId) =>
-      fetch(`http://localhost:8080/api/series/minimal/${seriesId}`).then(
-        (response) => response.json()
-      )
-    )
-  );
+// Find all series containers
+export async function FindSeriesContainers(): Promise<MinimalContainer[]> {
+  const RESPONSE = await fetch(
+    "http://localhost:8080/api/containers/series"
+  ).then((response) => response.json());
+  return RESPONSE.filter(
+    (container: { containerElementsList: { id: number }[] }) =>
+      container.containerElementsList.length > 0
+  ).map((container: SeriesContainer) => ({
+    id: container.id,
+    name: container.name,
+    contentList: container.containerElementsList.map(
+      (element: SeriesContainerElement) => element.series
+    ),
+  }));
 }
 // Find Season by Season Number and Series Id
 export async function FindSeasonByNumber(id: string, seasonNumber: number) {

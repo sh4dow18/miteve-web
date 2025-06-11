@@ -1,6 +1,6 @@
 // Series Page Requirements
 import { Slider, UpdateContent } from "@/components";
-import { FindSeriesByIds } from "@/lib/series";
+import { FindSeriesContainers } from "@/lib/series";
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -12,17 +12,8 @@ export const metadata: Metadata = {
 };
 // Series Page Main Function
 async function SeriesPage() {
-  // Series Page Sliders List Information
-  const SLIDERS_LIST = [
-    {
-      title: "Series Imaginativas",
-      contentList: await FindSeriesByIds(["210879"]),
-    },
-    {
-      title: "Series de Estados Unidos",
-      contentList: await FindSeriesByIds(["1399"]),
-    },
-  ];
+  // Movies Page Containers List Information
+  const CONTAINERS_LIST = await FindSeriesContainers();
   // Returns Series Page
   return (
     // Series Page Main Container
@@ -48,11 +39,11 @@ async function SeriesPage() {
       </div>
       {/* Series Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
-        {SLIDERS_LIST.map((slider, index) => (
+        {CONTAINERS_LIST.map((container) => (
           <Slider
-            key={index}
-            title={slider.title}
-            contentList={slider.contentList}
+            key={container.id}
+            title={container.name}
+            contentList={container.contentList}
             type="series"
           />
         ))}
