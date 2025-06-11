@@ -93,3 +93,26 @@ export type CONTAINER = {
   name: string;
   type: string;
 };
+export type MovieContainer = {
+  id: number;
+  name: string;
+  containerElementsList: MovieContainerElement[];
+}
+export type SeriesContainer = {
+  id: number;
+  name: string;
+  containerElementsList: SeriesContainerElement[];
+}
+export type MovieContainerElement = {
+  orderNumber: number;
+  movie: MinimalContent;
+}
+export type SeriesContainerElement = {
+  orderNumber: number;
+  series: MinimalContent;
+}
+export type MinimalContainer = {
+  id: number;
+  name: string;
+  contentList: MinimalContent[];
+}
