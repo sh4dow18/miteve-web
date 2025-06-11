@@ -26,14 +26,13 @@ async function SeriesPage() {
         </h1>
         {/* Movies Page Utilities CTA Container */}
         <div className="flex items-center gap-5">
-          {/* Movies Page Utilities CTA Update Content Button */}
-          <UpdateContent type="series" />
           {/* Movies Page Utilities CTA Search Button */}
           <Link
             href="/search"
-            className="bg-gray-800 p-2 rounded-md cursor-pointer hover:bg-gray-700"
+            className="flex items-center gap-1 bg-gray-800 p-2 rounded-md cursor-pointer hover:bg-gray-700"
           >
             <MagnifyingGlassIcon className="w-5 h-5 md:w-7 md:h-7" />
+            <span className="text-gray-300 md:text-lg">Buscar</span>
           </Link>
         </div>
       </div>
