@@ -25,7 +25,6 @@ interface Props {
   id: string;
   name: string;
   description: string;
-  changeQuality: boolean;
   series?: {
     season: string;
     episode: string;
@@ -36,7 +35,7 @@ interface Props {
   };
 }
 // Player Main Function
-function Player({ id, name, description, changeQuality, series }: Props) {
+function Player({ id, name, description, series }: Props) {
   // Player Main Constants
   const TYPE = series === undefined ? "movies" : "series";
   const ICONS_STYLE =
@@ -53,7 +52,6 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     progress: 0,
     waiting: false,
     resolution: "HD",
-    canChangeResolution: false,
     subtitlesOn: true,
   });
   // Execute this use effect when the video is paused to hide or display the controllers
@@ -116,8 +114,7 @@ function Player({ id, name, description, changeQuality, series }: Props) {
     // Get Navigation Connection to now network speed test
     const CONNECTION = (navigator as NavigatorConnection).connection;
     // Check if it an Slow Internet
-    const IS_CONNECTION_SLOW =
-      CONNECTION && ["slow-2g", "2g", "3g"].includes(CONNECTION.effectiveType);
+    const IS_CONNECTION_SLOW = CONNECTION && CONNECTION.effectiveType !== "4g";
     // Set it would be use the low quality version
     const LOW_QUALITY =
       videoStates.resolution === "SD" || IS_CONNECTION_SLOW === true;
@@ -254,24 +251,6 @@ function Player({ id, name, description, changeQuality, series }: Props) {
       VIDEO.duration
     );
   };
-  // Function that allows to change resolution
-  const ChangeResolution = () => {
-    const VIDEO = videoRef.current;
-    if (VIDEO === null) {
-      return;
-    }
-    if (videoStates.resolution === "HD") {
-      SetVideoStates({
-        ...videoStates,
-        resolution: "SD",
-      });
-      return;
-    }
-    SetVideoStates({
-      ...videoStates,
-      resolution: "HD",
-    });
-  };
   // Function that put subtitles in video
   const PutSubtitles = () => {
     const VIDEO = videoRef.current;
@@ -339,6 +318,18 @@ function Player({ id, name, description, changeQuality, series }: Props) {
               {description}
             </p>
           </div>
+        </div>
+      </div>
+      {/* Current Resolution Display Container */}
+      <div
+        className="absolute top-0 h-full w-full aria-hidden:hidden"
+        aria-hidden={!videoStates.paused}
+      >
+        <div className="absolute top-5 right-2 flex gap-1 select-none min-[425px]:right-5 min-[865px]:right-10">
+          <FilmIcon className="w-5 h-5 fill-gray-300 min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
+          <span className="text-gray-300 font-semibold max-[425px]:text-xs min-[865px]:text-xl">
+            {videoStates.resolution}
+          </span>
         </div>
       </div>
       {/* Loading Container */}
@@ -462,31 +453,6 @@ function Player({ id, name, description, changeQuality, series }: Props) {
               onClick={VolumeAndMute}
               aria-disabled={!videoStates.muted}
             />
-            {/* Change Resolution Buttons */}
-            <div
-              className="group flex gap-1 transition-all cursor-pointer select-none hover:scale-125 hover:text-white aria-disabled:hidden"
-              onClick={ChangeResolution}
-              aria-disabled={
-                videoStates.resolution === "SD" || changeQuality === false
-              }
-            >
-              <FilmIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
-              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
-                SD
-              </span>
-            </div>
-            <div
-              className="group flex gap-1 transition-all cursor-pointer select-none hover:scale-125 hover:text-white aria-disabled:hidden"
-              onClick={ChangeResolution}
-              aria-disabled={
-                videoStates.resolution === "HD" || changeQuality === false
-              }
-            >
-              <FilmIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
-              <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
-                HD
-              </span>
-            </div>
           </div>
           {/* Player Content Title */}
           <h1 className="hidden text-gray-300 min-[615px]:block min-[865px]:text-xl">

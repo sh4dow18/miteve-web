@@ -74,15 +74,6 @@ async function PlayerPage({ searchParams }: Props) {
   const CONTENT = await fetch(`http://localhost:8080/api/${TYPE}/${ID}`).then(
     (response) => response.json()
   );
-  // Check if exists a low quality version file
-  const LOW_RESOLUTION = await fetch(
-    `http://localhost:8080/api/${TYPE}/stream/${ID}${
-      TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
-    }?quality=low`,
-    {
-      method: "HEAD",
-    }
-  );
   // If the content is a series, Find the Season by Number
   const SEASONS_LIST =
     TYPE === "series"
@@ -109,7 +100,6 @@ async function PlayerPage({ searchParams }: Props) {
                 episode.episodeNumber === Number.parseInt(EPISODE)
             ).description
       }
-      changeQuality={LOW_RESOLUTION.ok === true}
       series={
         TYPE === "series"
           ? {

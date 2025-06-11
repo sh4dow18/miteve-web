@@ -1,6 +1,6 @@
 // Movies Page Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
-import { Slider, UpdateContent } from "@/components";
+import { Slider } from "@/components";
 import { FindMoviesContainers } from "@/lib/movies";
 import { Metadata } from "next";
 import Link from "next/link";

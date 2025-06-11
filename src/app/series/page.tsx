@@ -1,5 +1,5 @@
 // Series Page Requirements
-import { Slider, UpdateContent } from "@/components";
+import { Slider } from "@/components";
 import { FindSeriesContainers } from "@/lib/series";
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Metadata } from "next";
