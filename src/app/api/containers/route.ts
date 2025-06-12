@@ -1,6 +1,9 @@
+// Containers Endpoints Requirements
+import { API_HOST_IP } from "@/lib/admin";
+// Get Containers Endpoint Main Function
 export async function GET() {
   // Find All Containers from internal API endpoint
-  const RESPONSE = await fetch("http://localhost:8080/api/containers");
+  const RESPONSE = await fetch(`${API_HOST_IP}/api/containers`);
   // Return the response from the internal API as the final result
   return new Response(JSON.stringify(await RESPONSE.json()), {
     headers: { "Content-Type": "application/json" },

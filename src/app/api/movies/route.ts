@@ -1,9 +1,11 @@
+// Insert Movie Endpoint Requirements
+import { API_HOST_IP } from "@/lib/admin";
 // Insert Movie Endpoint Function
 export async function POST(request: Request) {
   // Insert Movie Endpoint Main Constants
   const BODY = await request.json();
   // Send the Movie data to internal API endpoint
-  const RESPONSE = await fetch("http://localhost:8080/api/movies", {
+  const RESPONSE = await fetch(`${API_HOST_IP}/api/movies`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -1,7 +1,10 @@
+// Genres Endpoints Requirements
+import { API_HOST_IP } from "@/lib/admin";
+// Get Genres Endpoint Function
 export async function GET() {
   // Get all Episodes from a Specific Season from a Specific Series
-  const GENRES = await fetch("http://localhost:8080/api/genres").then(
-    (response) => response.json()
+  const GENRES = await fetch(`${API_HOST_IP}/api/genres`).then((response) =>
+    response.json()
   );
   // Returns Episodes List
   return Response.json(GENRES);
@@ -11,7 +14,7 @@ export async function POST(request: Request) {
   // Insert Genre Endpoint Main Constants
   const BODY = await request.json();
   // Send the genre data to internal API endpoint
-  const RESPONSE = await fetch("http://localhost:8080/api/genres", {
+  const RESPONSE = await fetch(`${API_HOST_IP}/api/genres`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -17,5 +17,4 @@ export { default as Select } from "./select";
 export { default as Slider } from "./slider";
 export { default as Stars } from "./stars";
 export { default as Textarea } from "./textarea";
-export { default as UpdateContent } from "./update-content";
 export { default as YoutubeVideo } from "./youtube-video";

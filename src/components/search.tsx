@@ -1,8 +1,7 @@
 // Set this component as a client component
 "use client";
 import { FindMoviesByTitle } from "@/lib/movies";
-import { FindSeriesByTitle } from "@/lib/series";
-import { MinimalContent } from "@/lib/types";
+import { FindSeriesByTitle } from "@/lib/series"
 // Search Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import Image from "next/image";

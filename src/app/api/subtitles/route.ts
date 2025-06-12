@@ -1,3 +1,5 @@
+// Get Subtitles Endpoint Requirements
+import { API_HOST_IP } from "@/lib/admin";
 // Get Subtitles Main Function
 export async function GET(request: Request) {
   // Get Subtitles Main Constants
@@ -8,7 +10,7 @@ export async function GET(request: Request) {
   const EPISODE = searchParams.get("episode");
   // Get Subtitles from API
   const SUBTITLES = await fetch(
-    `http://localhost:8080/api/${TYPE}/subtitles/${ID}${
+    `${API_HOST_IP}/api/${TYPE}/subtitles/${ID}${
       TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
     }`
   ).then((response) => response.text());

@@ -1,3 +1,5 @@
+// Update Episode Endpoint Requirements
+import { API_HOST_IP } from "@/lib/admin";
 // Function that transforms String Time in Seconds as Number
 function TimeToSeconds(hourString: string) {
   const hourParts = hourString.split(":").map(Number);
@@ -27,7 +29,7 @@ export async function PUT(request: Request) {
   };
   // Update Episode Metadata to internal API endpoint
   const EPISODE_METADATA = await fetch(
-    `http://localhost:8080/api/series/metadata/${id}/season/${seasonNumber}/episode/${episodeNumber}`,
+    `${API_HOST_IP}/api/series/metadata/${id}/season/${seasonNumber}/episode/${episodeNumber}`,
     {
       method: "PUT",
       headers: {

@@ -1,5 +1,5 @@
 // Seasons Endpoints Requirements
-import { TMDB_API_KEY } from "@/lib/admin";
+import { TMDB_API_KEY, API_HOST_IP } from "@/lib/admin";
 import { TMDB_EPISODE } from "@/lib/types";
 import { FindSeasonByNumber } from "@/lib/series";
 // Get Season Endpoint Main Function
@@ -91,16 +91,13 @@ export async function POST(request: Request) {
     // Filter out any null season results
     .filter(Boolean);
   // Send the filtered seasons data to internal API endpoint
-  const SEASONS = await fetch(
-    `http://localhost:8080/api/series/${id}/episodes`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(FILTERES_SEASON_DATA_LIST),
-    }
-  );
+  const SEASONS = await fetch(`${API_HOST_IP}/api/series/${id}/episodes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(FILTERES_SEASON_DATA_LIST),
+  });
   // Return the response from the internal API as the final result
   return new Response(JSON.stringify(await SEASONS.json()), {
     headers: { "Content-Type": "application/json" },

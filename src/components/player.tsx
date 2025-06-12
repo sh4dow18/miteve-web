@@ -4,7 +4,6 @@
 import { NavigatorConnection } from "@/lib/types";
 import {
   ArrowLeftIcon,
-  ArrowLeftStartOnRectangleIcon,
   ArrowPathIcon,
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
@@ -231,7 +230,7 @@ function Player({ id, name, description, series }: Props) {
       document.removeEventListener("keydown", UserPress);
       document.removeEventListener("fullscreenchange", FullscreenChange);
     };
-  }, []);
+  }, [series]);
   // Execute this use effect to hide or display the controllers
   useEffect(() => {
     const CONTAINER = containerRef.current;
@@ -612,7 +611,7 @@ function Player({ id, name, description, series }: Props) {
                 if (VIDEO === null) {
                   return;
                 }
-                 // Get the size and position of the element
+                // Get the size and position of the element
                 const RECTANGLE = event.currentTarget.getBoundingClientRect();
                 // Calculate the horizontal position of the mouse relative to the element
                 const POSITION_X = event.clientX - RECTANGLE.left;
