@@ -2,7 +2,12 @@
 import moviesList from "@/db/movies.json";
 import moviesExtraList from "@/db/movies-extra.json";
 import { TMDB_API_KEY } from "./admin";
-import { Content, MinimalContainer, MovieContainer, MovieContainerElement } from "./types";
+import {
+  Content,
+  MinimalContainer,
+  MovieContainer,
+  MovieContainerElement,
+} from "./types";
 // Find all movies containers
 export async function FindMoviesContainers(): Promise<MinimalContainer[]> {
   const RESPONSE = await fetch(
@@ -69,4 +74,10 @@ export async function FindAllMovieCastFromTMDB(id: string) {
 // Find All Movies Function
 export function FindAllMovies(): Content[] {
   return moviesList;
+}
+// Find Movies by Title Function
+export async function FindMoviesByTitle(title: string) {
+  return await fetch(`http://localhost:8080/api/movies/title/${title}`).then(
+    (response) => response.json()
+  );
 }
