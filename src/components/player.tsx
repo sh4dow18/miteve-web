@@ -32,6 +32,13 @@ interface Props {
       season: string;
       episode: string;
     };
+    metadata: {
+      beginSummary: number | null;
+      endSummary: number | null;
+      beginIntro: number | null;
+      endIntro: number | null;
+      beginCredits: number | null;
+    };
   };
 }
 // Player Main Function
@@ -59,6 +66,11 @@ function Player({ id, name, description, series }: Props) {
     isHovering: false,
     hoverX: 0,
     buffered: 0,
+  });
+  const [skips, SetSkips] = useState({
+    summary: false,
+    intro: false,
+    credits: false,
   });
   // Execute this use effect when the video is paused to hide or display the controllers
   useEffect(() => {
@@ -213,6 +225,41 @@ function Player({ id, name, description, series }: Props) {
       VIDEO.removeEventListener("progress", UpdateBuffered);
     };
   }, [rangeStates]);
+  // Execute this use effect when the video current time change
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (series === undefined) {
+      return;
+    }
+    const ManageSkips = () => {
+      const CURRENT_TIME = VIDEO.currentTime;
+      const BEGIN_SUMMARY = series.metadata.beginSummary;
+      const END_SUMMARY = series.metadata.endSummary;
+      const BEGIN_INTRO = series.metadata.beginIntro;
+      const END_INTRO = series.metadata.endIntro;
+      const BEGIN_CREDITS = series.metadata.beginCredits;
+      SetSkips({
+        summary:
+          BEGIN_SUMMARY !== null && END_SUMMARY !== null
+            ? CURRENT_TIME > BEGIN_SUMMARY && CURRENT_TIME < END_SUMMARY
+            : false,
+        intro:
+          BEGIN_INTRO !== null && END_INTRO !== null
+            ? CURRENT_TIME > BEGIN_INTRO && CURRENT_TIME < END_INTRO
+            : false,
+        credits: BEGIN_CREDITS !== null ? CURRENT_TIME > BEGIN_CREDITS : false,
+      });
+    };
+    VIDEO.addEventListener("timeupdate", ManageSkips);
+    VIDEO.addEventListener("seeked", ManageSkips);
+    return () => {
+      VIDEO.removeEventListener("timeupdate", ManageSkips);
+      VIDEO.removeEventListener("seeked", ManageSkips);
+    };
+  }, []);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -308,7 +355,7 @@ function Player({ id, name, description, series }: Props) {
       "0"
     )}:${String(SECONDS).padStart(2, "0")}`;
   };
-  // function that allows to handle the progress bar
+  // Function that allows to handle the progress bar
   const ChangeTimeInProgressBar = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -322,6 +369,30 @@ function Player({ id, name, description, series }: Props) {
       ...videoStates,
       currentTime: FormatTime(NEW_TIME),
     });
+  };
+  // Function that allows to skip episodes summary and intros
+  const Skip = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (series === undefined) {
+      return;
+    }
+    if (skips.summary === true && series.metadata.endSummary !== null) {
+      VIDEO.currentTime = series.metadata.endSummary;
+      SetSkips({
+        ...skips,
+        summary: false,
+      });
+    }
+    if (skips.intro === true && series.metadata.endIntro !== null) {
+      VIDEO.currentTime = series.metadata.endIntro;
+      SetSkips({
+        ...skips,
+        intro: false,
+      });
+    }
   };
   // Returns Player Component
   return (
@@ -366,6 +437,28 @@ function Player({ id, name, description, series }: Props) {
       >
         <ArrowPathIcon className="w-20 absolute top-[50%] left-[50%] -translate-[50%] animate-spin drop-shadow drop-shadow-black" />
       </div>
+      {/* Skip Summary and Intro Button */}
+      <button
+        onClick={Skip}
+        className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+          videoStates.controlersHidden
+            ? "bottom-4"
+            : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
+        }`}
+        aria-hidden={!skips.summary && !skips.intro}
+      >
+        Omitir {skips.summary === true ? "Resumen" : "Intro"}
+      </button>
+      {/* Next Episode Button in Credits */}
+      {series?.nextEpisode && (
+        <a
+          href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
+          className="absolute bottom-25 right-4 cursor-pointer transition-opacity duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:bottom-28 min-[615px]:right-10 md:text-base min-[865px]:bottom-36 hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none"
+          aria-hidden={!skips.credits}
+        >
+          Siguiente Episodio
+        </a>
+      )}
       {/* Content Video */}
       <video
         ref={videoRef}
@@ -411,7 +504,7 @@ function Player({ id, name, description, series }: Props) {
       />
       {/* Player Controlers Container */}
       <div
-        className="absolute bottom-0 w-full bg-black aria-hidden:hidden"
+        className="absolute bottom-0 w-full bg-black transition-opacity duration-500 ease-in-out opacity-100 aria-hidden:opacity-0 aria-hidden:pointer-events-none"
         aria-hidden={videoStates.controlersHidden}
       >
         {/* Player Progress Container */}
@@ -531,7 +624,7 @@ function Player({ id, name, description, series }: Props) {
             />
           </div>
           {/* Player Content Title */}
-          <h1 className="hidden text-gray-300 min-[615px]:block min-[865px]:text-xl">
+          <h1 className="hidden text-gray-300 min-[680px]:block min-[865px]:text-xl">
             {name}
           </h1>
           {/* Player Second Controlers Container */}

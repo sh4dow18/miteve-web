@@ -1,7 +1,11 @@
 // Player Page Requirements
 import { Metadata } from "next";
 import { NotFound, Player } from "@/components";
-import { FindNextEpisodeByNumber, FindSeasonByNumber } from "@/lib/series";
+import {
+  FindEpisodeMetadataByNumber,
+  FindNextEpisodeByNumber,
+  FindSeasonByNumber,
+} from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -84,6 +88,10 @@ async function PlayerPage({ searchParams }: Props) {
     TYPE === "series"
       ? await FindNextEpisodeByNumber(ID, SEASON, EPISODE)
       : undefined;
+  const EPISODE_METADATA =
+    TYPE === "series"
+      ? await FindEpisodeMetadataByNumber(ID, SEASON, EPISODE)
+      : undefined;
   return EXISTS.ok === true ? (
     <Player
       id={`${ID}`}
@@ -112,6 +120,23 @@ async function PlayerPage({ searchParams }: Props) {
                       episode: NEXT_EPISODE.episodeNumber,
                     }
                   : undefined,
+              metadata:
+                EPISODE_METADATA !== undefined &&
+                EPISODE_METADATA.status === undefined
+                  ? {
+                      beginSummary: EPISODE_METADATA.beginSummary,
+                      endSummary: EPISODE_METADATA.endSummary,
+                      beginIntro: EPISODE_METADATA.beginIntro,
+                      endIntro: EPISODE_METADATA.endIntro,
+                      beginCredits: EPISODE_METADATA.beginCredits,
+                    }
+                  : {
+                      beginSummary: null,
+                      endSummary: null,
+                      beginIntro: null,
+                      endIntro: null,
+                      beginCredits: null,
+                    },
             }
           : undefined
       }

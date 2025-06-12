@@ -108,3 +108,13 @@ export async function FindNextEpisodeByNumber(
     `http://localhost:8080/api/series/next/${id}/season/${seasonNumber}/episode/${episodeNumber}`
   ).then((response) => response.json());
 }
+// Find Episode Metadata by Episode Number, Season Number and Series Id
+export async function FindEpisodeMetadataByNumber(
+  id: string,
+  seasonNumber: string,
+  episodeNumber: string
+) {
+  return await fetch(
+    `http://localhost:8080/api/series/metadata/${id}/season/${seasonNumber}/episode/${episodeNumber}`
+  ).then((response) => response.json());
+}
