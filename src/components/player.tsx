@@ -268,6 +268,14 @@ function Player({ id, name, description, series }: Props) {
         case "F":
           Fullscreen();
           break;
+        case "m":
+        case "M":
+          VolumeAndMute();
+          break;
+        case "c":
+        case "C":
+          PutSubtitles();
+          break;
         case "ArrowRight":
           AddTime(10);
           break;
@@ -286,14 +294,14 @@ function Player({ id, name, description, series }: Props) {
     return () => {
       document.removeEventListener("keydown", UserPress);
     };
-  }, [videoRef]);
+  }, []);
   // Execute this use effect when the changes the fullscreen mode
   useEffect(() => {
     const FullscreenChange = () => {
-      SetVideoStates({
-        ...videoStates,
-        fullscreen: !!document.fullscreenElement,
-      });
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
+        fullscreen: document.fullscreenElement ? true : false,
+      }));
     };
     document.addEventListener("fullscreenchange", FullscreenChange);
     return () =>
@@ -307,18 +315,18 @@ function Player({ id, name, description, series }: Props) {
     }
     if (VIDEO.paused) {
       VIDEO.play();
-      SetVideoStates({
-        ...videoStates,
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
         paused: false,
-      });
+      }));
       return;
     }
     VIDEO.pause();
-    SetVideoStates({
-      ...videoStates,
+    SetVideoStates((prevVideoStates) => ({
+      ...prevVideoStates,
       paused: true,
       controlersHidden: false,
-    });
+    }));
   };
   // Functions that allows to mute and unmute the video
   const VolumeAndMute = () => {
@@ -328,10 +336,10 @@ function Player({ id, name, description, series }: Props) {
     }
     const NEW_STATE = !VIDEO.muted;
     VIDEO.muted = NEW_STATE;
-    SetVideoStates({
-      ...videoStates,
+    SetVideoStates((prevVideoStates) => ({
+      ...prevVideoStates,
       muted: NEW_STATE,
-    });
+    }));
   };
   // Functions that allows to set fullscreen the video and controllers
   const Fullscreen = () => {
@@ -341,17 +349,17 @@ function Player({ id, name, description, series }: Props) {
     }
     if (!document.fullscreenElement) {
       CONTAINER.requestFullscreen();
-      SetVideoStates({
-        ...videoStates,
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
         fullscreen: true,
-      });
+      }));
       return;
     }
     document.exitFullscreen();
-    SetVideoStates({
-      ...videoStates,
+    SetVideoStates((prevVideoStates) => ({
+      ...prevVideoStates,
       fullscreen: false,
-    });
+    }));
   };
   // Function that allows to Add Time to the Video
   const AddTime = (seconds: number) => {
@@ -370,19 +378,19 @@ function Player({ id, name, description, series }: Props) {
     if (VIDEO === null) {
       return;
     }
-    if (videoStates.subtitlesOn === true) {
+    if (VIDEO.textTracks[0].mode === "showing") {
       VIDEO.textTracks[0].mode = "disabled";
-      SetVideoStates({
-        ...videoStates,
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
         subtitlesOn: false,
-      });
+      }));
       return;
     }
     VIDEO.textTracks[0].mode = "showing";
-    SetVideoStates({
-      ...videoStates,
+    SetVideoStates((prevVideoStates) => ({
+      ...prevVideoStates,
       subtitlesOn: true,
-    });
+    }));
   };
   // Function that allows to Format Current and Duration Times from Video
   const FormatTime = (time: number): string => {
@@ -436,7 +444,12 @@ function Player({ id, name, description, series }: Props) {
   // Returns Player Component
   return (
     // Player Page Main Container
-    <div ref={containerRef} className="h-full w-full relative">
+    <div
+      ref={containerRef}
+      className={`h-full w-full relative ${
+        videoStates.controlersHidden === true ? "cursor-none" : "cursor-pointer"
+      }`}
+    >
       {/* Player Content Information Background Container */}
       <div
         className="absolute top-0 h-full w-full bg-black/60 aria-hidden:hidden"
@@ -501,7 +514,7 @@ function Player({ id, name, description, series }: Props) {
       {/* Content Video */}
       <video
         ref={videoRef}
-        className="h-full w-full -z-10 cursor-pointer max-[1024px]:object-cover"
+        className="h-full w-full -z-10 max-[1024px]:object-cover"
         autoPlay
         playsInline
         onClick={PlayAndPause}
