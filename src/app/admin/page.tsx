@@ -270,8 +270,9 @@ function Admin() {
       id: FORM.seriesId.value,
       seasonNumber: FORM.seasonNumber.value,
       episodeNumber: FORM.episodeNumber.value,
-      beginSummary: FORM.beginSummary.value,
-      endSummary: FORM.endSummary.value,
+      beginSummary:
+        FORM.beginSummary.value !== "" ? FORM.beginSummary.value : null,
+      endSummary: FORM.endSummary.value !== "" ? FORM.endSummary.value : null,
       beginIntro: FORM.beginIntro.value,
       endIntro: FORM.endIntro.value,
       beginCredits: FORM.beginCredits.value,
@@ -741,6 +742,7 @@ function Admin() {
               help="Tiempo en el que empieza el resumen del capitulo"
               validation="time"
               maxLength={8}
+              optional
             />
             {/* End Summary Time Input */}
             <Input
@@ -750,6 +752,7 @@ function Admin() {
               help="Tiempo en el que termina el resumen del capitulo"
               validation="time"
               maxLength={8}
+              optional
             />
           </div>
           <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">

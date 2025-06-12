@@ -95,7 +95,7 @@ function Input({
         <input
           ref={reference}
           id={name}
-          name={optional ? `${name} (Opcional)` : name}
+          name={name}
           type="text"
           placeholder={`Ejemplo: ${placeholder}`}
           onChange={OnChange}
@@ -103,7 +103,7 @@ function Input({
           disabled={disabled}
           autoComplete={autoComplete || "on"}
           maxLength={maxLength || 10}
-          required={optional ? false : true}
+          required={optional === true ? false : true}
           className="w-full bg-transparent outline-hidden disabled:text-gray-600 text-white disabled:placeholder:text-gray-600"
         />
         {/* Input Validation Icon */}
@@ -132,7 +132,7 @@ function Input({
             : undefined
         }`}
       >
-        {help}
+        {`${help}${optional === true ? ". Este Campo es OPCIONAL" : ""}`}
       </small>
     </div>
   );

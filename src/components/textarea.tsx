@@ -47,6 +47,7 @@ function Textarea({ label, name, placeholder, help, maxLength, rows }: Props) {
           rows={rows || 4}
           onChange={OnChange}
           aria-invalid={state === "Valid" ? false : undefined}
+          required
           className="w-full resize-none text-black bg-transparent outline-hidden dark:text-white lowContrast:text-gray-500"
         />
         {/* Textarea Chars Container */}

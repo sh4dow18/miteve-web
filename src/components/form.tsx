@@ -45,10 +45,12 @@ function Form({
           REFERENCE.current.querySelectorAll<
             HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
           >("input, textarea, select")
-        ).map((input) => [
-          input.name,
-          input.getAttribute("aria-invalid") === "false",
-        ]);
+        )
+          .filter((input) => input.required === true)
+          .map((input) => [
+            input.name,
+            input.getAttribute("aria-invalid") === "false",
+          ]);
         // Create a new object from a key-value array
         // Example: From [ ["name", true], ["email", false] ] to { name: true, email: false }
         const FORM_OBJECT = Object.fromEntries(inputsList);
