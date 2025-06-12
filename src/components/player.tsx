@@ -260,6 +260,45 @@ function Player({ id, name, description, series }: Props) {
       VIDEO.removeEventListener("seeked", ManageSkips);
     };
   }, []);
+  // Execute this use effect when the user presses a key
+  useEffect(() => {
+    const UserPress = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "f":
+        case "F":
+          Fullscreen();
+          break;
+        case "ArrowRight":
+          AddTime(10);
+          break;
+        case "ArrowLeft":
+          AddTime(-10);
+          break;
+        case " ":
+          event.preventDefault();
+          PlayAndPause();
+          break;
+        default:
+          break;
+      }
+    };
+    document.addEventListener("keydown", UserPress);
+    return () => {
+      document.removeEventListener("keydown", UserPress);
+    };
+  }, [videoRef]);
+  // Execute this use effect when the changes the fullscreen mode
+  useEffect(() => {
+    const FullscreenChange = () => {
+      SetVideoStates({
+        ...videoStates,
+        fullscreen: !!document.fullscreenElement,
+      });
+    };
+    document.addEventListener("fullscreenchange", FullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", FullscreenChange);
+  }, []);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
