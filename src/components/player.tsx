@@ -605,7 +605,11 @@ function Player({ id, name, description, series }: Props) {
               min="0"
               max="100"
               step="0.1"
-              value={videoStates.progress}
+              value={
+                Number.isNaN(videoStates.progress) === false
+                  ? videoStates.progress
+                  : 0
+              }
               onChange={ChangeTimeInProgressBar}
               className="w-full h-2 appearance-none bg-transparent cursor-pointer range-thumb relative z-20"
             />
