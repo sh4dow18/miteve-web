@@ -3,6 +3,7 @@
 // Player Requirements
 import { NavigatorConnection } from "@/lib/types";
 import {
+  ArrowLeftIcon,
   ArrowLeftStartOnRectangleIcon,
   ArrowPathIcon,
   ArrowsPointingInIcon,
@@ -470,6 +471,18 @@ function Player({ id, name, description, series }: Props) {
           </div>
         </div>
       </div>
+      {/* Back to Content Button */}
+      <div
+        className="absolute top-0 h-full w-full aria-hidden:hidden"
+        aria-hidden={!videoStates.paused}
+      >
+        <Link
+          className="absolute top-5 left-5 flex gap-1 select-none z-20 min-[865px]:left-7"
+          href={`/${TYPE}/${id}${series ? `?season=${series.season}` : ""}`}
+        >
+          <ArrowLeftIcon className={ICONS_STYLE} />
+        </Link>
+      </div>
       {/* Current Resolution Display Container */}
       <div
         className="absolute top-0 h-full w-full aria-hidden:hidden"
@@ -656,7 +669,7 @@ function Player({ id, name, description, series }: Props) {
         {/* Player Controlers Second Container */}
         <div className="flex place-content-between items-center py-4 px-5">
           {/* Player First Controlers Container */}
-          <div className="flex gap-2 min-[355px]:gap-4 min-[475px]:gap-7">
+          <div className="flex gap-3 min-[355px]:gap-4 min-[475px]:gap-6">
             <PauseIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
@@ -704,7 +717,17 @@ function Player({ id, name, description, series }: Props) {
             {name}
           </h1>
           {/* Player Second Controlers Container */}
-          <div className="flex gap-4">
+          <div className="flex gap-3 min-[355px]:gap-4 min-[475px]:gap-6">
+            {series?.nextEpisode && (
+              // Next Episode Button
+              <a
+                href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
+                className="aria-disabled:hidden"
+                aria-disabled={!series?.nextEpisode}
+              >
+                <ForwardIcon className={ICONS_STYLE} />
+              </a>
+            )}
             {/* Subtitles Buttons */}
             <ChatBubbleBottomCenterTextIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -716,22 +739,6 @@ function Player({ id, name, description, series }: Props) {
               onClick={PutSubtitles}
               aria-disabled={videoStates.subtitlesOn === true}
             />
-            {/* Back to Content Button */}
-            <Link
-              href={`/${TYPE}/${id}${series ? `?season=${series.season}` : ""}`}
-            >
-              <ArrowLeftStartOnRectangleIcon className={ICONS_STYLE} />
-            </Link>
-            {series?.nextEpisode && (
-              // Next Episode Button
-              <a
-                href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
-                className="aria-disabled:hidden"
-                aria-disabled={!series?.nextEpisode}
-              >
-                <ForwardIcon className={ICONS_STYLE} />
-              </a>
-            )}
             {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
