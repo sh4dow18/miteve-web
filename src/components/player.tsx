@@ -1,5 +1,6 @@
 // Set this component as a client component
 "use client";
+import { SAME_NET_API_HOST_IP, VPN_API_HOST_IP } from "@/lib/admin";
 // Player Requirements
 import { NavigatorConnection } from "@/lib/types";
 import {
@@ -105,7 +106,7 @@ function Player({ id, name, description, series }: Props) {
     // Set a Timeout to Check the IPs to get the content
     const CONTROLLER = new AbortController();
     const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
-    let availableIP = "http://10.0.0.1:8080";
+    let availableIP = VPN_API_HOST_IP;
     // Check if the main IP is available
     fetch(`${availableIP}/${API}`, {
       method: "HEAD",
@@ -113,7 +114,7 @@ function Player({ id, name, description, series }: Props) {
     })
       .catch(() => {
         // If it is not, set the secondary IP
-        availableIP = "http://192.168.0.254:8080";
+        availableIP = SAME_NET_API_HOST_IP;
       })
       .finally(() => {
         SOURCE.src = `${availableIP}/${API}`;
@@ -153,7 +154,6 @@ function Player({ id, name, description, series }: Props) {
         );
         VIDEO.currentTime = CURRENT_TIME;
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Execute this use effect when the page is loading
   useEffect(() => {
