@@ -142,19 +142,20 @@ function Player({ id, name, description, series }: Props) {
         VIDEO.load();
         const PLAY = VIDEO.play();
         PLAY.then(() =>
-          SetVideoStates({
-            ...videoStates,
+          SetVideoStates((prevVideoStates) => ({
+            ...prevVideoStates,
             paused: false,
-          })
+          }))
         ).catch(() =>
-          SetVideoStates({
-            ...videoStates,
+          SetVideoStates((prevVideoStates) => ({
+            ...prevVideoStates,
             paused: true,
-          })
+          }))
         );
         VIDEO.currentTime = CURRENT_TIME;
       });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, series]);
   // Execute this use effect when the page is loading
   useEffect(() => {
     const VIDEO = videoRef.current;
