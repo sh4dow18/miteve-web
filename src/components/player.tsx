@@ -512,11 +512,53 @@ function Player({ id, name, description, series }: Props) {
           {/* Progress Bar Container */}
           <div className="relative w-full h-7 group">
             {/* Base Time Line */}
-            <div className="absolute top-1/2 left-0 w-full h-1.5 bg-gray-400 rounded-full transform -translate-y-1/2 z-0 group-hover:h-2.5" />
+            <div className="absolute top-1/2 left-0 w-full h-1.5 bg-gray-700 rounded-full transform -translate-y-1/2 z-0 group-hover:h-2.5" />
             {/* Buffered Video Time Line */}
             <div
-              className="absolute top-1/2 left-0 h-1.5 bg-primary-light rounded-full transform -translate-y-1/2 z-10 group-hover:h-2.5"
+              className="absolute top-1/2 left-0 h-1.5 bg-gray-300 rounded-full transform -translate-y-1/2 z-10 group-hover:h-2.5"
               style={{ width: `${rangeStates.buffered}%` }}
+            />
+            {/* Played Video Time Line */}
+            <div
+              className="absolute top-1/2 left-0 h-1.5 bg-primary-light rounded-full transform -translate-y-1/2 z-20 group-hover:h-2.5"
+              style={{ width: `${videoStates.progress}%` }}
+            />
+            {/* Hover Time Video Container */}
+            <div
+              className="absolute inset-0 z-30 cursor-pointer"
+              onMouseMove={(event) => {
+                const RECTANGLE = event.currentTarget.getBoundingClientRect();
+                const POSITION_X = event.clientX - RECTANGLE.left;
+                const PERCENT = Math.min(
+                  Math.max(POSITION_X / RECTANGLE.width, 0),
+                  1
+                );
+                SetRangeStates({
+                  ...rangeStates,
+                  hoverTime: (videoRef.current?.duration || 0) * PERCENT,
+                  isHovering: true,
+                  hoverX: POSITION_X,
+                });
+              }}
+              onMouseLeave={() =>
+                SetRangeStates({
+                  ...rangeStates,
+                  isHovering: false,
+                })
+              }
+              onClick={(event) => {
+                const VIDEO = videoRef.current;
+                if (VIDEO === null) {
+                  return;
+                }
+                const RECTANGLE = event.currentTarget.getBoundingClientRect();
+                const POSITION_X = event.clientX - RECTANGLE.left;
+                const PERCENT = Math.min(
+                  Math.max(POSITION_X / RECTANGLE.width, 0),
+                  1
+                );
+                VIDEO.currentTime = PERCENT * VIDEO.duration;
+              }}
             />
             {/* Progress Bar */}
             <input
@@ -526,28 +568,6 @@ function Player({ id, name, description, series }: Props) {
               step="0.1"
               value={videoStates.progress}
               onChange={ChangeTimeInProgressBar}
-              onMouseMove={(event) => {
-                // Get the size and position of the element relative to the viewport
-                const rect = event.currentTarget.getBoundingClientRect();
-                // Calculate the horizontal mouse position inside the element in pixels
-                const x = event.clientX - rect.left;
-                // Convert the position to a percentage of the element's width
-                const percent = x / rect.width;
-                SetRangeStates({
-                  ...rangeStates,
-                  hoverTime:
-                    (videoRef.current ? videoRef.current.duration : 100) *
-                    percent,
-                  isHovering: true,
-                  hoverX: x,
-                });
-              }}
-              onMouseLeave={() =>
-                SetRangeStates({
-                  ...rangeStates,
-                  isHovering: false,
-                })
-              }
               className="w-full h-2 appearance-none bg-transparent cursor-pointer range-thumb relative z-20"
             />
             {rangeStates.isHovering && (
