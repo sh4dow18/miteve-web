@@ -73,55 +73,6 @@ function Player({ id, name, description, series }: Props) {
     intro: false,
     credits: false,
   });
-  // Execute this use effect when the video is paused to hide or display the controllers
-  useEffect(() => {
-    if (videoStates.paused === false) {
-      const timer = setTimeout(() => {
-        SetVideoStates({
-          ...videoStates,
-          controlersHidden: true,
-        });
-      }, 5000);
-      return () => clearTimeout(timer);
-    } else {
-      SetVideoStates({
-        ...videoStates,
-        controlersHidden: false,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoStates.paused === false]);
-  // Execute this use effect to hide or display the controllers
-  useEffect(() => {
-    const CONTAINER = containerRef.current;
-    if (CONTAINER === null) {
-      return;
-    }
-    let timeout: NodeJS.Timeout;
-    const MouseMove = () => {
-      SetVideoStates((prevVideoStates) => ({
-        ...prevVideoStates,
-        controlersHidden: false,
-      }));
-      clearTimeout(timeout);
-      if (videoStates.paused === false) {
-        timeout = setTimeout(
-          () =>
-            SetVideoStates((prevVideoStates) => ({
-              ...prevVideoStates,
-              controlersHidden: true,
-            })),
-          5000
-        );
-      }
-    };
-    CONTAINER.addEventListener("mousemove", MouseMove);
-    return () => {
-      CONTAINER.removeEventListener("mousemove", MouseMove);
-      clearTimeout(timeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoStates.paused === false]);
   // Execute this use effect when the page is loading to know if can autoplay or not
   // Also, check if needs the HD version or low quality version
   useEffect(() => {
@@ -204,29 +155,8 @@ function Player({ id, name, description, series }: Props) {
         VIDEO.currentTime = CURRENT_TIME;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoStates.resolution]);
-  // Execute this use effect when the page is loading to set the buffered video
-  useEffect(() => {
-    const VIDEO = videoRef.current;
-    if (VIDEO === null) {
-      return;
-    }
-    const UpdateBuffered = () => {
-      if (VIDEO.buffered.length > 0) {
-        const END = VIDEO.buffered.end(VIDEO.buffered.length - 1);
-        const DURATION = VIDEO.duration || 1;
-        SetRangeStates({
-          ...rangeStates,
-          buffered: (END / DURATION) * 100,
-        });
-      }
-    };
-    VIDEO.addEventListener("progress", UpdateBuffered);
-    return () => {
-      VIDEO.removeEventListener("progress", UpdateBuffered);
-    };
-  }, [rangeStates]);
-  // Execute this use effect when the video current time change
+  }, []);
+  // Execute this use effect when the page is loading
   useEffect(() => {
     const VIDEO = videoRef.current;
     if (VIDEO === null) {
@@ -235,6 +165,7 @@ function Player({ id, name, description, series }: Props) {
     if (series === undefined) {
       return;
     }
+    // Function that allow to display and hide the skips buttons
     const ManageSkips = () => {
       const CURRENT_TIME = VIDEO.currentTime;
       const BEGIN_SUMMARY = series.metadata.beginSummary;
@@ -254,15 +185,7 @@ function Player({ id, name, description, series }: Props) {
         credits: BEGIN_CREDITS !== null ? CURRENT_TIME > BEGIN_CREDITS : false,
       });
     };
-    VIDEO.addEventListener("timeupdate", ManageSkips);
-    VIDEO.addEventListener("seeked", ManageSkips);
-    return () => {
-      VIDEO.removeEventListener("timeupdate", ManageSkips);
-      VIDEO.removeEventListener("seeked", ManageSkips);
-    };
-  }, []);
-  // Execute this use effect when the user presses a key
-  useEffect(() => {
+    // Function that allows to do something when the user presses a key
     const UserPress = (event: KeyboardEvent) => {
       switch (event.key) {
         case "f":
@@ -291,23 +214,87 @@ function Player({ id, name, description, series }: Props) {
           break;
       }
     };
-    document.addEventListener("keydown", UserPress);
-    return () => {
-      document.removeEventListener("keydown", UserPress);
-    };
-  }, []);
-  // Execute this use effect when the changes the fullscreen mode
-  useEffect(() => {
+    // Function that checks the changes the fullscreen mode
     const FullscreenChange = () => {
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
         fullscreen: document.fullscreenElement ? true : false,
       }));
     };
+    VIDEO.addEventListener("timeupdate", ManageSkips);
+    VIDEO.addEventListener("seeked", ManageSkips);
+    document.addEventListener("keydown", UserPress);
     document.addEventListener("fullscreenchange", FullscreenChange);
-    return () =>
+    return () => {
+      VIDEO.removeEventListener("timeupdate", ManageSkips);
+      VIDEO.removeEventListener("seeked", ManageSkips);
+      document.removeEventListener("keydown", UserPress);
       document.removeEventListener("fullscreenchange", FullscreenChange);
+    };
   }, []);
+  // Execute this use effect to hide or display the controllers
+  useEffect(() => {
+    const CONTAINER = containerRef.current;
+    if (CONTAINER === null) {
+      return;
+    }
+    let timeout: NodeJS.Timeout;
+    const MouseMove = () => {
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
+        controlersHidden: false,
+      }));
+      clearTimeout(timeout);
+      if (videoStates.paused === false) {
+        timeout = setTimeout(() => {
+          SetVideoStates((prevVideoStates) => ({
+            ...prevVideoStates,
+            controlersHidden: true,
+          }));
+        }, 5000);
+      }
+    };
+    if (videoStates.paused === true) {
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
+        controlersHidden: false,
+      }));
+    } else {
+      timeout = setTimeout(() => {
+        SetVideoStates((prevVideoStates) => ({
+          ...prevVideoStates,
+          controlersHidden: true,
+        }));
+      }, 5000);
+    }
+    CONTAINER.addEventListener("mousemove", MouseMove);
+    return () => {
+      CONTAINER.removeEventListener("mousemove", MouseMove);
+      clearTimeout(timeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoStates.paused === false]);
+  // Execute this use effect when the page is loading to set the buffered video
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    const UpdateBuffered = () => {
+      if (VIDEO.buffered.length > 0) {
+        const END = VIDEO.buffered.end(VIDEO.buffered.length - 1);
+        const DURATION = VIDEO.duration || 1;
+        SetRangeStates({
+          ...rangeStates,
+          buffered: (END / DURATION) * 100,
+        });
+      }
+    };
+    VIDEO.addEventListener("progress", UpdateBuffered);
+    return () => {
+      VIDEO.removeEventListener("progress", UpdateBuffered);
+    };
+  }, [rangeStates]);
   // Functions that allows to play and pause the video
   const PlayAndPause = () => {
     const VIDEO = videoRef.current;
@@ -502,7 +489,7 @@ function Player({ id, name, description, series }: Props) {
       >
         <ArrowPathIcon className="w-20 absolute top-[50%] left-[50%] -translate-[50%] animate-spin drop-shadow drop-shadow-black" />
       </div>
-      {/* Skip Summary and Intro Button */}
+      {/* Skip Summary Button */}
       <button
         onClick={Skip}
         className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
@@ -510,9 +497,21 @@ function Player({ id, name, description, series }: Props) {
             ? "bottom-4"
             : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
         }`}
-        aria-hidden={!skips.summary && !skips.intro}
+        aria-hidden={!skips.summary}
       >
-        Omitir {skips.summary === true ? "Resumen" : "Intro"}
+        Omitir Resumen
+      </button>
+      {/* Skip Intro Button */}
+      <button
+        onClick={Skip}
+        className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+          videoStates.controlersHidden
+            ? "bottom-4"
+            : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
+        }`}
+        aria-hidden={!skips.intro}
+      >
+        Omitir Intro
       </button>
       {/* Next Episode Button in Credits */}
       {series?.nextEpisode && (
@@ -546,24 +545,18 @@ function Player({ id, name, description, series }: Props) {
         onCanPlay={() => {
           SetVideoStates({
             ...videoStates,
-            currentTime: FormatTime(
-              videoRef.current ? videoRef.current?.currentTime : 0
-            ),
-            progress: videoRef.current
-              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-              : 0,
             waiting: false,
           });
         }}
         onTimeUpdate={() => {
+          const VIDEO = videoRef.current;
+          if (VIDEO === null) {
+            return;
+          }
           SetVideoStates({
             ...videoStates,
-            currentTime: FormatTime(
-              videoRef.current ? videoRef.current?.currentTime : 0
-            ),
-            progress: videoRef.current
-              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-              : 0,
+            currentTime: FormatTime(VIDEO.currentTime),
+            progress: (VIDEO.currentTime / VIDEO.duration) * 100,
           });
         }}
       />
@@ -592,8 +585,11 @@ function Player({ id, name, description, series }: Props) {
             <div
               className="absolute inset-0 z-30 cursor-pointer"
               onMouseMove={(event) => {
+                // Get the size and position of the element
                 const RECTANGLE = event.currentTarget.getBoundingClientRect();
+                // Calculate the horizontal position of the mouse relative to the element
                 const POSITION_X = event.clientX - RECTANGLE.left;
+                // Calculate the relative horizontal position as a percentage
                 const PERCENT = Math.min(
                   Math.max(POSITION_X / RECTANGLE.width, 0),
                   1
@@ -616,8 +612,11 @@ function Player({ id, name, description, series }: Props) {
                 if (VIDEO === null) {
                   return;
                 }
+                 // Get the size and position of the element
                 const RECTANGLE = event.currentTarget.getBoundingClientRect();
+                // Calculate the horizontal position of the mouse relative to the element
                 const POSITION_X = event.clientX - RECTANGLE.left;
+                // Calculate the relative horizontal position as a percentage
                 const PERCENT = Math.min(
                   Math.max(POSITION_X / RECTANGLE.width, 0),
                   1
