@@ -16,6 +16,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-lite-youtube-embed": "^2.4.0",
+    "react-loading-skeleton": "^3.5.0",
+    "react-skeleton-image": "^0.0.10",
     "react-star-ratings": "^2.3.0"
   },
   "devDependencies": {

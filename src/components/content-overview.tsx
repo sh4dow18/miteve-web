@@ -1,9 +1,9 @@
 // Content Overview Requirements
-import Image from "next/image";
 import Stars from "./stars";
 import Link from "next/link";
 import { PlayIcon } from "@heroicons/react/16/solid";
 import YoutubeVideo from "./youtube-video";
+import Image from "./image";
 // Content Overview Props
 interface Props {
   player: {
@@ -53,6 +53,7 @@ function ContentOverview({
         <Image
           src={`https://image.tmdb.org/t/p/original/${background}`}
           alt="Fondo decorativo"
+          skeleton="background"
           fill
           className="hidden object-cover object-center -z-10 mask-image rounded-t-sm min-[600px]:block"
           priority
@@ -63,6 +64,7 @@ function ContentOverview({
           <Image
             src={`https://image.tmdb.org/t/p/w780/${image}`}
             alt={`${title} Cover`}
+            skeleton="cover"
             width={600}
             height={635}
             priority
