@@ -2,10 +2,8 @@
 "use client";
 import { SAME_NET_API_HOST_IP, VPN_API_HOST_IP } from "@/lib/admin";
 // Player Requirements
-import { NavigatorConnection } from "@/lib/types";
 import {
   ArrowLeftIcon,
-  ArrowPathIcon,
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   ArrowUturnLeftIcon,
@@ -19,6 +17,7 @@ import {
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
 } from "@heroicons/react/16/solid";
+import { LoaderCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 // Player Props
@@ -51,6 +50,18 @@ function Player({ id, name, description, series }: Props) {
   // Player Main Hooks
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Speed Test Function
+  async function SpeedTest(): Promise<number> {
+    const TEST_FILE =
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/320px-Pierre-Person.jpg";
+    const BEGIN = performance.now();
+    const RESPONSE = await fetch(TEST_FILE, { cache: "no-store" });
+    await RESPONSE.blob();
+    const END = performance.now();
+    const SECONDS = (END - BEGIN) / 1000;
+    const MBPS = (0.105 / SECONDS) * 8;
+    return MBPS;
+  }
   const [videoStates, SetVideoStates] = useState({
     paused: true,
     muted: false,
@@ -58,7 +69,7 @@ function Player({ id, name, description, series }: Props) {
     controlersHidden: false,
     currentTime: "00:00:00",
     progress: 0,
-    waiting: false,
+    waiting: true,
     resolution: "HD",
     subtitlesOn: true,
   });
@@ -76,84 +87,87 @@ function Player({ id, name, description, series }: Props) {
   // Execute this use effect when the page is loading to know if can autoplay or not
   // Also, check if needs the HD version or low quality version
   useEffect(() => {
-    if (videoRef.current === null) {
-      return;
-    }
-    const VIDEO = videoRef.current;
-    const CURRENT_TIME = VIDEO.currentTime;
-    // Get Navigation Connection to now network speed test
-    const CONNECTION = (navigator as NavigatorConnection).connection;
-    // Check if it an Slow Internet
-    const IS_CONNECTION_SLOW = CONNECTION && CONNECTION.effectiveType !== "4g";
-    // Set it would be use the low quality version
-    const LOW_QUALITY =
-      videoStates.resolution === "SD" || IS_CONNECTION_SLOW === true;
-    // Set API URL
-    const API = `api/${
-      series === undefined ? "movies" : "series"
-    }/stream/${id}${
-      series !== undefined
-        ? `/season/${series.season}/episode/${series.episode}`
-        : ""
-    }${LOW_QUALITY ? "?quality=low" : ""}`;
-    // Set Resolution Video States with the New Resolution
-    SetVideoStates((prevVideoStates) => ({
-      ...prevVideoStates,
-      resolution: LOW_QUALITY ? "SD" : "HD",
-    }));
-    // Create new Source Element
-    const SOURCE = document.createElement("source");
-    // Set a Timeout to Check the IPs to get the content
-    const CONTROLLER = new AbortController();
-    const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
-    let availableIP = VPN_API_HOST_IP;
-    // Check if the main IP is available
-    fetch(`${availableIP}/${API}`, {
-      method: "HEAD",
-      signal: CONTROLLER.signal,
-    })
-      .catch(() => {
-        // If it is not, set the secondary IP
-        availableIP = SAME_NET_API_HOST_IP;
+    const SetVideo = async () => {
+      if (videoRef.current === null) {
+        return;
+      }
+      const VIDEO = videoRef.current;
+      const CURRENT_TIME = VIDEO.currentTime;
+      // Spped test to know if the connection is slow
+      const REAL_SPEED = await SpeedTest();
+      // Check if it an Slow Internet
+      const IS_CONNECTION_SLOW = REAL_SPEED < 4;
+      // Set it would be use the low quality version
+      const LOW_QUALITY =
+        videoStates.resolution === "SD" || IS_CONNECTION_SLOW === true;
+      // Set API URL
+      const API = `api/${
+        series === undefined ? "movies" : "series"
+      }/stream/${id}${
+        series !== undefined
+          ? `/season/${series.season}/episode/${series.episode}`
+          : ""
+      }${LOW_QUALITY ? "?quality=low" : ""}`;
+      // Set Resolution Video States with the New Resolution
+      SetVideoStates((prevVideoStates) => ({
+        ...prevVideoStates,
+        resolution: LOW_QUALITY ? "SD" : "HD",
+      }));
+      // Create new Source Element
+      const SOURCE = document.createElement("source");
+      // Set a Timeout to Check the IPs to get the content
+      const CONTROLLER = new AbortController();
+      const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
+      let availableIP = VPN_API_HOST_IP;
+      // Check if the main IP is available
+      fetch(`${availableIP}/${API}`, {
+        method: "HEAD",
+        signal: CONTROLLER.signal,
       })
-      .finally(() => {
-        SOURCE.src = `${availableIP}/${API}`;
-        // Clear the Timeout to clear memory
-        clearTimeout(TIMEOUT);
-        // Set Source Type to WEBM Videos
-        SOURCE.type = "video/webm";
-        // Remove all source elements from video
-        VIDEO.innerHTML = "";
-        // Add the New Source
-        VIDEO.appendChild(SOURCE);
-        // Add Subtitles
-        const SUBTITLES = document.createElement("track");
-        SUBTITLES.src = `/api/subtitles?id=${id}&type=${
-          series === undefined
-            ? "movies"
-            : `series&season=${series.season}&episode=${series.episode}`
-        }`;
-        SUBTITLES.kind = "subtitles";
-        SUBTITLES.srclang = "es";
-        SUBTITLES.label = "Español";
-        SUBTITLES.default = true;
-        VIDEO.appendChild(SUBTITLES);
-        // Reload Content
-        VIDEO.load();
-        const PLAY = VIDEO.play();
-        PLAY.then(() =>
-          SetVideoStates((prevVideoStates) => ({
-            ...prevVideoStates,
-            paused: false,
-          }))
-        ).catch(() =>
-          SetVideoStates((prevVideoStates) => ({
-            ...prevVideoStates,
-            paused: true,
-          }))
-        );
-        VIDEO.currentTime = CURRENT_TIME;
-      });
+        .catch(() => {
+          // If it is not, set the secondary IP
+          availableIP = SAME_NET_API_HOST_IP;
+        })
+        .finally(() => {
+          SOURCE.src = `${availableIP}/${API}`;
+          // Clear the Timeout to clear memory
+          clearTimeout(TIMEOUT);
+          // Set Source Type to WEBM Videos
+          SOURCE.type = "video/webm";
+          // Remove all source elements from video
+          VIDEO.innerHTML = "";
+          // Add the New Source
+          VIDEO.appendChild(SOURCE);
+          // Add Subtitles
+          const SUBTITLES = document.createElement("track");
+          SUBTITLES.src = `/api/subtitles?id=${id}&type=${
+            series === undefined
+              ? "movies"
+              : `series&season=${series.season}&episode=${series.episode}`
+          }`;
+          SUBTITLES.kind = "subtitles";
+          SUBTITLES.srclang = "es";
+          SUBTITLES.label = "Español";
+          SUBTITLES.default = true;
+          VIDEO.appendChild(SUBTITLES);
+          // Reload Content
+          VIDEO.load();
+          const PLAY = VIDEO.play();
+          PLAY.then(() =>
+            SetVideoStates((prevVideoStates) => ({
+              ...prevVideoStates,
+              paused: false,
+            }))
+          ).catch(() =>
+            SetVideoStates((prevVideoStates) => ({
+              ...prevVideoStates,
+              paused: true,
+            }))
+          );
+          VIDEO.currentTime = CURRENT_TIME;
+        });
+    };
+    SetVideo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, series]);
   // Execute this use effect when the page is loading
@@ -487,7 +501,7 @@ function Player({ id, name, description, series }: Props) {
         className="absolute top-0 h-full w-full aria-hidden:hidden"
         aria-hidden={!videoStates.waiting}
       >
-        <ArrowPathIcon className="w-20 absolute top-[50%] left-[50%] -translate-[50%] animate-spin drop-shadow drop-shadow-black" />
+        <LoaderCircleIcon className="h-20 w-20 text-gray-300 absolute top-[50%] left-[50%] -translate-[50%] animate-spin" />
       </div>
       {/* Skip Summary Button */}
       <button
