@@ -49,7 +49,7 @@ function Nav() {
           />
         </button>
         <Link href="/" className="min-[1035px]:m-3">
-          <MainLogo width={120} height={20} className="mx-auto" />
+          <MainLogo width={120} height={32} className="w-[120px] h-[32px]" />
         </Link>
         {/* Desktop Nav */}
         <div className="hidden min-[1035px]:block">

@@ -39,6 +39,11 @@ function Image({
           height={height}
           fill={fill}
           priority={priority}
+          sizes={
+            fill && skeleton === "background"
+              ? "(min-width: 816px) 816px, (min-width: 600px) 520px"
+              : undefined
+          }
           className={`${className} animate-pulse`}
         />
       )}
@@ -51,6 +56,11 @@ function Image({
         priority={priority}
         loading="eager"
         onLoad={() => SetLoaded(true)}
+        sizes={
+          fill && skeleton === "background"
+            ? "(min-width: 816px) 816px, (min-width: 600px) 520px"
+            : undefined
+        }
         className={`${className} ${loaded === false ? "hidden" : ""}`}
       />
     </>
