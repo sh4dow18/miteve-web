@@ -102,12 +102,12 @@ export default function Home() {
     {
       name: "¿Puedo acceder a Miteve fuera de mi casa?",
       answer:
-        "Por si solo, Miteve no es capaz de acceder a este contenido fuera de la red local, pero se puede usar un servidor de Red Privada Virtual (VPN) propio para poder acceder a este de manera segura.",
+        "Por si solo, Miteve no es capaz de acceder a este contenido fuera de la red local, pero se puede usar un servidor de Red Privada Virtual (VPN) propio, como Wireguard, para poder acceder a este de manera segura.",
     },
     {
       name: "¿Miteve organiza automáticamente mis series y películas?",
       answer:
-        "Por el momento, Miteve no organiza automaticamente el contenido, se debe hacer manual a través del gestor de archivos",
+        "Miteve permite que actualice usted su contenido a través de la ventana de Administración de manera sencilla y el contenido se pondriá desde su gestor de archivos",
     },
     {
       name: "¿Es necesario saber de programación para usar Miteve?",
@@ -116,16 +116,16 @@ export default function Home() {
     {
       name: "¿Es necesario saber de programación para administrar Miteve?",
       answer:
-        "Actualmente sí, debido a que hay que configurar algunos archivos para poder administrar Miteve, pero esto cambiará en futuras versiones.",
+        "No, actualmente se puede administrar Miteve desde la misma aplicación y el contenido a través del explorador de archivos",
     },
     {
       name: "¿Qué formatos de video soporta Miteve?",
       answer:
-        "Actualmente solo es compatible con archivos WEBM, con el objetivo que funcione en la mayor cantidad de dispositivos y navegadores.",
+        "Tiene como objetivo ser compatible con archivos WEBM, debido a que se busca que funcione en la mayor cantidad de dispositivos y navegadores, pero actualmente las versiones en menor calidad de los episodios se leen como MP4.",
     },
     {
       name: "¿Puedo personalizar la apariencia de Miteve?",
-      answer: "Actualmente no, pero en futuras versiones esto puede cambiar",
+      answer: "Actualmente no, pero en futuras versiones esto podría cambiar",
     },
   ];
   // Returns Home Page
