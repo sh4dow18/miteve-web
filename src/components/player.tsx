@@ -675,7 +675,10 @@ function Player({ id, name, description, series }: Props) {
             <span>{videoStates.currentTime}</span>
             <span className="hidden min-[581px]:block">
               {" / "}
-              {FormatTime(videoRef.current ? videoRef.current?.duration : 0)}
+              {videoRef.current &&
+              Number.isNaN(videoRef.current.duration) === false
+                ? FormatTime(videoRef.current.duration)
+                : "--:--:--"}
             </span>
           </div>
         </div>
