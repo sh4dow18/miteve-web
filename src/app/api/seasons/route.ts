@@ -1,6 +1,20 @@
-// Insert Seasons from Series Endpoint Requirements
-import { TMDB_API_KEY } from "@/lib/admin";
+// Seasons Endpoints Requirements
+import { TMDB_API_KEY, API_HOST_IP } from "@/lib/admin";
 import { TMDB_EPISODE } from "@/lib/types";
+import { FindSeasonByNumber } from "@/lib/series";
+// Get Season Endpoint Main Function
+export async function GET(request: Request) {
+  // Get Season Endpoint Main Constants
+  const { searchParams } = new URL(request.url);
+  const GET_ID = searchParams.get("id");
+  const GET_SEASON_ID = searchParams.get("season");
+  const ID = typeof GET_ID === "string" ? GET_ID : "1";
+  const SEASON_ID = typeof GET_SEASON_ID === "string" ? GET_SEASON_ID : "1";
+  // Get Season from a Specific Series
+  const SEASON = await FindSeasonByNumber(ID, Number.parseInt(SEASON_ID));
+  // Returns Season
+  return Response.json(SEASON);
+}
 // Insert Seasons from Series Endpoint Main Function
 export async function POST(request: Request) {
   // Insert Seasons from Series Endpoint Main Constants
@@ -77,16 +91,13 @@ export async function POST(request: Request) {
     // Filter out any null season results
     .filter(Boolean);
   // Send the filtered seasons data to internal API endpoint
-  const SEASONS = await fetch(
-    `http://localhost:8080/api/series/${id}/episodes`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(FILTERES_SEASON_DATA_LIST),
-    }
-  );
+  const SEASONS = await fetch(`${API_HOST_IP}/api/series/${id}/episodes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(FILTERES_SEASON_DATA_LIST),
+  });
   // Return the response from the internal API as the final result
   return new Response(JSON.stringify(await SEASONS.json()), {
     headers: { "Content-Type": "application/json" },

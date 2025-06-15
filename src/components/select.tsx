@@ -57,6 +57,7 @@ function Select({ name, label, optionsList, help, multiple, disabled }: Props) {
               : true
           }
           disabled={disabled}
+          required
           className="w-full appearance-none rounded-md outline-2 py-2 pl-1 bg-gray-800 text-white outline-gray-800 focus-within:outline-mateoryPurple aria-disabled:bg-gray-900 min-[344px]:pl-3"
         >
           {optionsList.map((option, index) => (

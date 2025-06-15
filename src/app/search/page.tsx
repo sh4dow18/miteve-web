@@ -1,7 +1,5 @@
 // Search Page Requirements
 import { Search } from "@/components";
-import { FindAllMovies } from "@/lib/movies";
-import { FindAllSeries } from "@/lib/series";
 import { Metadata } from "next";
 // Search Page Metadata
 export const metadata: Metadata = {
@@ -10,9 +8,6 @@ export const metadata: Metadata = {
 };
 // Search Page Main Function
 function SearchPage() {
-  // Search Page Main Constants
-  const MOVIES_LIST = FindAllMovies();
-  const SERIES_LIST = FindAllSeries();
   // Returns Search Page
   return (
     // Search Page Main Container
@@ -29,7 +24,7 @@ function SearchPage() {
         </p>
       </section>
       {/* Search Page Input Search */}
-      <Search moviesList={MOVIES_LIST} seriesList={SERIES_LIST} />
+      <Search />
     </div>
   );
 }

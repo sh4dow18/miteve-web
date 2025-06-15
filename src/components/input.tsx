@@ -9,7 +9,7 @@ interface Props {
   placeholder: string;
   name: string;
   help: string;
-  validation: "float" | "text" | "int" | "intNoCero" | "name" | "file" | "time";
+  validation: "float" | "text" | "int" | "intNoCero" | "name" | "file" | "time" | "code";
   disabled?: boolean;
   autoComplete?: string;
   maxLength?: number;
@@ -36,7 +36,12 @@ const REGEX: Record<string, RegExp> = {
   // Only Files Names
   // Example: Kung Fu Panda.webm or Astralopitecus.mp4
   file: /^[\w\s\-()\[\]]+\.[a-zA-Z0-9]{1,5}$/,
+  // Only Time Format
+  // Example: 00:45:23 or 01:00:21
   time: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+  // Only Youtube Video Code
+  // Example: P8S3DKZCNeI or eMM_ssMgGOM
+  code: /^[a-zA-Z0-9_-]+$/
 };
 // Input Main Function
 function Input({
@@ -95,7 +100,7 @@ function Input({
         <input
           ref={reference}
           id={name}
-          name={optional ? `${name} (Opcional)` : name}
+          name={name}
           type="text"
           placeholder={`Ejemplo: ${placeholder}`}
           onChange={OnChange}
@@ -103,7 +108,7 @@ function Input({
           disabled={disabled}
           autoComplete={autoComplete || "on"}
           maxLength={maxLength || 10}
-          required={optional ? false : true}
+          required={optional === true ? false : true}
           className="w-full bg-transparent outline-hidden disabled:text-gray-600 text-white disabled:placeholder:text-gray-600"
         />
         {/* Input Validation Icon */}
@@ -132,7 +137,7 @@ function Input({
             : undefined
         }`}
       >
-        {help}
+        {`${help}${optional === true ? ". Este Campo es OPCIONAL" : ""}`}
       </small>
     </div>
   );

@@ -4,10 +4,10 @@
 import "keen-slider/keen-slider.min.css";
 // Slider Requirements
 import { useKeenSlider } from "keen-slider/react";
-import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
 import { MinimalSeries, MinimalContent } from "@/lib/types";
+import Image from "./image";
 // Slider Props
 interface Props {
   title: string;
@@ -66,6 +66,7 @@ function Slider({ title, contentList, type, lessSlides }: Props) {
               <Image
                 src={`https://image.tmdb.org/t/p/w500/${content.cover}`}
                 alt={`${content.title} Cover`}
+                skeleton="cover"
                 width={300}
                 height={450}
                 className={`rounded-md w-44 mx-auto transition-all ease-in-out hover:scale-110 ${

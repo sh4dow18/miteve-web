@@ -58,15 +58,6 @@ export type Actor = {
   name: string;
   character: string;
 };
-
-export interface NavigatorConnection {
-  connection?: {
-    downlink: number;
-    effectiveType: "slow-2g" | "2g" | "3g" | "4g";
-    rtt: number;
-    saveData: boolean;
-  };
-}
 export type TMBD_CONTENT = {
   id: string;
   title: string;

@@ -1,7 +1,11 @@
 // Player Page Requirements
 import { Metadata } from "next";
 import { NotFound, Player } from "@/components";
-import { FindNextEpisodeByNumber, FindSeasonByNumber } from "@/lib/series";
+import {
+  FindEpisodeMetadataByNumber,
+  FindNextEpisodeByNumber,
+  FindSeasonByNumber,
+} from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -74,15 +78,6 @@ async function PlayerPage({ searchParams }: Props) {
   const CONTENT = await fetch(`http://localhost:8080/api/${TYPE}/${ID}`).then(
     (response) => response.json()
   );
-  // Check if exists a low quality version file
-  const LOW_RESOLUTION = await fetch(
-    `http://localhost:8080/api/${TYPE}/stream/${ID}${
-      TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
-    }?quality=low`,
-    {
-      method: "HEAD",
-    }
-  );
   // If the content is a series, Find the Season by Number
   const SEASONS_LIST =
     TYPE === "series"
@@ -92,6 +87,10 @@ async function PlayerPage({ searchParams }: Props) {
   const NEXT_EPISODE =
     TYPE === "series"
       ? await FindNextEpisodeByNumber(ID, SEASON, EPISODE)
+      : undefined;
+  const EPISODE_METADATA =
+    TYPE === "series"
+      ? await FindEpisodeMetadataByNumber(ID, SEASON, EPISODE)
       : undefined;
   return EXISTS.ok === true ? (
     <Player
@@ -109,7 +108,6 @@ async function PlayerPage({ searchParams }: Props) {
                 episode.episodeNumber === Number.parseInt(EPISODE)
             ).description
       }
-      changeQuality={LOW_RESOLUTION.ok === true}
       series={
         TYPE === "series"
           ? {
@@ -122,6 +120,23 @@ async function PlayerPage({ searchParams }: Props) {
                       episode: NEXT_EPISODE.episodeNumber,
                     }
                   : undefined,
+              metadata:
+                EPISODE_METADATA !== undefined &&
+                EPISODE_METADATA.status === undefined
+                  ? {
+                      beginSummary: EPISODE_METADATA.beginSummary,
+                      endSummary: EPISODE_METADATA.endSummary,
+                      beginIntro: EPISODE_METADATA.beginIntro,
+                      endIntro: EPISODE_METADATA.endIntro,
+                      beginCredits: EPISODE_METADATA.beginCredits,
+                    }
+                  : {
+                      beginSummary: null,
+                      endSummary: null,
+                      beginIntro: null,
+                      endIntro: null,
+                      beginCredits: null,
+                    },
             }
           : undefined
       }

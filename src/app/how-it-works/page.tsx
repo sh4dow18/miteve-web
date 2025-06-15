@@ -54,9 +54,9 @@ function HowItWorksPage() {
       caption: "Página de Películas con Contenido",
     },
     {
-      src: "movie.png",
-      alt: "Kung Fu Panda",
-      caption: "Página de Pelicula con Contenido",
+      src: "series.png",
+      alt: "Big Time Rush",
+      caption: "Página de Serie con Contenido",
     },
     {
       src: "episodes.png",
@@ -64,7 +64,7 @@ function HowItWorksPage() {
       caption: "Página de Serie con Selección de Episodios",
     },
     {
-      src: "player-series.png",
+      src: "player.png",
       alt: "Reproductor",
       caption: "Reproductor con Episodio de Serie",
     },

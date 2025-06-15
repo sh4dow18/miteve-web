@@ -1,20 +1,11 @@
-// Genres Endpoints Requirements
+// Insert Movie Endpoint Requirements
 import { API_HOST_IP } from "@/lib/admin";
-// Get Genres Endpoint Function
-export async function GET() {
-  // Get all genres
-  const GENRES = await fetch(`${API_HOST_IP}/api/genres`).then((response) =>
-    response.json()
-  );
-  // Return Genres
-  return Response.json(GENRES);
-}
-// Insert Genre Endpoint Function
+// Insert Movie Endpoint Function
 export async function POST(request: Request) {
-  // Insert Genre Endpoint Main Constants
+  // Insert Movie Endpoint Main Constants
   const BODY = await request.json();
-  // Send the genre data to internal API endpoint
-  const RESPONSE = await fetch(`${API_HOST_IP}/api/genres`, {
+  // Send the Movie data to internal API endpoint
+  const RESPONSE = await fetch(`${API_HOST_IP}/api/movies`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

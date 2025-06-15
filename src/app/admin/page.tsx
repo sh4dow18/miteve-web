@@ -60,7 +60,7 @@ function Admin() {
     };
     // Function used to get containers from API
     const GetContainers = async () => {
-      const RESPONSE = await fetch("/api/container").then((response) =>
+      const RESPONSE = await fetch("/api/containers").then((response) =>
         response.json()
       );
       const MOVIES_CONTAINERS_LIST = RESPONSE.filter(
@@ -94,7 +94,7 @@ function Admin() {
       return;
     }
     // Get the Movie Information
-    const MOVIE = await fetch(`/api/movie?id=${contentRef.current.value}`).then(
+    const MOVIE = await fetch(`/api/tmdb?id=${contentRef.current.value}`).then(
       (response) => response.json()
     );
     // If the Movie does not exists in The Movie Database, return
@@ -139,7 +139,7 @@ function Admin() {
     }
     // Get the Series Information
     const SERIES = await fetch(
-      `/api/movie?id=${contentRef.current.value}&series=true`
+      `/api/tmdb?id=${contentRef.current.value}&series=true`
     ).then((response) => response.json());
     // If the Series does not exists in The Movie Database, return
     if (SERIES.success === false) {
@@ -170,7 +170,7 @@ function Admin() {
   // Genre Form On Submit Function
   const GenreSubmit = async (event: FormEvent<HTMLFormElement>) => {
     const FORM = event.target as HTMLFormElement;
-    return await fetch("http://localhost:8080/api/genres", {
+    return await fetch("/api/genres", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -204,7 +204,7 @@ function Admin() {
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
     };
-    return await fetch("http://localhost:8080/api/movies", {
+    return await fetch("/api/movies", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -237,7 +237,7 @@ function Admin() {
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
     };
-    return await fetch("http://localhost:8080/api/series", {
+    return await fetch("/api/series", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -270,13 +270,14 @@ function Admin() {
       id: FORM.seriesId.value,
       seasonNumber: FORM.seasonNumber.value,
       episodeNumber: FORM.episodeNumber.value,
-      beginSummary: FORM.beginSummary.value,
-      endSummary: FORM.endSummary.value,
+      beginSummary:
+        FORM.beginSummary.value !== "" ? FORM.beginSummary.value : null,
+      endSummary: FORM.endSummary.value !== "" ? FORM.endSummary.value : null,
       beginIntro: FORM.beginIntro.value,
       endIntro: FORM.endIntro.value,
       beginCredits: FORM.beginCredits.value,
     };
-    return await fetch("/api/update-episode", {
+    return await fetch("/api/episodes", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -291,7 +292,7 @@ function Admin() {
       name: FORM.containerName.value,
       type: FORM.containerType.value,
     };
-    return await fetch("/api/container", {
+    return await fetch("/api/containers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -417,11 +418,11 @@ function Admin() {
               <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
                 <section>
                   <span className="text-white">Compañía</span>
-                  <p>{contentInfo.company}</p>
+                  <p>{contentInfo.company ? contentInfo.company : "N/A"}</p>
                 </section>
                 <section>
                   <span className="text-white">Colección</span>
-                  <p>{contentInfo.collection}</p>
+                  <p>{contentInfo.collection ? contentInfo.collection : "N/A"}</p>
                 </section>
               </div>
               {/* Movie Information Images */}
@@ -490,7 +491,7 @@ function Admin() {
               placeholder="PXi3Mv6KMzY"
               name="trailer"
               help="Código de Trailer de Youtube"
-              validation="text"
+              validation="code"
               maxLength={20}
             />
           </div>
@@ -632,7 +633,7 @@ function Admin() {
               placeholder="PXi3Mv6KMzY"
               name="trailer"
               help="Código de Trailer de Youtube"
-              validation="text"
+              validation="code"
               maxLength={20}
             />
           </div>
@@ -741,6 +742,7 @@ function Admin() {
               help="Tiempo en el que empieza el resumen del capitulo"
               validation="time"
               maxLength={8}
+              optional
             />
             {/* End Summary Time Input */}
             <Input
@@ -750,6 +752,7 @@ function Admin() {
               help="Tiempo en el que termina el resumen del capitulo"
               validation="time"
               maxLength={8}
+              optional
             />
           </div>
           <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
@@ -797,7 +800,7 @@ function Admin() {
             name="containerName"
             help="Nombre del Contenedor de Contenido"
             validation="text"
-            maxLength={30}
+            maxLength={35}
           />
           {/* Container Types List Select */}
           <Select

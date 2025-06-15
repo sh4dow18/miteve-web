@@ -6,12 +6,11 @@ import Link from "next/link";
 // Cast Props
 interface Props {
   type: "movies" | "series";
-  title: string;
   credits: Actor[];
   contentId: string;
 }
 // Cast Main Function
-function Cast({ type, title, credits, contentId }: Props) {
+function Cast({ type, credits, contentId }: Props) {
   // Returns Cast Component
   return (
     // Cast Main Section
@@ -30,7 +29,7 @@ function Cast({ type, title, credits, contentId }: Props) {
       {/* Cast Description */}
       <p className="leading-7">
         Aquí se Muestra el Cast Original de la{" "}
-        {type === "movies" ? "Película" : "Serie"} <strong>{title}</strong>
+        {type === "movies" ? "Película" : "Serie"}
       </p>
       {/* Cast Actor Cards Container */}
       <div className="flex flex-wrap gap-7 place-content-center">

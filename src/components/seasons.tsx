@@ -26,7 +26,7 @@ function Seasons({ seriesId, seasonsList, displaySeason }: Props) {
     const GetEpisodes = async () => {
       // Get All Season Information
       const SEASON = await fetch(
-        `/api/get-season?id=${seriesId}&season=${selectedSeason}`
+        `/api/seasons?id=${seriesId}&season=${selectedSeason}`
       ).then((response) => response.json());
       // Set Episodes List to Hook
       SetEpisodesList(SEASON.episodesList);
