@@ -113,8 +113,6 @@ function Player({ id, name, description, series }: Props) {
         ...prevVideoStates,
         resolution: LOW_QUALITY ? "SD" : "HD",
       }));
-      // Create new Source Element
-      const SOURCE = document.createElement("source");
       // Set a Timeout to Check the IPs to get the content
       const CONTROLLER = new AbortController();
       const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
@@ -129,15 +127,8 @@ function Player({ id, name, description, series }: Props) {
           availableIP = SAME_NET_API_HOST_IP;
         })
         .finally(() => {
-          SOURCE.src = `${availableIP}/${API}`;
-          // Clear the Timeout to clear memory
           clearTimeout(TIMEOUT);
-          // Set Source Type to WEBM Videos
-          SOURCE.type = "video/webm";
-          // Remove all source elements from video
-          VIDEO.innerHTML = "";
-          // Add the New Source
-          VIDEO.appendChild(SOURCE);
+          VIDEO.src = `${availableIP}/${API}`;
           // Add Subtitles
           const SUBTITLES = document.createElement("track");
           SUBTITLES.src = `/api/subtitles?id=${id}&type=${
@@ -541,6 +532,13 @@ function Player({ id, name, description, series }: Props) {
       {/* Content Video */}
       <video
         ref={videoRef}
+        src={
+          videoRef.current
+            ? videoRef.current.src !== ""
+              ? videoRef.current.src
+              : undefined
+            : undefined
+        }
         className="h-full w-full -z-10 max-[1024px]:object-cover"
         autoPlay
         playsInline
