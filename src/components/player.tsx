@@ -154,6 +154,7 @@ function Player({ id, name, description, series }: Props) {
             SetVideoStates((prevVideoStates) => ({
               ...prevVideoStates,
               paused: true,
+              waiting: false,
             }))
           );
           VIDEO.currentTime = CURRENT_TIME;
@@ -540,7 +541,6 @@ function Player({ id, name, description, series }: Props) {
             : undefined
         }
         className="h-full w-full -z-10 max-[1024px]:object-cover"
-        autoPlay
         playsInline
         onClick={PlayAndPause}
         onSeeking={() => {
