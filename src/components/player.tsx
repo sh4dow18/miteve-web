@@ -157,6 +157,7 @@ function Player({ id, name, description, series }: Props) {
             SetVideoStates((prevVideoStates) => ({
               ...prevVideoStates,
               paused: false,
+              waiting: false,
             }))
           ).catch(() =>
             SetVideoStates((prevVideoStates) => ({

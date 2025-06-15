@@ -1,7 +1,5 @@
 // Set this component as a client component
 "use client";
-import { FindMoviesByTitle } from "@/lib/movies";
-import { FindSeriesByTitle } from "@/lib/series"
 // Search Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import Image from "next/image";
@@ -20,8 +18,12 @@ function Search() {
       SetSearchList([]);
       return;
     }
-    const MOVIES = await FindMoviesByTitle(VALUE);
-    const SERIES = await FindSeriesByTitle(VALUE);
+    const MOVIES = await fetch(`/api/movies/search?search=${VALUE}`).then(
+      (response) => response.json()
+    );
+    const SERIES = await fetch(`/api/series/search?search=${VALUE}`).then(
+      (response) => response.json()
+    );
     const NEW_LIST = [
       ...MOVIES.map((movie: { id: number; title: string; cover: string }) => ({
         image: movie.cover,

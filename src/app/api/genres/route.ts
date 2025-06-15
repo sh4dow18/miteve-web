@@ -2,11 +2,11 @@
 import { API_HOST_IP } from "@/lib/admin";
 // Get Genres Endpoint Function
 export async function GET() {
-  // Get all Episodes from a Specific Season from a Specific Series
+  // Get all genres
   const GENRES = await fetch(`${API_HOST_IP}/api/genres`).then((response) =>
     response.json()
   );
-  // Returns Episodes List
+  // Return Genres
   return Response.json(GENRES);
 }
 // Insert Genre Endpoint Function

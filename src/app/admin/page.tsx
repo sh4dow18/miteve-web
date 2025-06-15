@@ -418,11 +418,11 @@ function Admin() {
               <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
                 <section>
                   <span className="text-white">Compañía</span>
-                  <p>{contentInfo.company}</p>
+                  <p>{contentInfo.company ? contentInfo.company : "N/A"}</p>
                 </section>
                 <section>
                   <span className="text-white">Colección</span>
-                  <p>{contentInfo.collection}</p>
+                  <p>{contentInfo.collection ? contentInfo.collection : "N/A"}</p>
                 </section>
               </div>
               {/* Movie Information Images */}
@@ -491,7 +491,7 @@ function Admin() {
               placeholder="PXi3Mv6KMzY"
               name="trailer"
               help="Código de Trailer de Youtube"
-              validation="text"
+              validation="code"
               maxLength={20}
             />
           </div>
@@ -633,7 +633,7 @@ function Admin() {
               placeholder="PXi3Mv6KMzY"
               name="trailer"
               help="Código de Trailer de Youtube"
-              validation="text"
+              validation="code"
               maxLength={20}
             />
           </div>
@@ -800,7 +800,7 @@ function Admin() {
             name="containerName"
             help="Nombre del Contenedor de Contenido"
             validation="text"
-            maxLength={30}
+            maxLength={35}
           />
           {/* Container Types List Select */}
           <Select
