@@ -2,8 +2,7 @@
 "use client";
 // Seasons Requirements
 import { Episode } from "@/lib/types";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
 import { ChangeEvent, useEffect, useState } from "react";
 // Seasons Props
 interface Props {
@@ -65,7 +64,7 @@ function Seasons({ seriesId, seasonsList, displaySeason }: Props) {
       <div className="flex flex-col gap-7">
         {episodesList.map((episode: Episode, index: number) => (
           // Season Episode Card Link Container
-          <Link
+          <a
             key={index}
             className="flex flex-col gap-2 w-full bg-gray-900 transition hover:scale-105 min-[600px]:flex-row"
             href={`/player?type=series&id=${seriesId}&season=${selectedSeason}&episode=${episode.episodeNumber}`}
@@ -95,7 +94,7 @@ function Seasons({ seriesId, seasonsList, displaySeason }: Props) {
                   : "No hay Información Disponible sobre este capítulo actualmente, favor volver a consultar en otro momento"}
               </p>
             </section>
-          </Link>
+          </a>
         ))}
       </div>
     </section>

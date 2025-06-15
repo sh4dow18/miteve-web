@@ -92,7 +92,6 @@ function Player({ id, name, description, series }: Props) {
         return;
       }
       const VIDEO = videoRef.current;
-      const CURRENT_TIME = VIDEO.currentTime;
       // Spped test to know if the connection is slow
       const REAL_SPEED = await SpeedTest();
       // Check if it an Slow Internet
@@ -128,36 +127,51 @@ function Player({ id, name, description, series }: Props) {
         })
         .finally(() => {
           clearTimeout(TIMEOUT);
+          VIDEO.oncanplay = null;
+          VIDEO.onerror = null;
           VIDEO.src = `${availableIP}/${API}`;
-          // Add Subtitles
-          const SUBTITLES = document.createElement("track");
-          SUBTITLES.src = `/api/subtitles?id=${id}&type=${
-            series === undefined
-              ? "movies"
-              : `series&season=${series.season}&episode=${series.episode}`
-          }`;
-          SUBTITLES.kind = "subtitles";
-          SUBTITLES.srclang = "es";
-          SUBTITLES.label = "Español";
-          SUBTITLES.default = true;
-          VIDEO.appendChild(SUBTITLES);
-          // Reload Content
-          VIDEO.load();
-          const PLAY = VIDEO.play();
-          PLAY.then(() =>
-            SetVideoStates((prevVideoStates) => ({
-              ...prevVideoStates,
-              paused: false,
-              waiting: false,
-            }))
-          ).catch(() =>
+          // Load Content and autoplay
+          VIDEO.addEventListener(
+            "canplay",
+            () => {
+              VIDEO.play()
+                .then(() =>
+                  SetVideoStates((prevVideoStates) => ({
+                    ...prevVideoStates,
+                    paused: false,
+                    waiting: false,
+                  }))
+                )
+                .catch(() =>
+                  SetVideoStates((prevVideoStates) => ({
+                    ...prevVideoStates,
+                    paused: true,
+                    waiting: false,
+                  }))
+                );
+              // Add Subtitles
+              const SUBTITLES = document.createElement("track");
+              SUBTITLES.src = `/api/subtitles?id=${id}&type=${
+                series === undefined
+                  ? "movies"
+                  : `series&season=${series.season}&episode=${series.episode}`
+              }`;
+              SUBTITLES.kind = "subtitles";
+              SUBTITLES.srclang = "es";
+              SUBTITLES.label = "Español";
+              SUBTITLES.default = true;
+              VIDEO.appendChild(SUBTITLES);
+            },
+            { once: true }
+          );
+          VIDEO.onerror = () => {
             SetVideoStates((prevVideoStates) => ({
               ...prevVideoStates,
               paused: true,
               waiting: false,
-            }))
-          );
-          VIDEO.currentTime = CURRENT_TIME;
+            }));
+          };
+          VIDEO.load();
         });
     };
     SetVideo();
@@ -550,12 +564,6 @@ function Player({ id, name, description, series }: Props) {
           });
         }}
         onPlaying={() => {
-          SetVideoStates({
-            ...videoStates,
-            waiting: false,
-          });
-        }}
-        onCanPlay={() => {
           SetVideoStates({
             ...videoStates,
             waiting: false,

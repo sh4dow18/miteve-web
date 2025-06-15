@@ -73,7 +73,7 @@ function ContentOverview({
           {/* Content Overview Button Container */}
           <div className="mt-auto">
             {/* Content Overview Play Button */}
-            <Link
+            <a
               href={`/player?type=${
                 player.series === undefined ? "movies" : "series"
               }&id=${player.id}${
@@ -85,7 +85,7 @@ function ContentOverview({
             >
               <PlayIcon className="w-7 h-7 mr-1" />
               <span>Reproducir</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>
