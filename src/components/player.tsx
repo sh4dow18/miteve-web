@@ -206,7 +206,15 @@ function Player({ id, name, description, series }: Props) {
         credits: BEGIN_CREDITS !== null ? CURRENT_TIME > BEGIN_CREDITS : false,
       });
     };
-    // Function that allows to do something when the user presses a key
+    VIDEO.addEventListener("timeupdate", ManageSkips);
+    VIDEO.addEventListener("seeked", ManageSkips);
+    return () => {
+      VIDEO.removeEventListener("timeupdate", ManageSkips);
+      VIDEO.removeEventListener("seeked", ManageSkips);
+    };
+  }, [series]);
+  // Execute this use effect when the page is loading
+  useEffect(() => {
     const UserPress = (event: KeyboardEvent) => {
       switch (event.key) {
         case "f":
@@ -242,17 +250,13 @@ function Player({ id, name, description, series }: Props) {
         fullscreen: document.fullscreenElement ? true : false,
       }));
     };
-    VIDEO.addEventListener("timeupdate", ManageSkips);
-    VIDEO.addEventListener("seeked", ManageSkips);
     document.addEventListener("keydown", UserPress);
     document.addEventListener("fullscreenchange", FullscreenChange);
     return () => {
-      VIDEO.removeEventListener("timeupdate", ManageSkips);
-      VIDEO.removeEventListener("seeked", ManageSkips);
       document.removeEventListener("keydown", UserPress);
       document.removeEventListener("fullscreenchange", FullscreenChange);
     };
-  }, [series]);
+  }, []);
   // Execute this use effect to hide or display the controllers
   useEffect(() => {
     const CONTAINER = containerRef.current;
