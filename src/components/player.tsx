@@ -78,7 +78,6 @@ function Player({ id, name, description, series }: Props) {
     resolution: "HD",
     subtitlesOn: true,
   });
-  const [temp, SetTemp] = useState("");
   const [rangeStates, SetRangeStates] = useState({
     hoverTime: 0,
     isHovering: false,
@@ -100,7 +99,6 @@ function Player({ id, name, description, series }: Props) {
       const VIDEO = videoRef.current;
       // Spped test to know if the connection is slow
       const REAL_SPEED = await SpeedTest();
-      SetTemp(REAL_SPEED.toFixed(2));
       // Check if it an Slow Internet
       const IS_CONNECTION_SLOW = REAL_SPEED < 4;
       // Set it would be use the low quality version
@@ -481,7 +479,7 @@ function Player({ id, name, description, series }: Props) {
           <div className="flex flex-col gap-3">
             {/* Player Content Name */}
             <span className="text-lg font-bold text-gray-200 min-[475px]:text-2xl min-[730px]:text-3xl min-[1000px]:text-5xl">
-              {temp}
+              {name}
             </span>
             {/* Player Content Description */}
             <p className="line-clamp-2 leading-7 text-gray-300 max-[475px]:text-xs min-[475px]:line-clamp-2 min-[730px]:text-sm min-[1000px]:text-lg">
@@ -549,7 +547,11 @@ function Player({ id, name, description, series }: Props) {
       {series?.nextEpisode && (
         <a
           href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
-          className="absolute bottom-25 right-4 cursor-pointer transition-opacity duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:bottom-28 min-[615px]:right-10 md:text-base min-[865px]:bottom-36 hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none"
+          className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+            videoStates.controlersHidden
+              ? "bottom-4"
+              : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
+          }`}
           aria-hidden={!skips.credits}
         >
           Siguiente Episodio
