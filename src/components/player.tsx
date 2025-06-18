@@ -1,6 +1,6 @@
 // Set this component as a client component
 "use client";
-import { SAME_NET_API_HOST_IP, VPN_API_HOST_IP } from "@/lib/admin";
+import { SAME_NET_API_HOST_IP, EXTERNAL_API_HOST_IP } from "@/lib/admin";
 // Player Requirements
 import {
   ArrowLeftIcon,
@@ -120,7 +120,7 @@ function Player({ id, name, description, series }: Props) {
       // Set a Timeout to Check the IPs to get the content
       const CONTROLLER = new AbortController();
       const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 200);
-      let availableIP = VPN_API_HOST_IP;
+      let availableIP = EXTERNAL_API_HOST_IP;
       // Check if the main IP is available
       fetch(`${availableIP}/${API}`, {
         method: "HEAD",
