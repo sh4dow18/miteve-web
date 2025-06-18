@@ -52,15 +52,20 @@ function Player({ id, name, description, series }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Speed Test Function
   async function SpeedTest(): Promise<number> {
-    const TEST_FILE =
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/320px-Pierre-Person.jpg";
-    const BEGIN = performance.now();
-    const RESPONSE = await fetch(TEST_FILE, { cache: "no-store" });
-    await RESPONSE.blob();
-    const END = performance.now();
-    const SECONDS = (END - BEGIN) / 1000;
-    const MBPS = (0.105 / SECONDS) * 8;
-    return MBPS;
+    const RESULTS_LIST: number[] = [];
+    for (let i = 0; i < 2; i++) {
+      const BEGIN = performance.now();
+      const RESPONSE = await fetch(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/320px-Pierre-Person.jpg",
+        { cache: "no-store" }
+      );
+      await RESPONSE.blob();
+      const END = performance.now();
+      const SECONDS = (END - BEGIN) / 1000;
+      const MBPS = (0.105 / SECONDS) * 8;
+      RESULTS_LIST.push(MBPS);
+    }
+    return Math.max(...RESULTS_LIST);
   }
   const [videoStates, SetVideoStates] = useState({
     paused: true,
@@ -73,6 +78,7 @@ function Player({ id, name, description, series }: Props) {
     resolution: "HD",
     subtitlesOn: true,
   });
+  const [temp, SetTemp] = useState("");
   const [rangeStates, SetRangeStates] = useState({
     hoverTime: 0,
     isHovering: false,
@@ -94,6 +100,7 @@ function Player({ id, name, description, series }: Props) {
       const VIDEO = videoRef.current;
       // Spped test to know if the connection is slow
       const REAL_SPEED = await SpeedTest();
+      SetTemp(REAL_SPEED.toFixed(2));
       // Check if it an Slow Internet
       const IS_CONNECTION_SLOW = REAL_SPEED < 4;
       // Set it would be use the low quality version
@@ -474,7 +481,7 @@ function Player({ id, name, description, series }: Props) {
           <div className="flex flex-col gap-3">
             {/* Player Content Name */}
             <span className="text-lg font-bold text-gray-200 min-[475px]:text-2xl min-[730px]:text-3xl min-[1000px]:text-5xl">
-              {name}
+              {temp}
             </span>
             {/* Player Content Description */}
             <p className="line-clamp-2 leading-7 text-gray-300 max-[475px]:text-xs min-[475px]:line-clamp-2 min-[730px]:text-sm min-[1000px]:text-lg">
