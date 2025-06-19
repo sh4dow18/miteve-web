@@ -69,6 +69,7 @@ function Slider({ title, contentList, type, lessSlides }: Props) {
                 skeleton="cover"
                 width={300}
                 height={450}
+                priority
                 className={`rounded-md w-44 mx-auto transition-all ease-in-out hover:scale-110 ${
                   lessSlides
                     ? "h-28 min-[376px]:h-32 min-[481px]:h-36 min-[580px]:h-40 min-[800px]:h-44 min-[850px]:h-52"
