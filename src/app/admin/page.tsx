@@ -285,6 +285,27 @@ function Admin() {
       body: JSON.stringify(BODY),
     });
   };
+  // All Episode Metadata Form On Submit Function
+  const AllEpisodesSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    const BODY = {
+      id: FORM.seriesId.value,
+      seasonNumber: FORM.seasonNumber.value,
+      beginSummary:
+        FORM.beginSummary.value !== "" ? FORM.beginSummary.value : null,
+      endSummary: FORM.endSummary.value !== "" ? FORM.endSummary.value : null,
+      beginIntro: FORM.beginIntro.value,
+      endIntro: FORM.endIntro.value,
+      credits: FORM.credits.value,
+    };
+    return await fetch("/api/episodes/all", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
   // Containers Form On Submit Function
   const ContainersSubmit = async (event: FormEvent<HTMLFormElement>) => {
     const FORM = event.target as HTMLFormElement;
@@ -422,7 +443,9 @@ function Admin() {
                 </section>
                 <section>
                   <span className="text-white">Colección</span>
-                  <p>{contentInfo.collection ? contentInfo.collection : "N/A"}</p>
+                  <p>
+                    {contentInfo.collection ? contentInfo.collection : "N/A"}
+                  </p>
                 </section>
               </div>
               {/* Movie Information Images */}
@@ -699,92 +722,170 @@ function Admin() {
       )}
       {/* Admin Page Episodes Form */}
       {selectedModel === 5 && (
-        <Form
-          className="flex flex-col gap-4 w-full max-w-xl"
-          submitButton="Actualizar Episodio"
-          OnSubmit={EpisodesSubmit}
-        >
-          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
-            {/* Series Id Input */}
+        <div className="flex flex-col gap-3">
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Episodio"
+            OnSubmit={EpisodesSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Series Id Input */}
+              <Input
+                label="Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Identificador de la Serie Existente"
+                validation="int"
+                maxLength={10}
+              />
+              {/* Season Number Input */}
+              <Input
+                label="Temporada"
+                placeholder="1"
+                name="seasonNumber"
+                help="Número de la Temporada Existente"
+                validation="int"
+                maxLength={3}
+              />
+              {/* Episode Number Input */}
+              <Input
+                label="Episodio"
+                placeholder="1"
+                name="episodeNumber"
+                help="Número del Episodio Existente"
+                validation="int"
+                maxLength={5}
+              />
+            </div>
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Begin Summary Time Input */}
+              <Input
+                label="Empieza el Resumen"
+                placeholder="00:00:00"
+                name="beginSummary"
+                help="Tiempo en el que empieza el resumen del capitulo"
+                validation="time"
+                maxLength={8}
+                optional
+              />
+              {/* End Summary Time Input */}
+              <Input
+                label="Termina el Resumen"
+                placeholder="00:01:00"
+                name="endSummary"
+                help="Tiempo en el que termina el resumen del capitulo"
+                validation="time"
+                maxLength={8}
+                optional
+              />
+            </div>
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Begin Intro Time Input */}
+              <Input
+                label="Empieza la Intro"
+                placeholder="00:00:00"
+                name="beginIntro"
+                help="Tiempo en el que empieza la intro del capitulo"
+                validation="time"
+                maxLength={8}
+              />
+              {/* End Intro Time Input */}
+              <Input
+                label="Termina la Intro"
+                placeholder="00:01:00"
+                name="endIntro"
+                help="Tiempo en el que termina la intro del capitulo"
+                validation="time"
+                maxLength={8}
+              />
+            </div>
             <Input
-              label="Serie"
-              placeholder="1399"
-              name="seriesId"
-              help="Identificador de la Serie Existente"
-              validation="int"
-              maxLength={10}
-            />
-            {/* Season Number Input */}
-            <Input
-              label="Temporada"
-              placeholder="1"
-              name="seasonNumber"
-              help="Número de la Temporada Existente"
-              validation="int"
-              maxLength={10}
-            />
-            {/* Episode Number Input */}
-            <Input
-              label="Episodio"
-              placeholder="1"
-              name="episodeNumber"
-              help="Número del Episodio Existente"
-              validation="int"
-              maxLength={10}
-            />
-          </div>
-          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
-            {/* Begin Summary Time Input */}
-            <Input
-              label="Empieza el Resumen"
+              label="Empiezan los Créditos"
               placeholder="00:00:00"
-              name="beginSummary"
-              help="Tiempo en el que empieza el resumen del capitulo"
+              name="beginCredits"
+              help="Tiempo en el que empiezan los créditos del capitulo"
               validation="time"
               maxLength={8}
-              optional
             />
-            {/* End Summary Time Input */}
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Multiples Episodios"
+            OnSubmit={AllEpisodesSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Series Id Input */}
+              <Input
+                label="Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Identificador de la Serie Existente"
+                validation="int"
+                maxLength={10}
+              />
+              {/* Season Number Input */}
+              <Input
+                label="Temporada"
+                placeholder="1"
+                name="seasonNumber"
+                help="Número de la Temporada Existente"
+                validation="int"
+                maxLength={3}
+              />
+            </div>
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Begin Summary Time Input */}
+              <Input
+                label="Empieza el Resumen"
+                placeholder="00:00:00"
+                name="beginSummary"
+                help="Tiempo en el que empieza el resumen del capitulo"
+                validation="time"
+                maxLength={8}
+                optional
+              />
+              {/* End Summary Time Input */}
+              <Input
+                label="Termina el Resumen"
+                placeholder="00:01:00"
+                name="endSummary"
+                help="Tiempo en el que termina el resumen del capitulo"
+                validation="time"
+                maxLength={8}
+                optional
+              />
+            </div>
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Begin Intro Time Input */}
+              <Input
+                label="Empieza la Intro"
+                placeholder="00:00:00"
+                name="beginIntro"
+                help="Tiempo en el que empieza la intro de los capitulos"
+                validation="time"
+                maxLength={8}
+              />
+              {/* End Intro Time Input */}
+              <Input
+                label="Termina la Intro"
+                placeholder="00:01:00"
+                name="endIntro"
+                help="Tiempo en el que termina la intro de los capitulos"
+                validation="time"
+                maxLength={8}
+              />
+            </div>
             <Input
-              label="Termina el Resumen"
-              placeholder="00:01:00"
-              name="endSummary"
-              help="Tiempo en el que termina el resumen del capitulo"
-              validation="time"
-              maxLength={8}
-              optional
-            />
-          </div>
-          <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
-            {/* Begin Intro Time Input */}
-            <Input
-              label="Empieza la Intro"
+              label="Duración de los Créditos"
               placeholder="00:00:00"
-              name="beginIntro"
-              help="Tiempo en el que empieza la intro del capitulo"
+              name="credits"
+              help="Tiempo que duran los créditos de los capitulos"
               validation="time"
               maxLength={8}
             />
-            {/* End Intro Time Input */}
-            <Input
-              label="Termina la Intro"
-              placeholder="00:01:00"
-              name="endIntro"
-              help="Tiempo en el que termina la intro del capitulo"
-              validation="time"
-              maxLength={8}
-            />
-          </div>
-          {/* Begin Credits Time Input */}
-          <Input
-            label="Empiezan los Créditos"
-            placeholder="00:00:00"
-            name="beginCredits"
-            help="Tiempo en el que empiezan los créditos del capitulo"
-            validation="time"
-            maxLength={8}
-          />
-        </Form>
+          </Form>
+        </div>
       )}
       {/* Admin Page Container Form */}
       {selectedModel === 6 && (

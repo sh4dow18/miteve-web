@@ -1,30 +1,30 @@
-// Update Episode Endpoint Requirements
+// Update All Episodes Metadata From Season Endpoint Requirements
 import { API_HOST_IP } from "@/lib/admin";
 import { TimeToSeconds } from "@/lib/utils";
-// Update Episode Endpoint Main Function
+// Update All Episodes Metadata From Season Endpoint Main Function
 export async function PUT(request: Request) {
-  // Update Episode Endpoint Constants
+  // Update All Episodes Metadata From Season Endpoint Constants
   const BODY = await request.json();
   const {
     id,
     seasonNumber,
-    episodeNumber,
     beginSummary,
     endSummary,
     beginIntro,
     endIntro,
-    beginCredits,
+    credits,
   } = BODY;
   const NEW_BODY = {
     beginSummary: beginSummary !== null ? TimeToSeconds(beginSummary) : null,
     endSummary: endSummary !== null ? TimeToSeconds(endSummary) : null,
     beginIntro: TimeToSeconds(beginIntro),
     endIntro: TimeToSeconds(endIntro),
-    beginCredits: TimeToSeconds(beginCredits),
+    credits: TimeToSeconds(credits),
   };
-  // Update Episode Metadata to internal API endpoint
-  const EPISODE_METADATA = await fetch(
-    `${API_HOST_IP}/api/series/metadata/${id}/season/${seasonNumber}/episode/${episodeNumber}`,
+  console.log(NEW_BODY)
+  // Update All Episodes Metadata From Season to internal API endpoint
+  const EPISODES_METADATA_LIST = await fetch(
+    `${API_HOST_IP}/api/series/metadata/all/${id}/season/${seasonNumber}`,
     {
       method: "PUT",
       headers: {
@@ -34,8 +34,8 @@ export async function PUT(request: Request) {
     }
   );
   // Return the response from the internal API as the final result
-  return new Response(JSON.stringify(await EPISODE_METADATA.json()), {
+  return new Response(JSON.stringify(await EPISODES_METADATA_LIST.json()), {
     headers: { "Content-Type": "application/json" },
-    status: EPISODE_METADATA.status,
+    status: EPISODES_METADATA_LIST.status,
   });
 }
