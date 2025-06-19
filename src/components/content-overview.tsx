@@ -1,10 +1,9 @@
 // Content Overview Requirements
-import { Genre } from "@/lib/types";
-import Image from "next/image";
 import Stars from "./stars";
 import Link from "next/link";
 import { PlayIcon } from "@heroicons/react/16/solid";
 import YoutubeVideo from "./youtube-video";
+import Image from "./image";
 // Content Overview Props
 interface Props {
   player: {
@@ -18,7 +17,7 @@ interface Props {
   image: string;
   background: string;
   date: string;
-  genresList: Genre[];
+  genres: string;
   tagline: string | null;
   overview: string;
   rating: number;
@@ -36,7 +35,7 @@ function ContentOverview({
   image,
   background,
   date,
-  genresList,
+  genres,
   tagline,
   overview,
   rating,
@@ -54,6 +53,7 @@ function ContentOverview({
         <Image
           src={`https://image.tmdb.org/t/p/original/${background}`}
           alt="Fondo decorativo"
+          skeleton="background"
           fill
           className="hidden object-cover object-center -z-10 mask-image rounded-t-sm min-[600px]:block"
           priority
@@ -64,6 +64,7 @@ function ContentOverview({
           <Image
             src={`https://image.tmdb.org/t/p/w780/${image}`}
             alt={`${title} Cover`}
+            skeleton="cover"
             width={600}
             height={635}
             priority
@@ -72,7 +73,7 @@ function ContentOverview({
           {/* Content Overview Button Container */}
           <div className="mt-auto">
             {/* Content Overview Play Button */}
-            <Link
+            <a
               href={`/player?type=${
                 player.series === undefined ? "movies" : "series"
               }&id=${player.id}${
@@ -84,7 +85,7 @@ function ContentOverview({
             >
               <PlayIcon className="w-7 h-7 mr-1" />
               <span>Reproducir</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>
@@ -95,11 +96,9 @@ function ContentOverview({
           {title} ({date})
         </h1>
         {/* Content Overview Description Genres */}
-        <span className="text-center min-[600px]:text-left">
-          {genresList.map((genre: Genre) => genre.name).join(", ")}
-        </span>
+        <span className="text-center min-[600px]:text-left">{genres}</span>
         {/* Content Overview Description Tagline */}
-        {tagline && (
+        {tagline && tagline !== "N/A" && (
           <span className="italic text-center min-[600px]:text-left">{`"${tagline}"`}</span>
         )}
         {/* Content Overview Description Second Container */}
@@ -107,7 +106,7 @@ function ContentOverview({
           {/* Content Overview Description Title */}
           <span className="font-semibold text-gray-300">Descripción</span>
           {/* Content Overview Description Paragraph */}
-          <p className="leading-7 text-justify hyphens-auto">{overview}</p>
+          <p className="leading-7 hyphens-auto">{overview}</p>
         </section>
         {/* Content Overview Extra Information Container */}
         <div className="flex flex-col gap-3 min-[477px]:flex-row min-[477px]:flex-wrap min-[477px]:items-center">
@@ -117,9 +116,9 @@ function ContentOverview({
             <span className="font-semibold text-gray-300">Valoración</span>
             {/* Content Overview Extra Information Rating Stars */}
             <div className="flex items-center">
-              <Stars count={5} size={30} value={rating / 2} />
+              <Stars count={5} size={30} value={rating} />
               <span className="hidden text-lg font-semibold ml-2 mt-1 min-[352px]:block">
-                ({(rating / 2).toPrecision(2)} / 5)
+                ({rating})
               </span>
             </div>
           </section>

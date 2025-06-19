@@ -1,10 +1,11 @@
 // Player Page Requirements
 import { Metadata } from "next";
-import { promises as fs } from "fs";
-import path from "path";
 import { NotFound, Player } from "@/components";
-import { FindMoviesByProp, FindTMDBMovieById } from "@/lib/movies";
-import { FindSeriesByProp, FindTMDBSeasonById } from "@/lib/series";
+import {
+  FindEpisodeMetadataByNumber,
+  FindNextEpisodeByNumber,
+  FindSeasonByNumber,
+} from "@/lib/series";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -16,53 +17,25 @@ export const metadata: Metadata = {
 // Player Page Main Function
 async function PlayerPage({ searchParams }: Props) {
   // Player Page Main Params
-  const TYPE = (await searchParams).type;
-  const ID = (await searchParams).id;
-  const SEASON = (await searchParams).season;
-  const EPISODE = (await searchParams).episode;
-  // Function that Check if the File Exists in Project
-  async function FileExists(
-    plusEpisode?: number,
-    plusSeason?: number
-  ): Promise<boolean> {
-    const SEASON_NUMBER = plusSeason
-      ? typeof SEASON === "string"
-        ? Number.parseInt(SEASON) + plusSeason
-        : SEASON
-      : SEASON;
-    const EPISODE_NUMBER = plusSeason
-      ? 1
-      : plusEpisode
-      ? typeof EPISODE === "string"
-        ? Number.parseInt(EPISODE) + plusEpisode
-        : EPISODE
-      : EPISODE;
-    const FILE = `/videos/${TYPE}/${ID}${
-      TYPE === "movies"
-        ? `.webm`
-        : `/Temporada ${SEASON_NUMBER}/Episodio ${EPISODE_NUMBER}.webm`
-    }`;
-    const PATH_WITH_FILE = path.join(process.cwd(), "public", FILE);
-    try {
-      await fs.access(PATH_WITH_FILE);
-      return true;
-    } catch {
+  const PARAM_ID = (await searchParams).id;
+  const PARAM_TYPE = (await searchParams).type;
+  const PARAM_SEASON = (await searchParams).season;
+  const PARAM_EPISODE = (await searchParams).episode;
+  const ID = typeof PARAM_ID === "string" ? PARAM_ID : "";
+  const TYPE = typeof PARAM_TYPE === "string" ? PARAM_TYPE : "";
+  const SEASON = typeof PARAM_SEASON === "string" ? PARAM_SEASON : "";
+  const EPISODE = typeof PARAM_EPISODE === "string" ? PARAM_EPISODE : "";
+  // Function that check if the param submitted is valid
+  const ValidNumberParam = (param: string): boolean => {
+    if (param === "") {
       return false;
     }
-  }
-  // Functions that Check if the params sent are a valid file
-  const ValidFile = async (): Promise<boolean> => {
-    // Function that Check if the Param Sent is a Valid Code Number
-    const ValidNumberParam = (
-      param: string | string[] | undefined
-    ): boolean => {
-      if (typeof param !== "string") {
-        return false;
-      }
-      return /^[0-9]+$/.test(param);
-    };
+    return /^[0-9]+$/.test(param);
+  };
+  // Function that check if the information submitted could get a valid file
+  const ValidFile = (): boolean => {
     // Check if Type Exists and it is Movies or Series
-    if (TYPE === undefined || !(TYPE === "movies" || TYPE === "series")) {
+    if (TYPE === "" || !(TYPE === "movies" || TYPE === "series")) {
       return false;
     }
     // If Type is Movies and ID is not a Valid Code Number, return false
@@ -78,54 +51,92 @@ async function PlayerPage({ searchParams }: Props) {
     ) {
       return false;
     }
-    // If file does not exists, return false
-    if ((await FileExists()) === false) {
-      return false;
-    }
-    // If everything is ok, returns true
+    // If everything is ok, return true
     return true;
   };
-  // Function that check if exists a Next Episode File
-  const NextEpisodeFile = async () => {
-    if (typeof SEASON !== "string") {
-      return 0;
+  // If is an invalid file, return Not Found
+  if (ValidFile() === false) {
+    return (
+      <NotFound
+        backTo={{
+          name: "Inicio",
+          href: "/",
+        }}
+      />
+    );
+  }
+  // Check if the content file exists
+  const EXISTS = await fetch(
+    `http://localhost:8080/api/${TYPE}/stream/${ID}${
+      TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
+    }`,
+    {
+      method: "HEAD",
     }
-    if (typeof EPISODE !== "string") {
-      return 0;
-    }
-    if ((await FileExists(1, 0)) === true) {
-      return Number.parseInt(EPISODE) + 1;
-    } else if ((await FileExists(undefined, 1)) === true) {
-      return 1;
-    }
-    return 0;
-  };
-  // Return Player Page
-  return (await ValidFile()) ? (
+  );
+  // Get Content Information
+  const CONTENT = await fetch(`http://localhost:8080/api/${TYPE}/${ID}`).then(
+    (response) => response.json()
+  );
+  // If the content is a series, Find the Season by Number
+  const SEASONS_LIST =
+    TYPE === "series"
+      ? await FindSeasonByNumber(ID, Number.parseInt(SEASON))
+      : undefined;
+  // If the content is a series, find the next episode by episode number
+  const NEXT_EPISODE =
+    TYPE === "series"
+      ? await FindNextEpisodeByNumber(ID, SEASON, EPISODE)
+      : undefined;
+  const EPISODE_METADATA =
+    TYPE === "series"
+      ? await FindEpisodeMetadataByNumber(ID, SEASON, EPISODE)
+      : undefined;
+  return EXISTS.ok === true ? (
     <Player
       id={`${ID}`}
       name={
         TYPE === "movies"
-          ? FindMoviesByProp("id", `${ID}`)[0].title
-          : `${
-              FindSeriesByProp("id", `${ID}`)[0].title
-            }: T${SEASON} E${EPISODE}`
+          ? CONTENT.title
+          : `${CONTENT.title}: T${SEASON} E${EPISODE}`
       }
       description={
         TYPE === "movies"
-          ? (await FindTMDBMovieById(`${ID}`)).overview
-          : EPISODE && typeof EPISODE === "string"
-          ? (await FindTMDBSeasonById(`${ID}`, `${SEASON}`)).episodes[
-              Number.parseInt(EPISODE) - 1
-            ].overview
-          : "No Hay Información Disponible"
+          ? CONTENT.description
+          : SEASONS_LIST.episodesList.find(
+              (episode: { episodeNumber: number }) =>
+                episode.episodeNumber === Number.parseInt(EPISODE)
+            ).description
       }
       series={
         TYPE === "series"
           ? {
-              season: `${SEASON}`,
-              episode: `${EPISODE}`,
-              nextEpisode: await NextEpisodeFile(),
+              season: SEASON,
+              episode: EPISODE,
+              nextEpisode:
+                NEXT_EPISODE !== undefined && NEXT_EPISODE.status === undefined
+                  ? {
+                      season: NEXT_EPISODE.seasonNumber,
+                      episode: NEXT_EPISODE.episodeNumber,
+                    }
+                  : undefined,
+              metadata:
+                EPISODE_METADATA !== undefined &&
+                EPISODE_METADATA.status === undefined
+                  ? {
+                      beginSummary: EPISODE_METADATA.beginSummary,
+                      endSummary: EPISODE_METADATA.endSummary,
+                      beginIntro: EPISODE_METADATA.beginIntro,
+                      endIntro: EPISODE_METADATA.endIntro,
+                      beginCredits: EPISODE_METADATA.beginCredits,
+                    }
+                  : {
+                      beginSummary: null,
+                      endSummary: null,
+                      beginIntro: null,
+                      endIntro: null,
+                      beginCredits: null,
+                    },
             }
           : undefined
       }

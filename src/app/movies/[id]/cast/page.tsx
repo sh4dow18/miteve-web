@@ -1,6 +1,6 @@
 // Movies Cast Page Requirements
 import { Cast } from "@/components";
-import { FindAllMovieCastFromTMDB, FindMoviesByProp } from "@/lib/movies";
+import { FindAllMovieCastFromTMDB } from "@/lib/movies";
 import { Metadata } from "next";
 // Movies Cast Page Metadata
 export const metadata: Metadata = {
@@ -16,13 +16,11 @@ interface Props {
 async function MoviesCastPage({ params }: Props) {
   // Movies Cast Page Main Constants
   const { id } = await params;
-  const EXISTING_MOVIE = FindMoviesByProp("id", `${id}`)[0];
   const CREDITS = (await FindAllMovieCastFromTMDB(id)).cast;
   // Returns Movies Cast Page
   return (
     <Cast
       type="movies"
-      title={EXISTING_MOVIE.title}
       credits={CREDITS}
       contentId={id}
     />

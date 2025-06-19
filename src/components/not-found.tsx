@@ -6,9 +6,13 @@ interface Props {
     name: string;
     href: string;
   };
+  message?: {
+    title: string;
+    description: string;
+  };
 }
 // Not Found Main Function
-function NotFound({ backTo }: Props) {
+function NotFound({ backTo, message }: Props) {
   // Returns Not Found Component
   return (
     // Not Found Container
@@ -21,10 +25,14 @@ function NotFound({ backTo }: Props) {
       <section className="flex flex-col gap-5 items-center">
         {/* Not Found Title */}
         <h1 className="text-gray-300 text-[2.5rem] leading-none font-bold min-[351px]:text-5xl min-[420px]:text-6xl">
-          Contenido No Encontrado
+          {message ? message.title : "Contenido No Encontrado"}
         </h1>
         {/* Not Found Description */}
-        <p>Lo sentimos, no se pudo encontrar el contenido que está buscando.</p>
+        <p>
+          {message
+            ? message.description
+            : "Lo sentimos, no se pudo encontrar el contenido que está buscando."}
+        </p>
         {/* Not Found Link */}
         <Link
           href={backTo.href}

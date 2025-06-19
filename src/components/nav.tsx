@@ -17,6 +17,7 @@ function Nav() {
     { href: "/how-it-works", name: "¿Cómo Funciona?" },
     { href: "/movies", name: "Películas" },
     { href: "/series", name: "Series" },
+    { href: "/admin", name: "Administración" },
   ];
   // Function that Sets the Opposite Value in Open Hook to Open and Close the Burger Menu
   const OnClickButton = () => {
@@ -48,7 +49,7 @@ function Nav() {
           />
         </button>
         <Link href="/" className="min-[1035px]:m-3">
-          <MainLogo width={120} height={20} className="mx-auto" />
+          <MainLogo width={120} height={32} className="w-[120px] h-[32px] mx-auto" />
         </Link>
         {/* Desktop Nav */}
         <div className="hidden min-[1035px]:block">

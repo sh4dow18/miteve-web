@@ -1,6 +1,6 @@
 // Series Page Requirements
-import { Slider, UpdateContent } from "@/components";
-import { FindAnimes, FindSeriesByProp } from "@/lib/series";
+import { Slider } from "@/components";
+import { FindSeriesContainers } from "@/lib/series";
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -11,18 +11,9 @@ export const metadata: Metadata = {
     "Aquí se pueden ver todas las series que ofrece Miteve para reproducir",
 };
 // Series Page Main Function
-function SeriesPage() {
-  // Series Page Sliders List Information
-  const SLIDERS_LIST = [
-    {
-      title: "Series Imaginativas",
-      contentList: FindAnimes(),
-    },
-    {
-      title: "Series de Estados Unidos",
-      contentList: FindSeriesByProp("originCountry", "US"),
-    },
-  ];
+async function SeriesPage() {
+  // Movies Page Containers List Information
+  const CONTAINERS_LIST = await FindSeriesContainers();
   // Returns Series Page
   return (
     // Series Page Main Container
@@ -35,24 +26,23 @@ function SeriesPage() {
         </h1>
         {/* Movies Page Utilities CTA Container */}
         <div className="flex items-center gap-5">
-          {/* Movies Page Utilities CTA Update Content Button */}
-          <UpdateContent type="series" />
           {/* Movies Page Utilities CTA Search Button */}
           <Link
             href="/search"
-            className="bg-gray-800 p-2 rounded-md cursor-pointer hover:bg-gray-700"
+            className="flex items-center gap-1 bg-gray-800 p-2 rounded-md cursor-pointer hover:bg-gray-700"
           >
             <MagnifyingGlassIcon className="w-5 h-5 md:w-7 md:h-7" />
+            <span className="text-gray-300 md:text-lg">Buscar</span>
           </Link>
         </div>
       </div>
       {/* Series Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
-        {SLIDERS_LIST.map((slider, index) => (
+        {CONTAINERS_LIST.map((container) => (
           <Slider
-            key={index}
-            title={slider.title}
-            contentList={slider.contentList}
+            key={container.id}
+            title={container.name}
+            contentList={container.contentList}
             type="series"
           />
         ))}
