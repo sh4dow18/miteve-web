@@ -19,6 +19,7 @@ export async function middleware(request: NextRequest) {
       const RESPONSE = await fetch(`${API_HOST_IP}/api/utils/health`, {
         method: "HEAD",
       });
+      console.log(RESPONSE)
       apiOk = RESPONSE.ok;
     } catch (e) {
       console.log(e);
