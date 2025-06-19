@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
         method: "HEAD",
       });
       apiOk = RESPONSE.ok;
-    } catch (_) {
+    } catch {
       apiOk = false;
     }
     // If api is up and the current page is "Error", redirect to movies page
