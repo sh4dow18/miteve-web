@@ -6,6 +6,7 @@ import {
   FindNextEpisodeByNumber,
   FindSeasonByNumber,
 } from "@/lib/series";
+import { API_HOST_IP } from "@/lib/admin";
 // Player Page Props
 interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -67,7 +68,7 @@ async function PlayerPage({ searchParams }: Props) {
   }
   // Check if the content file exists
   const EXISTS = await fetch(
-    `http://localhost:8080/api/${TYPE}/stream/${ID}${
+    `${API_HOST_IP}/api/${TYPE}/stream/${ID}${
       TYPE === "series" ? `/season/${SEASON}/episode/${EPISODE}` : ""
     }`,
     {
@@ -75,7 +76,7 @@ async function PlayerPage({ searchParams }: Props) {
     }
   );
   // Get Content Information
-  const CONTENT = await fetch(`http://localhost:8080/api/${TYPE}/${ID}`).then(
+  const CONTENT = await fetch(`${API_HOST_IP}/api/${TYPE}/${ID}`).then(
     (response) => response.json()
   );
   // If the content is a series, Find the Season by Number
