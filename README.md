@@ -1,9 +1,9 @@
-# Miteve
+# Miteve (Frontend Web)
 
 <section>
   <!-- REPO INFORMATION -->
   <a href="https://github.com/sh4dow18/miteve">
-    <img src="https://img.shields.io/badge/1.0.0-00AA00?style=for-the-badge&logo=github&labelColor=gray" alt="RELEASE" />
+    <img src="https://img.shields.io/badge/2.0.0%20Beta%204-00AA00?style=for-the-badge&logo=github&labelColor=gray" alt="RELEASE" />
   </a>
   <a href="https://github.com/sh4dow18/mateory/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/MIT%20LICENSE-0066AA?style=for-the-badge&labelColor=gray" alt="LICENSE" />
