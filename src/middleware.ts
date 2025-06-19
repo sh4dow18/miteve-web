@@ -15,11 +15,13 @@ export async function middleware(request: NextRequest) {
   ) {
     let apiOk = true;
     try {
+      console.log(`${API_HOST_IP}/api/utils/health`);
       const RESPONSE = await fetch(`${API_HOST_IP}/api/utils/health`, {
         method: "HEAD",
       });
       apiOk = RESPONSE.ok;
-    } catch {
+    } catch (e) {
+      console.log(e);
       apiOk = false;
     }
     // If api is up and the current page is "Error", redirect to movies page
