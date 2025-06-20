@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
   ) {
     let apiOk = true;
     const CONTROLLER = new AbortController();
-    const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 300);
+    const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 1000);
     try {
       const RESPONSE = await fetch(`${API_HOST_IP}/api/utils/health`, {
         method: "HEAD",
