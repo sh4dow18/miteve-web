@@ -5,6 +5,13 @@ import { NextResponse, NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   // Middleware Main Constants
   const PAGE_NAME = request.nextUrl.pathname;
+  // If it is the admin page, check if the secret password was sent, if not, redirect to 404
+  if (
+    PAGE_NAME === "/admin" &&
+    request.nextUrl.searchParams.get("secret") !== SECURITY_PASSWORD
+  ) {
+    return NextResponse.redirect(new URL("/404", request.url));
+  }
   // Check if the page is a async page that needs the internal API
   if (
     PAGE_NAME.includes("/movies") ||
@@ -34,13 +41,6 @@ export async function middleware(request: NextRequest) {
     // If api is down and the current page is not "Error", redirect to error page
     if (apiOk === false && PAGE_NAME !== "/error") {
       return NextResponse.redirect(new URL("/error", request.url));
-    }
-    // If it is the admin page, check if the secret password was sent, if not, redirect to 404
-    if (
-      PAGE_NAME === "/admin" &&
-      request.nextUrl.searchParams.get("secret") !== SECURITY_PASSWORD
-    ) {
-      return NextResponse.redirect(new URL("/404", request.url));
     }
   }
 }
