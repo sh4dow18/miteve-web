@@ -108,6 +108,7 @@ function Nav() {
           <a
             key={page.href}
             href={page.href}
+            onClick={() => SetOpen(false)}
             className={`mx-2 my-1 px-3 py-2 font-medium ${
               CURRENT_PAGE === page.href ? "bg-gray-700 rounded-md" : ""
             }`}
