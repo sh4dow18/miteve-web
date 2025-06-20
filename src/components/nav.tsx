@@ -50,7 +50,11 @@ function Nav() {
           />
         </button>
         <Link href="/" className="min-[1035px]:m-3">
-          <MainLogo width={120} height={32} className="w-[120px] h-[32px] mx-auto" />
+          <MainLogo
+            width={120}
+            height={32}
+            className="w-[120px] h-[32px] mx-auto"
+          />
         </Link>
         {/* Desktop Nav */}
         <div className="hidden min-[1035px]:block">
@@ -99,6 +103,17 @@ function Nav() {
           >
             {page.name}
           </Link>
+        ))}
+        {NAV_RELOAD_PAGES_LIST.map((page) => (
+          <a
+            key={page.href}
+            href={page.href}
+            className={`mx-2 my-1 px-3 py-2 font-medium ${
+              CURRENT_PAGE === page.href ? "bg-gray-700 rounded-md" : ""
+            }`}
+          >
+            {page.name}
+          </a>
         ))}
       </div>
     </nav>
