@@ -56,6 +56,7 @@ function Nav() {
             <Link
               key={page.href}
               href={page.href}
+              prefetch={false}
               className={`font-medium mx-2 px-3 py-2 rounded-md select-none ${
                 CURRENT_PAGE === page.href
                   ? "bg-gray-800 text-white"
