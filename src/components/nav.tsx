@@ -15,6 +15,8 @@ function Nav() {
   const NAV_PAGES_LIST = [
     { href: "/", name: "Inicio" },
     { href: "/how-it-works", name: "¿Cómo Funciona?" },
+  ];
+  const NAV_RELOAD_PAGES_LIST = [
     { href: "/movies", name: "Películas" },
     { href: "/series", name: "Series" },
   ];
@@ -56,7 +58,6 @@ function Nav() {
             <Link
               key={page.href}
               href={page.href}
-              prefetch={false}
               className={`font-medium mx-2 px-3 py-2 rounded-md select-none ${
                 CURRENT_PAGE === page.href
                   ? "bg-gray-800 text-white"
@@ -65,6 +66,19 @@ function Nav() {
             >
               {page.name}
             </Link>
+          ))}
+          {NAV_RELOAD_PAGES_LIST.map((page) => (
+            <a
+              key={page.href}
+              href={page.href}
+              className={`font-medium mx-2 px-3 py-2 rounded-md select-none ${
+                CURRENT_PAGE === page.href
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-300 hover:text-white hover:bg-gray-700"
+              }`}
+            >
+              {page.name}
+            </a>
           ))}
         </div>
       </div>
