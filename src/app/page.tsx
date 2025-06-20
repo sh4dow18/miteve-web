@@ -102,7 +102,7 @@ export default function Home() {
     {
       name: "¿Puedo acceder a Miteve fuera de mi casa?",
       answer:
-        "Por si solo, Miteve no es capaz de acceder a este contenido fuera de la red local, pero se puede usar un servidor de Red Privada Virtual (VPN) propio, como Wireguard, para poder acceder a este de manera segura.",
+        "Por si solo, Miteve no es capaz de acceder a este contenido fuera de la red local, pero como funciona como página web, se puede hostear en cualquier lugar que admita Next.JS, como Vercel que es un PaaS, así como crear su propio servidor con Nginx o usar Hostinet, por ejemplo. No se recomienda usar un servidor de Red Privada Virtual (VPN) propio en su propio servidor para poder acceder a este, debido que estos relentizan mucho los servicios de streaming",
     },
     {
       name: "¿Miteve organiza automáticamente mis series y películas?",
