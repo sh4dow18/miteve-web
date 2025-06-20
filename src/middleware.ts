@@ -1,5 +1,5 @@
 // Middleware Requirements
-import { API_HOST_IP } from "@/lib/admin";
+import { API_HOST_IP, SECURITY_PASSWORD } from "@/lib/admin";
 import { NextResponse, NextRequest } from "next/server";
 // Middleware Main Function
 export async function middleware(request: NextRequest) {
@@ -29,6 +29,10 @@ export async function middleware(request: NextRequest) {
     // If api is down and the current page is not "Error", redirect to error page
     if (apiOk === false && PAGE_NAME !== "/error") {
       return NextResponse.redirect(new URL("/error", request.url));
+    }
+    // If it is the admin page, check if the secret password was sent, if not, redirect to 404
+    if (PAGE_NAME === "/admin" && request.nextUrl.searchParams.get("secret") !== SECURITY_PASSWORD) {
+      return NextResponse.redirect(new URL("/404", request.url));
     }
   }
 }
