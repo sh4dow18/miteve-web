@@ -44,3 +44,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 }
+// Middleware Config
+export const config = {
+  matcher: [
+    "/movies/:path*",
+    "/series/:path*",
+    "/player/:path*",
+    "/admin",
+    "/error",
+  ],
+};
