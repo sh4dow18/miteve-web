@@ -60,6 +60,6 @@ If you want to know about this license, click
 
 ## <img src="https://emojiapi.dev/api/v1/rocket/32.jpg" alt="STARTED" height="20"/> Full Documentation
 
-To see the complete and updated documentation of this project, you can go to the **Miteve** Main Documentation Page:
+To see the documentation of this project, you can go to the **Miteve** DeepWiki Documentation Page: https://deepwiki.com/sh4dow18/miteve-web
 
-- Coming Soon...
+More docs will coming soon...
