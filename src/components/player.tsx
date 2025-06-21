@@ -139,16 +139,16 @@ function Player({ id, name, description, series }: Props) {
           if (series !== undefined) {
             const { beginSummary, endSummary, beginIntro, endIntro } =
               series.metadata;
-            if (beginSummary === 0 && endSummary != null) {
-              VIDEO.currentTime = endSummary;
-            } else if (beginIntro === 0 && endIntro != null) {
-              VIDEO.currentTime = endIntro;
-            } else if (
+            if (
               beginSummary === 0 &&
               endSummary !== null &&
               beginIntro === endSummary + 1 &&
               endIntro != null
             ) {
+              VIDEO.currentTime = endIntro;
+            } else if (beginSummary === 0 && endSummary != null) {
+              VIDEO.currentTime = endSummary;
+            } else if (beginIntro === 0 && endIntro != null) {
               VIDEO.currentTime = endIntro;
             }
           }
