@@ -17,8 +17,8 @@ export async function PUT(request: Request) {
   const NEW_BODY = {
     beginSummary: beginSummary !== null ? TimeToSeconds(beginSummary) : null,
     endSummary: endSummary !== null ? TimeToSeconds(endSummary) : null,
-    beginIntro: TimeToSeconds(beginIntro),
-    endIntro: TimeToSeconds(endIntro),
+    beginIntro: beginIntro !== null ? TimeToSeconds(beginIntro) : null,
+    endIntro: endIntro !== null ? TimeToSeconds(endIntro) : null,
     credits: TimeToSeconds(credits),
   };
   console.log(NEW_BODY)

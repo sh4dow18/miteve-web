@@ -273,8 +273,8 @@ function Admin() {
       beginSummary:
         FORM.beginSummary.value !== "" ? FORM.beginSummary.value : null,
       endSummary: FORM.endSummary.value !== "" ? FORM.endSummary.value : null,
-      beginIntro: FORM.beginIntro.value,
-      endIntro: FORM.endIntro.value,
+      beginIntro: FORM.beginIntro.value !== "" ? FORM.beginIntro.value : null,
+      endIntro: FORM.endIntro.value !== "" ? FORM.endIntro.value : null,
       beginCredits: FORM.beginCredits.value,
     };
     return await fetch("/api/episodes", {
@@ -294,8 +294,8 @@ function Admin() {
       beginSummary:
         FORM.beginSummary.value !== "" ? FORM.beginSummary.value : null,
       endSummary: FORM.endSummary.value !== "" ? FORM.endSummary.value : null,
-      beginIntro: FORM.beginIntro.value,
-      endIntro: FORM.endIntro.value,
+      beginIntro: FORM.beginIntro.value !== "" ? FORM.beginIntro.value : null,
+      endIntro: FORM.endIntro.value !== "" ? FORM.endIntro.value : null,
       credits: FORM.credits.value,
     };
     return await fetch("/api/episodes/all", {
@@ -788,6 +788,7 @@ function Admin() {
                 help="Tiempo en el que empieza la intro del capitulo"
                 validation="time"
                 maxLength={8}
+                optional
               />
               {/* End Intro Time Input */}
               <Input
@@ -797,6 +798,7 @@ function Admin() {
                 help="Tiempo en el que termina la intro del capitulo"
                 validation="time"
                 maxLength={8}
+                optional
               />
             </div>
             <Input
@@ -865,6 +867,7 @@ function Admin() {
                 help="Tiempo en el que empieza la intro de los capitulos"
                 validation="time"
                 maxLength={8}
+                optional
               />
               {/* End Intro Time Input */}
               <Input
@@ -874,6 +877,7 @@ function Admin() {
                 help="Tiempo en el que termina la intro de los capitulos"
                 validation="time"
                 maxLength={8}
+                optional
               />
             </div>
             <Input
