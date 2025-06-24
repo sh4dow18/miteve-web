@@ -1,6 +1,6 @@
 // Set this component as a client component
 "use client";
-import { SAME_NET_API_HOST_IP, EXTERNAL_API_HOST_IP } from "@/lib/admin";
+import { EXTERNAL_API_HOST_IP, SAME_NET_API_HOST_IP } from "@/lib/admin";
 // Player Requirements
 import {
   ArrowLeftIcon,
@@ -50,6 +50,7 @@ function Player({ id, name, description, series }: Props) {
   // Player Main Hooks
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
   // Speed Test Function
   async function SpeedTest(): Promise<number> {
     const RESULTS_LIST: number[] = [];
@@ -71,7 +72,7 @@ function Player({ id, name, description, series }: Props) {
     paused: true,
     muted: false,
     fullscreen: false,
-    controlersHidden: false,
+    controlsHidden: false,
     currentTime: "00:00:00",
     progress: 0,
     waiting: true,
@@ -282,21 +283,25 @@ function Player({ id, name, description, series }: Props) {
   // Execute this use effect to hide or display the controllers
   useEffect(() => {
     const CONTAINER = containerRef.current;
-    if (CONTAINER === null) {
+    const CONTROLS = controlsRef.current;
+    if (CONTAINER === null || CONTROLS === null) {
       return;
     }
     let timeout: NodeJS.Timeout;
     const MouseMove = () => {
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
-        controlersHidden: false,
+        controlsHidden: false,
       }));
       clearTimeout(timeout);
-      if (videoStates.paused === false) {
+      if (
+        videoStates.paused === false &&
+        CONTROLS.matches(":hover") === false
+      ) {
         timeout = setTimeout(() => {
           SetVideoStates((prevVideoStates) => ({
             ...prevVideoStates,
-            controlersHidden: true,
+            controlsHidden: true,
           }));
         }, 5000);
       }
@@ -304,13 +309,13 @@ function Player({ id, name, description, series }: Props) {
     if (videoStates.paused === true) {
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
-        controlersHidden: false,
+        controlsHidden: false,
       }));
     } else {
       timeout = setTimeout(() => {
         SetVideoStates((prevVideoStates) => ({
           ...prevVideoStates,
-          controlersHidden: true,
+          controlsHidden: true,
         }));
       }, 5000);
     }
@@ -328,14 +333,26 @@ function Player({ id, name, description, series }: Props) {
       return;
     }
     const UpdateBuffered = () => {
-      if (VIDEO.buffered.length > 0) {
-        const END = VIDEO.buffered.end(VIDEO.buffered.length - 1);
-        const DURATION = VIDEO.duration || 1;
-        SetRangeStates({
-          ...rangeStates,
-          buffered: (END / DURATION) * 100,
-        });
+      const BUFFERED = VIDEO.buffered;
+      if (BUFFERED.length <= 0) {
+        return;
       }
+      const CURRENT_TIME = VIDEO.currentTime;
+      const DURATION = VIDEO.duration || 1;
+      let bufferedAhead = 0;
+      for (let i = 0; i < BUFFERED.length; i++) {
+        const START = BUFFERED.start(i);
+        const END = BUFFERED.end(i);
+        // Get only the buffered part that has the current time
+        if (CURRENT_TIME >= START && CURRENT_TIME <= END) {
+          bufferedAhead = END - CURRENT_TIME;
+          break;
+        }
+      }
+      SetRangeStates({
+        ...rangeStates,
+        buffered: ((CURRENT_TIME + bufferedAhead) / DURATION) * 100,
+      });
     };
     VIDEO.addEventListener("progress", UpdateBuffered);
     return () => {
@@ -360,7 +377,7 @@ function Player({ id, name, description, series }: Props) {
     SetVideoStates((prevVideoStates) => ({
       ...prevVideoStates,
       paused: true,
-      controlersHidden: false,
+      controlsHidden: false,
     }));
   };
   // Functions that allows to mute and unmute the video
@@ -482,7 +499,7 @@ function Player({ id, name, description, series }: Props) {
     <div
       ref={containerRef}
       className={`h-full w-full relative ${
-        videoStates.controlersHidden === true ? "cursor-none" : "cursor-pointer"
+        videoStates.controlsHidden === true ? "cursor-none" : "cursor-pointer"
       }`}
     >
       {/* Player Content Information Background Container */}
@@ -540,7 +557,7 @@ function Player({ id, name, description, series }: Props) {
       <button
         onClick={Skip}
         className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
-          videoStates.controlersHidden
+          videoStates.controlsHidden
             ? "bottom-4"
             : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
         }`}
@@ -552,7 +569,7 @@ function Player({ id, name, description, series }: Props) {
       <button
         onClick={Skip}
         className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
-          videoStates.controlersHidden
+          videoStates.controlsHidden
             ? "bottom-4"
             : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
         }`}
@@ -565,7 +582,7 @@ function Player({ id, name, description, series }: Props) {
         <a
           href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
           className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
-            videoStates.controlersHidden
+            videoStates.controlsHidden
               ? "bottom-4"
               : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
           }`}
@@ -599,6 +616,12 @@ function Player({ id, name, description, series }: Props) {
             waiting: false,
           });
         }}
+        onCanPlay={() => {
+          SetVideoStates({
+            ...videoStates,
+            waiting: false,
+          });
+        }}
         onTimeUpdate={() => {
           const VIDEO = videoRef.current;
           if (VIDEO === null) {
@@ -611,10 +634,11 @@ function Player({ id, name, description, series }: Props) {
           });
         }}
       />
-      {/* Player Controlers Container */}
+      {/* Player Controls Container */}
       <div
+        ref={controlsRef}
         className="absolute bottom-0 w-full bg-black transition-opacity duration-500 ease-in-out opacity-100 aria-hidden:opacity-0 aria-hidden:pointer-events-none"
-        aria-hidden={videoStates.controlersHidden}
+        aria-hidden={videoStates.controlsHidden}
       >
         {/* Player Progress Container */}
         <div className="flex items-center gap-3">
@@ -719,9 +743,9 @@ function Player({ id, name, description, series }: Props) {
             </span>
           </div>
         </div>
-        {/* Player Controlers Second Container */}
+        {/* Player Controls Second Container */}
         <div className="flex place-content-between items-center py-4 px-5">
-          {/* Player First Controlers Container */}
+          {/* Player First Controls Container */}
           <div className="flex gap-3 min-[355px]:gap-4 min-[475px]:gap-6">
             <PauseIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -769,7 +793,7 @@ function Player({ id, name, description, series }: Props) {
           <h1 className="hidden text-gray-300 min-[680px]:block min-[865px]:text-xl">
             {name}
           </h1>
-          {/* Player Second Controlers Container */}
+          {/* Player Second Controls Container */}
           <div className="flex gap-3 min-[355px]:gap-4 min-[475px]:gap-6">
             {series?.nextEpisode && (
               // Next Episode Button
