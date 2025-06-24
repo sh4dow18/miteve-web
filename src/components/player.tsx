@@ -1,6 +1,6 @@
 // Set this component as a client component
 "use client";
-import { SAME_NET_API_HOST_IP, EXTERNAL_API_HOST_IP } from "@/lib/admin";
+import { EXTERNAL_API_HOST_IP, SAME_NET_API_HOST_IP } from "@/lib/admin";
 // Player Requirements
 import {
   ArrowLeftIcon,
@@ -328,14 +328,26 @@ function Player({ id, name, description, series }: Props) {
       return;
     }
     const UpdateBuffered = () => {
-      if (VIDEO.buffered.length > 0) {
-        const END = VIDEO.buffered.end(VIDEO.buffered.length - 1);
-        const DURATION = VIDEO.duration || 1;
-        SetRangeStates({
-          ...rangeStates,
-          buffered: (END / DURATION) * 100,
-        });
+      const BUFFERED = VIDEO.buffered;
+      if (BUFFERED.length <= 0) {
+        return;
       }
+      const CURRENT_TIME = VIDEO.currentTime;
+      const DURATION = VIDEO.duration || 1;
+      let bufferedAhead = 0
+      for (let i = 0; i < BUFFERED.length; i++) {
+        const START = BUFFERED.start(i);
+        const END = BUFFERED.end(i);
+        // Get only the buffered part that has the current time
+        if (CURRENT_TIME >= START && CURRENT_TIME <= END) {
+          bufferedAhead = END - CURRENT_TIME;
+          break;
+        }
+      }
+      SetRangeStates({
+        ...rangeStates,
+        buffered: ((CURRENT_TIME + bufferedAhead) / DURATION) * 100,
+      });
     };
     VIDEO.addEventListener("progress", UpdateBuffered);
     return () => {
