@@ -334,7 +334,7 @@ function Player({ id, name, description, series }: Props) {
       }
       const CURRENT_TIME = VIDEO.currentTime;
       const DURATION = VIDEO.duration || 1;
-      let bufferedAhead = 0
+      let bufferedAhead = 0;
       for (let i = 0; i < BUFFERED.length; i++) {
         const START = BUFFERED.start(i);
         const END = BUFFERED.end(i);
@@ -606,6 +606,12 @@ function Player({ id, name, description, series }: Props) {
           });
         }}
         onPlaying={() => {
+          SetVideoStates({
+            ...videoStates,
+            waiting: false,
+          });
+        }}
+        onCanPlay={() => {
           SetVideoStates({
             ...videoStates,
             waiting: false,
