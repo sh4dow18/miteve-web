@@ -1,6 +1,10 @@
 // Series Page Requirements
 import { Slider } from "@/components";
-import { FindSeriesContainers, FindSeriesSoon } from "@/lib/series";
+import {
+  FindSeriesContainers,
+  FindSeriesNew,
+  FindSeriesSoon,
+} from "@/lib/series";
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -13,6 +17,7 @@ export const metadata: Metadata = {
 // Series Page Main Function
 async function SeriesPage() {
   // Movies Page Containers List Information
+  const NEW_SERIES_LIST = await FindSeriesNew();
   const COMING_SOON_LIST = await FindSeriesSoon();
   const CONTAINERS_LIST = await FindSeriesContainers();
   // Returns Series Page
@@ -39,6 +44,13 @@ async function SeriesPage() {
       </div>
       {/* Series Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
+        {NEW_SERIES_LIST.length > 0 && (
+          <Slider
+            title="Nuevo Disponible"
+            contentList={NEW_SERIES_LIST}
+            type="movies"
+          />
+        )}
         {COMING_SOON_LIST.length > 0 && (
           <Slider
             title="Próximamente en Miteve"

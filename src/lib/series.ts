@@ -45,6 +45,12 @@ export async function FindSeriesSoon() {
     (response) => response.json()
   );
 }
+// Find all new series
+export async function FindSeriesNew() {
+  return await fetch(`${API_HOST_IP}/api/series/new`).then((response) =>
+    response.json()
+  );
+}
 // Find Season by Season Number and Series Id
 export async function FindSeasonByNumber(id: string, seasonNumber: number) {
   return await fetch(
