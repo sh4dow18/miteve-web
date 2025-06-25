@@ -18,6 +18,7 @@ function Nav() {
     { href: "/how-it-works", name: "¿Cómo Funciona?", reload: false },
     { href: "/movies", name: "Películas", reload: true },
     { href: "/series", name: "Series", reload: true },
+    { href: "/report-bug", name: "Reportar Problema", reload: false },
   ];
   // Execute this use effect to close the menu when clicking outside it
   useEffect(() => {
