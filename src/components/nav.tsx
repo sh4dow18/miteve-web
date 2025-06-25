@@ -13,12 +13,10 @@ function Nav() {
   const CURRENT_PAGE = usePathname();
   // Nav Pages List to use in Mobile Nav and Desktop Nav
   const NAV_PAGES_LIST = [
-    { href: "/", name: "Inicio" },
-    { href: "/how-it-works", name: "¿Cómo Funciona?" },
-  ];
-  const NAV_RELOAD_PAGES_LIST = [
-    { href: "/movies", name: "Películas" },
-    { href: "/series", name: "Series" },
+    { href: "/", name: "Inicio", reload: false },
+    { href: "/how-it-works", name: "¿Cómo Funciona?", reload: false },
+    { href: "/movies", name: "Películas", reload: true },
+    { href: "/series", name: "Series", reload: true },
   ];
   // Function that Sets the Opposite Value in Open Hook to Open and Close the Burger Menu
   const OnClickButton = () => {
@@ -62,6 +60,7 @@ function Nav() {
             <Link
               key={page.href}
               href={page.href}
+              target={page.reload === true ? "_self" : undefined}
               className={`font-medium mx-2 px-3 py-2 rounded-md select-none ${
                 CURRENT_PAGE === page.href
                   ? "bg-gray-800 text-white"
@@ -70,19 +69,6 @@ function Nav() {
             >
               {page.name}
             </Link>
-          ))}
-          {NAV_RELOAD_PAGES_LIST.map((page) => (
-            <a
-              key={page.href}
-              href={page.href}
-              className={`font-medium mx-2 px-3 py-2 rounded-md select-none ${
-                CURRENT_PAGE === page.href
-                  ? "bg-gray-800 text-white"
-                  : "text-gray-300 hover:text-white hover:bg-gray-700"
-              }`}
-            >
-              {page.name}
-            </a>
           ))}
         </div>
       </div>
@@ -96,6 +82,7 @@ function Nav() {
           <Link
             key={page.href}
             href={page.href}
+            target={page.reload === true ? "_self" : undefined}
             onClick={() => SetOpen(false)}
             className={`mx-2 my-1 px-3 py-2 font-medium ${
               CURRENT_PAGE === page.href ? "bg-gray-700 rounded-md" : ""
@@ -103,18 +90,6 @@ function Nav() {
           >
             {page.name}
           </Link>
-        ))}
-        {NAV_RELOAD_PAGES_LIST.map((page) => (
-          <a
-            key={page.href}
-            href={page.href}
-            onClick={() => SetOpen(false)}
-            className={`mx-2 my-1 px-3 py-2 font-medium ${
-              CURRENT_PAGE === page.href ? "bg-gray-700 rounded-md" : ""
-            }`}
-          >
-            {page.name}
-          </a>
         ))}
       </div>
     </nav>
