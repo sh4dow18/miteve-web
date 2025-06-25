@@ -38,7 +38,9 @@ async function SeriesContentPage({ params, searchParams }: Props) {
     CONTENT.id !== undefined && CONTENT.seasonsList.length > 0
       ? await FindSeasonByNumber(id, CONTENT.seasonsList[0])
       : { seasonNumber: 1, episodesList: [{ episodeNumber: 1 }] };
-  const FIRST_EPISODE = FIRST_SEASON.episodesList[0].episodeNumber;
+  const FIRST_EPISODE = FIRST_SEASON.episodesList[0]
+    ? FIRST_SEASON.episodesList[0].episodeNumber
+    : undefined;
   // Returns Series Content Page
   return CONTENT.id !== undefined ? (
     // Series Content Main Container

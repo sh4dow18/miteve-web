@@ -77,7 +77,8 @@ function ContentOverview({
               href={`/player?type=${
                 player.series === undefined ? "movies" : "series"
               }&id=${player.id}${
-                player.series !== undefined
+                player.series !== undefined &&
+                player.series.episode !== "undefined"
                   ? `&season=${player.series.season}&episode=${player.series.episode}`
                   : ""
               }`}
