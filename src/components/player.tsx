@@ -617,10 +617,10 @@ function Player({ id, name, description, series }: Props) {
           });
         }}
         onCanPlay={() => {
-          SetVideoStates({
-            ...videoStates,
+          SetVideoStates((prevVideoStates) => ({
+            ...prevVideoStates,
             waiting: false,
-          });
+          }));
         }}
         onTimeUpdate={() => {
           const VIDEO = videoRef.current;
