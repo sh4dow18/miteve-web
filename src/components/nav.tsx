@@ -1,7 +1,7 @@
 // Set this component as a client component
 "use client";
 // Nav Requirements
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import MainLogo from "./main-logo";
 function Nav() {
   // Nav Hooks
   const [open, SetOpen] = useState<boolean>(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const CURRENT_PAGE = usePathname();
   // Nav Pages List to use in Mobile Nav and Desktop Nav
   const NAV_PAGES_LIST = [
@@ -18,6 +19,21 @@ function Nav() {
     { href: "/movies", name: "Películas", reload: true },
     { href: "/series", name: "Series", reload: true },
   ];
+  // Execute this use effect to close the menu when clicking outside it
+  useEffect(() => {
+    const ClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        menuRef.current.contains(event.target as Node) === false
+      ) {
+        SetOpen(false);
+      }
+    };
+    document.addEventListener("click", ClickOutside);
+    return () => {
+      document.removeEventListener("click", ClickOutside);
+    };
+  }, [menuRef]);
   // Function that Sets the Opposite Value in Open Hook to Open and Close the Burger Menu
   const OnClickButton = () => {
     if (document.startViewTransition) {
@@ -30,6 +46,7 @@ function Nav() {
   return (
     <nav>
       <div
+        ref={menuRef}
         className={`p-2 grid grid-cols-3 items-center relative min-[1035px]:flex min-[1035px]:px-6 ${
           open ? "bg-gray-900" : "bg-gray-950"
         }`}
