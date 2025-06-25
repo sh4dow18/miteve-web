@@ -14,7 +14,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const BODY = await request.json();
   // Insert Container to internal API endpoint
-  const RESPONSE = await fetch("http://localhost:8080/api/containers", {
+  const RESPONSE = await fetch(`${API_HOST_IP}/api/containers`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -18,7 +18,7 @@ function ReportBugPage() {
   // Return Report Bug Page
   return (
     // Report Bug Page Main Container
-    <div className="flex flex-col gap-5 my-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-5 my-6 max-w-2xl mx-6 min-[710px]:mx-auto">
       {/* Report Bug Page Information Section */}
       <section className="flex flex-col gap-5 min-[370px]:text-center">
         {/* Report Bug Page Page Title */}

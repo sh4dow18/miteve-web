@@ -19,6 +19,7 @@ function Nav() {
     { href: "/movies", name: "Películas", reload: true },
     { href: "/series", name: "Series", reload: true },
     { href: "/report-bug", name: "Reportar Problema", reload: false },
+    { href: "/content-app", name: "Solicitar Contenido", reload: false },
   ];
   // Execute this use effect to close the menu when clicking outside it
   useEffect(() => {
