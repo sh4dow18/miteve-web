@@ -48,7 +48,7 @@ async function SeriesPage() {
           <Slider
             title="Nuevo Disponible"
             contentList={NEW_SERIES_LIST}
-            type="movies"
+            type="series"
           />
         )}
         {COMING_SOON_LIST.length > 0 && (
