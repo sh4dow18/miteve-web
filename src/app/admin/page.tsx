@@ -203,6 +203,7 @@ function Admin() {
       trailer: FORM.trailer.value,
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/movies", {
       method: "POST",
@@ -212,7 +213,7 @@ function Admin() {
       body: JSON.stringify(BODY),
     });
   };
-    // Update Movie Form On Submit Function
+  // Update Movie Form On Submit Function
   const UpdateMovieSubmit = async (event: FormEvent<HTMLFormElement>) => {
     const FORM = event.target as HTMLFormElement;
     // Set Body to Send the Request
@@ -222,6 +223,22 @@ function Admin() {
       orderNumber: FORM.orderNumber.value,
     };
     return await fetch("/api/movies", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Soon Movie Form On Submit Function
+  const UpdateSoonMovieSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.movieId.value,
+      soon: FORM.soon.value === "1"
+    };
+    return await fetch("/api/movies/soon", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -253,6 +270,7 @@ function Admin() {
       trailer: FORM.trailer.value,
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/series", {
       method: "POST",
@@ -272,6 +290,22 @@ function Admin() {
       orderNumber: FORM.orderNumber.value,
     };
     return await fetch("/api/series", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Soon Series Form On Submit Function
+  const UpdateSoonSeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.seriesId.value,
+      soon: FORM.soon.value === "1"
+    };
+    return await fetch("/api/series/soon", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -553,6 +587,16 @@ function Admin() {
                 maxLength={20}
               />
             </div>
+            {/* Soon Select */}
+            <Select
+              label="Próximamente"
+              name="soon"
+              optionsList={[
+                { name: "No", value: "0" },
+                { name: "Sí", value: "1" },
+              ]}
+              help="Estado de la película para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+            />
           </Form>
           <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
           <Form
@@ -588,6 +632,34 @@ function Admin() {
               help="Contenedores Disponibles para las películas"
               disabled={containers.movies.length === 0}
             />
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Estado de Película"
+            OnSubmit={UpdateSoonMovieSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Movie Id Input */}
+              <Input
+                label="Identificador de Película"
+                placeholder="10191"
+                name="movieId"
+                help="Número Entero Positivo que indica cuál serie es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Soon Select */}
+              <Select
+                label="Próximamente"
+                name="soon"
+                optionsList={[
+                  { name: "No", value: "0" },
+                  { name: "Sí", value: "1" },
+                ]}
+                help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+              />
+            </div>
           </Form>
         </div>
       )}
@@ -732,6 +804,16 @@ function Admin() {
                 maxLength={20}
               />
             </div>
+            {/* Soon Select */}
+            <Select
+              label="Próximamente"
+              name="soon"
+              optionsList={[
+                { name: "No", value: "0" },
+                { name: "Sí", value: "1" },
+              ]}
+              help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+            />
           </Form>
           <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
           <Form
@@ -767,6 +849,34 @@ function Admin() {
               help="Contenedores Disponibles para las series"
               disabled={containers.series.length === 0}
             />
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Estado de Series"
+            OnSubmit={UpdateSoonSeriesSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Series Id Input */}
+              <Input
+                label="Identificador de Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Número Entero Positivo que indica cuál serie es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Soon Select */}
+              <Select
+                label="Próximamente"
+                name="soon"
+                optionsList={[
+                  { name: "No", value: "0" },
+                  { name: "Sí", value: "1" },
+                ]}
+                help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+              />
+            </div>
           </Form>
         </div>
       )}

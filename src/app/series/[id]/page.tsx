@@ -67,6 +67,7 @@ async function SeriesContentPage({ params, searchParams }: Props) {
           href: `/series/${id}/cast`,
         }}
         trailer={CONTENT.trailer}
+        soon={CONTENT.soon}
       />
       {CONTENT.seasonsList.length > 0 && (
         // Display Seasons Component

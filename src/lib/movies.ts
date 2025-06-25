@@ -21,6 +21,12 @@ export async function FindMoviesContainers(): Promise<MinimalContainer[]> {
     ),
   }));
 }
+// Find all movies that are coming soon
+export async function FindMoviesSoon() {
+  return await fetch(`${API_HOST_IP}/api/movies/soon`).then((response) =>
+    response.json()
+  );
+}
 // Find the 10 First Recomendations From Movie Function
 export async function FindRecomendationsByMovie(id: string) {
   return await fetch(`${API_HOST_IP}/api/movies/recommendations/${id}`).then(
