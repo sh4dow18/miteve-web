@@ -9,7 +9,16 @@ interface Props {
   placeholder: string;
   name: string;
   help: string;
-  validation: "float" | "text" | "int" | "intNoCero" | "name" | "file" | "time" | "code";
+  validation:
+    | "float"
+    | "text"
+    | "int"
+    | "intNoCero"
+    | "name"
+    | "file"
+    | "time"
+    | "code"
+    | "email";
   disabled?: boolean;
   autoComplete?: string;
   maxLength?: number;
@@ -41,7 +50,10 @@ const REGEX: Record<string, RegExp> = {
   time: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
   // Only Youtube Video Code
   // Example: P8S3DKZCNeI or eMM_ssMgGOM
-  code: /^[a-zA-Z0-9_-]+$/
+  code: /^[a-zA-Z0-9_-]+$/,
+  // Only valid e-mails
+  // Example: sh4dow18@miteve.com or example@example.com
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 };
 // Input Main Function
 function Input({

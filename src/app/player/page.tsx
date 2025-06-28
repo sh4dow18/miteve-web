@@ -93,7 +93,11 @@ async function PlayerPage({ searchParams }: Props) {
     TYPE === "series"
       ? await FindEpisodeMetadataByNumber(ID, SEASON, EPISODE)
       : undefined;
-  return EXISTS.ok === true ? (
+  const HAVE_METADATA =
+    TYPE === "series" ? EPISODE_METADATA.beginCredits !== null : true;
+  return EXISTS.ok === true &&
+    CONTENT.soon === false &&
+    HAVE_METADATA === true ? (
     <Player
       id={`${ID}`}
       name={

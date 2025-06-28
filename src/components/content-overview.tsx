@@ -27,6 +27,7 @@ interface Props {
     href: string;
   };
   trailer: string | undefined;
+  soon: boolean;
 }
 // Content Overview Main Container
 function ContentOverview({
@@ -42,6 +43,7 @@ function ContentOverview({
   certification,
   credits,
   trailer,
+  soon,
 }: Props) {
   // Returns Content Overview Component
   return (
@@ -72,20 +74,29 @@ function ContentOverview({
           />
           {/* Content Overview Button Container */}
           <div className="mt-auto">
-            {/* Content Overview Play Button */}
-            <a
-              href={`/player?type=${
-                player.series === undefined ? "movies" : "series"
-              }&id=${player.id}${
-                player.series !== undefined
-                  ? `&season=${player.series.season}&episode=${player.series.episode}`
-                  : ""
-              }`}
-              className="flex items-center justify-center bg-gray-300 text-xl py-2 px-5 rounded-sm text-gray-900 font-semibold hover:bg-gray-100"
-            >
-              <PlayIcon className="w-7 h-7 mr-1" />
-              <span>Reproducir</span>
-            </a>
+            {soon === true ? (
+              <button
+                className="flex items-center justify-center bg-gray-300 text-xl py-2 px-5 rounded-sm text-gray-900 font-semibold w-full"
+                disabled
+              >
+                Próximamente
+              </button>
+            ) : (
+              <a
+                href={`/player?type=${
+                  player.series === undefined ? "movies" : "series"
+                }&id=${player.id}${
+                  player.series !== undefined &&
+                  player.series.episode !== "undefined"
+                    ? `&season=${player.series.season}&episode=${player.series.episode}`
+                    : ""
+                }`}
+                className="flex items-center justify-center bg-gray-300 text-xl py-2 px-5 rounded-sm text-gray-900 font-semibold hover:bg-gray-100"
+              >
+                <PlayIcon className="w-7 h-7 mr-1" />
+                <span>Reproducir</span>
+              </a>
+            )}
           </div>
         </div>
       </div>

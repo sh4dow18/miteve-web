@@ -1,7 +1,7 @@
 // Movies Page Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Slider } from "@/components";
-import { FindMoviesContainers } from "@/lib/movies";
+import { FindMoviesContainers, FindMoviesNew, FindMoviesSoon } from "@/lib/movies";
 import { Metadata } from "next";
 import Link from "next/link";
 // Movies Page Metadata
@@ -13,6 +13,8 @@ export const metadata: Metadata = {
 // Movies Page Main Function
 async function MoviesPage() {
   // Movies Page Containers List Information
+  const NEW_MOVIES_LIST = await FindMoviesNew();
+  const COMING_SOON_LIST = await FindMoviesSoon();
   const CONTAINERS_LIST = await FindMoviesContainers();
   // Returns Movies Page
   return (
@@ -38,6 +40,20 @@ async function MoviesPage() {
       </div>
       {/* Movies Page Sliders Container */}
       <div className="flex flex-col gap-5 md:gap-7">
+        {NEW_MOVIES_LIST.length > 0 && (
+          <Slider
+            title="Nuevo Disponible"
+            contentList={NEW_MOVIES_LIST}
+            type="movies"
+          />
+        )}
+        {COMING_SOON_LIST.length > 0 && (
+          <Slider
+            title="Próximamente en Miteve"
+            contentList={COMING_SOON_LIST}
+            type="movies"
+          />
+        )}
         {CONTAINERS_LIST.map((container) => (
           <Slider
             key={container.id}

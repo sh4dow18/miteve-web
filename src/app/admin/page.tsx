@@ -203,9 +203,43 @@ function Admin() {
       trailer: FORM.trailer.value,
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/movies", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Movie Form On Submit Function
+  const UpdateMovieSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.movieId.value,
+      containerId: FORM.container.value,
+      orderNumber: FORM.orderNumber.value,
+    };
+    return await fetch("/api/movies", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Soon Movie Form On Submit Function
+  const UpdateSoonMovieSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.movieId.value,
+      soon: FORM.soon.value === "1"
+    };
+    return await fetch("/api/movies/soon", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -236,9 +270,43 @@ function Admin() {
       trailer: FORM.trailer.value,
       containerId: FORM.container.value,
       orderInContainer: FORM.orderNumber.value,
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/series", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Series Form On Submit Function
+  const UpdateSeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.seriesId.value,
+      containerId: FORM.container.value,
+      orderNumber: FORM.orderNumber.value,
+    };
+    return await fetch("/api/series", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Soon Series Form On Submit Function
+  const UpdateSoonSeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.seriesId.value,
+      soon: FORM.soon.value === "1"
+    };
+    return await fetch("/api/series/soon", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -374,293 +442,443 @@ function Admin() {
       )}
       {/* Admin Page Movie Form */}
       {selectedModel === 2 && (
-        <Form
-          className="flex flex-col gap-4 w-full max-w-xl"
-          submitButton="Agregar Película"
-          extraValidation={contentInfo.title !== "No hay Información"}
-          OnSubmit={MovieSubmit}
-        >
-          <Input
-            label="The Movie Database Id"
-            placeholder="123456"
-            name="tmdbId"
-            help="Identificador de la Película en TMBD"
-            validation="int"
-            reference={contentRef}
-          />
-          {/* Button to Search Movie Information */}
-          <button
-            className="py-2 px-3 font-medium rounded-md text-center bg-primary text-white w-full cursor-pointer hover:bg-primary-light"
-            type="button"
-            onClick={GetMovieInfo}
+        <div className="flex flex-col gap-3">
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Agregar Película"
+            extraValidation={contentInfo.title !== "No hay Información"}
+            OnSubmit={MovieSubmit}
           >
-            Buscar Película
-          </button>
-          {/* Movie Information Section */}
-          <section className="flex flex-col gap-4">
-            {/* Movie Information Title */}
-            <h2 className="text-gray-200 text-xl font-bold min-[361px]:text-2xl md:text-3xl">
-              Información de la Película
-            </h2>
-            {/* Movie Infomation */}
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+            <Input
+              label="The Movie Database Id"
+              placeholder="123456"
+              name="tmdbId"
+              help="Identificador de la Película en TMBD"
+              validation="int"
+              reference={contentRef}
+            />
+            {/* Button to Search Movie Information */}
+            <button
+              className="py-2 px-3 font-medium rounded-md text-center bg-primary text-white w-full cursor-pointer hover:bg-primary-light"
+              type="button"
+              onClick={GetMovieInfo}
+            >
+              Buscar Película
+            </button>
+            {/* Movie Information Section */}
+            <section className="flex flex-col gap-4">
+              {/* Movie Information Title */}
+              <h2 className="text-gray-200 text-xl font-bold min-[361px]:text-2xl md:text-3xl">
+                Información de la Película
+              </h2>
+              {/* Movie Infomation */}
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">Título</span>
+                    <p>{contentInfo.title}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Año</span>
+                    <p>{contentInfo.year}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Eslogan</span>
+                    <p>{contentInfo.tagline}</p>
+                  </section>
+                </div>
                 <section>
-                  <span className="text-white">Título</span>
-                  <p>{contentInfo.title}</p>
+                  <span className="text-white">Descripción</span>
+                  <p>{contentInfo.description}</p>
                 </section>
-                <section>
-                  <span className="text-white">Año</span>
-                  <p>{contentInfo.year}</p>
-                </section>
-                <section>
-                  <span className="text-white">Eslogan</span>
-                  <p>{contentInfo.tagline}</p>
-                </section>
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">Valoración</span>
+                    <p>{contentInfo.rating}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Clasificación</span>
+                    <p>{contentInfo.classification}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Cŕeditos</span>
+                    <p>{contentInfo.cast}</p>
+                  </section>
+                </div>
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">Compañía</span>
+                    <p>{contentInfo.company ? contentInfo.company : "N/A"}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Colección</span>
+                    <p>
+                      {contentInfo.collection ? contentInfo.collection : "N/A"}
+                    </p>
+                  </section>
+                </div>
+                {/* Movie Information Images */}
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section className="min-[450px]:w-[23%] min-[548px]:w-[26%]">
+                    <span className="text-white">Carátula</span>
+                    <Image
+                      src={
+                        contentInfo.cover === "404.png" ||
+                        contentInfo.cover === null
+                          ? "/images/cover-404.png"
+                          : `https://image.tmdb.org/t/p/w500/${contentInfo.cover}`
+                      }
+                      alt="Cover Image"
+                      width={400}
+                      height={400}
+                    />
+                  </section>
+                  <section className="min-[450px]:w-[60%] min-[548px]:w-[70%]">
+                    <span className="text-white">Fondo</span>
+                    <Image
+                      src={
+                        contentInfo.background === "404.png" ||
+                        contentInfo.background === null
+                          ? "/images/404.png"
+                          : `https://image.tmdb.org/t/p/w500/${contentInfo.background}`
+                      }
+                      alt="Cover Image"
+                      width={400}
+                      height={400}
+                    />
+                  </section>
+                </div>
               </div>
-              <section>
-                <span className="text-white">Descripción</span>
-                <p>{contentInfo.description}</p>
-              </section>
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section>
-                  <span className="text-white">Valoración</span>
-                  <p>{contentInfo.rating}</p>
-                </section>
-                <section>
-                  <span className="text-white">Clasificación</span>
-                  <p>{contentInfo.classification}</p>
-                </section>
-                <section>
-                  <span className="text-white">Cŕeditos</span>
-                  <p>{contentInfo.cast}</p>
-                </section>
-              </div>
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section>
-                  <span className="text-white">Compañía</span>
-                  <p>{contentInfo.company ? contentInfo.company : "N/A"}</p>
-                </section>
-                <section>
-                  <span className="text-white">Colección</span>
-                  <p>
-                    {contentInfo.collection ? contentInfo.collection : "N/A"}
-                  </p>
-                </section>
-              </div>
-              {/* Movie Information Images */}
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section className="min-[450px]:w-[23%] min-[548px]:w-[26%]">
-                  <span className="text-white">Carátula</span>
-                  <Image
-                    src={
-                      contentInfo.cover === "404.png" ||
-                      contentInfo.cover === null
-                        ? "/images/cover-404.png"
-                        : `https://image.tmdb.org/t/p/w500/${contentInfo.cover}`
-                    }
-                    alt="Cover Image"
-                    width={400}
-                    height={400}
-                  />
-                </section>
-                <section className="min-[450px]:w-[60%] min-[548px]:w-[70%]">
-                  <span className="text-white">Fondo</span>
-                  <Image
-                    src={
-                      contentInfo.background === "404.png" ||
-                      contentInfo.background === null
-                        ? "/images/404.png"
-                        : `https://image.tmdb.org/t/p/w500/${contentInfo.background}`
-                    }
-                    alt="Cover Image"
-                    width={400}
-                    height={400}
-                  />
-                </section>
-              </div>
+            </section>
+            {/* Genres List Select */}
+            <Select
+              label="Géneros"
+              name="genresList"
+              optionsList={genresList}
+              help="Géneros Disponibles para las películas"
+              disabled={genresList.length === 0}
+              multiple
+            />
+            {/* Containers List Select */}
+            <Select
+              label="Contenedor"
+              name="container"
+              optionsList={containers.movies}
+              help="Contenedores Disponibles para las películas"
+              disabled={containers.movies.length === 0}
+            />
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Order Input */}
+              <Input
+                label="Orden en Contenedor"
+                placeholder="3"
+                name="orderNumber"
+                help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+                validation="intNoCero"
+                maxLength={2}
+              />
+              {/* Trailer Input */}
+              <Input
+                label="Trailer"
+                placeholder="PXi3Mv6KMzY"
+                name="trailer"
+                help="Código de Trailer de Youtube"
+                validation="code"
+                maxLength={20}
+              />
             </div>
-          </section>
-          {/* Genres List Select */}
-          <Select
-            label="Géneros"
-            name="genresList"
-            optionsList={genresList}
-            help="Géneros Disponibles para las películas"
-            disabled={genresList.length === 0}
-            multiple
-          />
-          {/* Containers List Select */}
-          <Select
-            label="Contenedor"
-            name="container"
-            optionsList={containers.movies}
-            help="Géneros Disponibles para las películas"
-            disabled={containers.movies.length === 0}
-          />
-          <div className="flex flex-col gap-3 min-[530px]:flex-row">
-            {/* Order Input */}
-            <Input
-              label="Orden en Contenedor"
-              placeholder="3"
-              name="orderNumber"
-              help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
-              validation="intNoCero"
-              maxLength={2}
+            {/* Soon Select */}
+            <Select
+              label="Próximamente"
+              name="soon"
+              optionsList={[
+                { name: "No", value: "0" },
+                { name: "Sí", value: "1" },
+              ]}
+              help="Estado de la película para conocer si se debe poner en una sección especial llamada 'Próximamente'"
             />
-            {/* Trailer Input */}
-            <Input
-              label="Trailer"
-              placeholder="PXi3Mv6KMzY"
-              name="trailer"
-              help="Código de Trailer de Youtube"
-              validation="code"
-              maxLength={20}
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Película"
+            OnSubmit={UpdateMovieSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Series Id Input */}
+              <Input
+                label="Identificador de Película"
+                placeholder="603"
+                name="movieId"
+                help="Número Entero Positivo que indica cuál película es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Order Input */}
+              <Input
+                label="Orden en Contenedor"
+                placeholder="3"
+                name="orderNumber"
+                help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+                validation="intNoCero"
+                maxLength={2}
+              />
+            </div>
+            {/* Containers List Select */}
+            <Select
+              label="Contenedor"
+              name="container"
+              optionsList={containers.movies}
+              help="Contenedores Disponibles para las películas"
+              disabled={containers.movies.length === 0}
             />
-          </div>
-        </Form>
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Estado de Película"
+            OnSubmit={UpdateSoonMovieSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Movie Id Input */}
+              <Input
+                label="Identificador de Película"
+                placeholder="10191"
+                name="movieId"
+                help="Número Entero Positivo que indica cuál serie es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Soon Select */}
+              <Select
+                label="Próximamente"
+                name="soon"
+                optionsList={[
+                  { name: "No", value: "0" },
+                  { name: "Sí", value: "1" },
+                ]}
+                help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+              />
+            </div>
+          </Form>
+        </div>
       )}
       {/* Admin Page Series Form */}
       {selectedModel === 3 && (
-        <Form
-          className="flex flex-col gap-4 w-full max-w-xl"
-          submitButton="Agregar Serie"
-          extraValidation={contentInfo.title !== "No hay Información"}
-          OnSubmit={SeriesSubmit}
-        >
-          <Input
-            label="The Movie Database Id"
-            placeholder="123456"
-            name="tmdbId"
-            help="Identificador de la Serie de TMBD"
-            validation="int"
-            reference={contentRef}
-          />
-          {/* Button to Search Series Information */}
-          <button
-            className="py-2 px-3 font-medium rounded-md text-center bg-primary text-white w-full cursor-pointer hover:bg-primary-light"
-            type="button"
-            onClick={GetSeriesInfo}
+        <div className="flex flex-col gap-3">
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Agregar Serie"
+            extraValidation={contentInfo.title !== "No hay Información"}
+            OnSubmit={SeriesSubmit}
           >
-            Buscar Serie
-          </button>
-          {/* Movie Information Section */}
-          <section className="flex flex-col gap-4">
-            {/* Movie Information Title */}
-            <h2 className="text-gray-200 text-xl font-bold min-[361px]:text-2xl md:text-3xl">
-              Información de la Serie
-            </h2>
-            {/* Movie Infomation */}
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+            <Input
+              label="The Movie Database Id"
+              placeholder="123456"
+              name="tmdbId"
+              help="Identificador de la Serie de TMBD"
+              validation="int"
+              reference={contentRef}
+            />
+            {/* Button to Search Series Information */}
+            <button
+              className="py-2 px-3 font-medium rounded-md text-center bg-primary text-white w-full cursor-pointer hover:bg-primary-light"
+              type="button"
+              onClick={GetSeriesInfo}
+            >
+              Buscar Serie
+            </button>
+            {/* Movie Information Section */}
+            <section className="flex flex-col gap-4">
+              {/* Movie Information Title */}
+              <h2 className="text-gray-200 text-xl font-bold min-[361px]:text-2xl md:text-3xl">
+                Información de la Serie
+              </h2>
+              {/* Movie Infomation */}
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">Título</span>
+                    <p>{contentInfo.title}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Año</span>
+                    <p>{contentInfo.year}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Eslogan</span>
+                    <p>{contentInfo.tagline}</p>
+                  </section>
+                </div>
                 <section>
-                  <span className="text-white">Título</span>
-                  <p>{contentInfo.title}</p>
+                  <span className="text-white">Descripción</span>
+                  <p>{contentInfo.description}</p>
                 </section>
-                <section>
-                  <span className="text-white">Año</span>
-                  <p>{contentInfo.year}</p>
-                </section>
-                <section>
-                  <span className="text-white">Eslogan</span>
-                  <p>{contentInfo.tagline}</p>
-                </section>
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">Valoración</span>
+                    <p>{contentInfo.rating}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Clasificación</span>
+                    <p>{contentInfo.classification}</p>
+                  </section>
+                  <section>
+                    <span className="text-white">Cŕeditos</span>
+                    <p>{contentInfo.cast}</p>
+                  </section>
+                </div>
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section>
+                    <span className="text-white">País de Origen</span>
+                    <p>{contentInfo.originCountry}</p>
+                  </section>
+                </div>
+                {/* Series Information Images */}
+                <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
+                  <section className="min-[450px]:w-[23%] min-[548px]:w-[26%]">
+                    <span className="text-white">Carátula</span>
+                    <Image
+                      src={
+                        contentInfo.cover === "404.png" ||
+                        contentInfo.cover === null
+                          ? "/images/cover-404.png"
+                          : `https://image.tmdb.org/t/p/w500/${contentInfo.cover}`
+                      }
+                      alt="Cover Image"
+                      width={400}
+                      height={400}
+                    />
+                  </section>
+                  <section className="min-[450px]:w-[60%] min-[548px]:w-[70%]">
+                    <span className="text-white">Fondo</span>
+                    <Image
+                      src={
+                        contentInfo.background === "404.png" ||
+                        contentInfo.background === null
+                          ? "/images/404.png"
+                          : `https://image.tmdb.org/t/p/w500/${contentInfo.background}`
+                      }
+                      alt="Cover Image"
+                      width={400}
+                      height={400}
+                    />
+                  </section>
+                </div>
               </div>
-              <section>
-                <span className="text-white">Descripción</span>
-                <p>{contentInfo.description}</p>
-              </section>
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section>
-                  <span className="text-white">Valoración</span>
-                  <p>{contentInfo.rating}</p>
-                </section>
-                <section>
-                  <span className="text-white">Clasificación</span>
-                  <p>{contentInfo.classification}</p>
-                </section>
-                <section>
-                  <span className="text-white">Cŕeditos</span>
-                  <p>{contentInfo.cast}</p>
-                </section>
-              </div>
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section>
-                  <span className="text-white">País de Origen</span>
-                  <p>{contentInfo.originCountry}</p>
-                </section>
-              </div>
-              {/* Series Information Images */}
-              <div className="flex gap-3 flex-wrap min-[400px]:gap-5">
-                <section className="min-[450px]:w-[23%] min-[548px]:w-[26%]">
-                  <span className="text-white">Carátula</span>
-                  <Image
-                    src={
-                      contentInfo.cover === "404.png" ||
-                      contentInfo.cover === null
-                        ? "/images/cover-404.png"
-                        : `https://image.tmdb.org/t/p/w500/${contentInfo.cover}`
-                    }
-                    alt="Cover Image"
-                    width={400}
-                    height={400}
-                  />
-                </section>
-                <section className="min-[450px]:w-[60%] min-[548px]:w-[70%]">
-                  <span className="text-white">Fondo</span>
-                  <Image
-                    src={
-                      contentInfo.background === "404.png" ||
-                      contentInfo.background === null
-                        ? "/images/404.png"
-                        : `https://image.tmdb.org/t/p/w500/${contentInfo.background}`
-                    }
-                    alt="Cover Image"
-                    width={400}
-                    height={400}
-                  />
-                </section>
-              </div>
+            </section>
+            {/* Genres List Select */}
+            <Select
+              label="Géneros"
+              name="genresList"
+              optionsList={genresList}
+              help="Géneros Disponibles para las series"
+              disabled={genresList.length === 0}
+              multiple
+            />
+            {/* Containers List Select */}
+            <Select
+              label="Contenedor"
+              name="container"
+              optionsList={containers.series}
+              help="Contenedores Disponibles para las series"
+              disabled={containers.series.length === 0}
+            />
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Order Input */}
+              <Input
+                label="Orden en Contenedor"
+                placeholder="3"
+                name="orderNumber"
+                help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+                validation="intNoCero"
+                maxLength={2}
+              />
+              {/* Trailer Input */}
+              <Input
+                label="Trailer"
+                placeholder="PXi3Mv6KMzY"
+                name="trailer"
+                help="Código de Trailer de Youtube"
+                validation="code"
+                maxLength={20}
+              />
             </div>
-          </section>
-          {/* Genres List Select */}
-          <Select
-            label="Géneros"
-            name="genresList"
-            optionsList={genresList}
-            help="Géneros Disponibles para las películas"
-            disabled={genresList.length === 0}
-            multiple
-          />
-          {/* Containers List Select */}
-          <Select
-            label="Contenedor"
-            name="container"
-            optionsList={containers.series}
-            help="Géneros Disponibles para las películas"
-            disabled={containers.series.length === 0}
-          />
-          <div className="flex flex-col gap-3 min-[530px]:flex-row">
-            {/* Order Input */}
-            <Input
-              label="Orden en Contenedor"
-              placeholder="3"
-              name="orderNumber"
-              help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
-              validation="intNoCero"
-              maxLength={2}
+            {/* Soon Select */}
+            <Select
+              label="Próximamente"
+              name="soon"
+              optionsList={[
+                { name: "No", value: "0" },
+                { name: "Sí", value: "1" },
+              ]}
+              help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
             />
-            {/* Trailer Input */}
-            <Input
-              label="Trailer"
-              placeholder="PXi3Mv6KMzY"
-              name="trailer"
-              help="Código de Trailer de Youtube"
-              validation="code"
-              maxLength={20}
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Serie"
+            OnSubmit={UpdateSeriesSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Series Id Input */}
+              <Input
+                label="Identificador de Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Número Entero Positivo que indica cuál serie es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Order Input */}
+              <Input
+                label="Orden en Contenedor"
+                placeholder="3"
+                name="orderNumber"
+                help="Número Entero Positivo de Orden en el Contenedor Seleccionado"
+                validation="intNoCero"
+                maxLength={2}
+              />
+            </div>
+            {/* Containers List Select */}
+            <Select
+              label="Contenedor"
+              name="container"
+              optionsList={containers.series}
+              help="Contenedores Disponibles para las series"
+              disabled={containers.series.length === 0}
             />
-          </div>
-        </Form>
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Estado de Series"
+            OnSubmit={UpdateSoonSeriesSubmit}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row">
+              {/* Series Id Input */}
+              <Input
+                label="Identificador de Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Número Entero Positivo que indica cuál serie es"
+                validation="intNoCero"
+                maxLength={10}
+              />
+              {/* Soon Select */}
+              <Select
+                label="Próximamente"
+                name="soon"
+                optionsList={[
+                  { name: "No", value: "0" },
+                  { name: "Sí", value: "1" },
+                ]}
+                help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
+              />
+            </div>
+          </Form>
+        </div>
       )}
       {/* Admin Page Season Form */}
       {selectedModel === 4 && (

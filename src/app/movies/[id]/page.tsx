@@ -50,6 +50,7 @@ async function MovieContentPage({ params }: Props) {
           href: `/movies/${id}/cast`,
         }}
         trailer={CONTENT.trailer}
+        soon={CONTENT.soon}
       />
       {RECOMENDATIONS.length > 0 && (
         // Recomendations Slider
