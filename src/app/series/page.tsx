@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description:
     "Aquí se pueden ver todas las series que ofrece Miteve para reproducir",
 };
+// Force Dynamic in Build
+export const dynamic = "force-dynamic";
 // Series Page Main Function
 async function SeriesPage() {
   // Movies Page Containers List Information

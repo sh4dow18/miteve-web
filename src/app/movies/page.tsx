@@ -1,7 +1,11 @@
 // Movies Page Requirements
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 import { Slider } from "@/components";
-import { FindMoviesContainers, FindMoviesNew, FindMoviesSoon } from "@/lib/movies";
+import {
+  FindMoviesContainers,
+  FindMoviesNew,
+  FindMoviesSoon,
+} from "@/lib/movies";
 import { Metadata } from "next";
 import Link from "next/link";
 // Movies Page Metadata
@@ -10,6 +14,8 @@ export const metadata: Metadata = {
   description:
     "Aquí se pueden ver todas las películas que ofrece Miteve para reproducir",
 };
+// Force Dynamic in Build
+export const dynamic = "force-dynamic";
 // Movies Page Main Function
 async function MoviesPage() {
   // Movies Page Containers List Information
