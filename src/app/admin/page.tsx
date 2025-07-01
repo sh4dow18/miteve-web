@@ -47,6 +47,9 @@ function Admin() {
   const [contentInfo, SetContentInfo] =
     useState<TMBD_CONTENT>(DEFAULT_CONTENT_INFO);
   useEffect(() => {
+    if (reload === false) {
+      return;
+    }
     // Function used to get genres from API
     const GetGenres = async () => {
       const RESPONSE = await fetch("/api/genres").then((response) =>
@@ -84,7 +87,7 @@ function Admin() {
     GetGenres();
     GetContainers();
     SetReload(false);
-  }, [reload === true]);
+  }, [reload]);
   // Function that allows to get Movie Info from The Movie Database API
   const GetMovieInfo = async () => {
     // Check if exists TMDB movie id in input
