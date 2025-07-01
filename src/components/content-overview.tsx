@@ -28,6 +28,7 @@ interface Props {
   };
   trailer: string | undefined;
   soon: boolean;
+  note: string | null;
 }
 // Content Overview Main Container
 function ContentOverview({
@@ -44,6 +45,7 @@ function ContentOverview({
   credits,
   trailer,
   soon,
+  note,
 }: Props) {
   // Returns Content Overview Component
   return (
@@ -155,6 +157,17 @@ function ContentOverview({
           </section>
         </div>
       </section>
+      {note && note !== null && (
+        // Content Overview Note Section
+        <section>
+          {/* Content Overview Note Section Title */}
+          <span className="font-semibold text-gray-300">Nota</span>
+          {/* Content Overview Note Section Description */}
+          <blockquote className="italic text-gray-200 bg-gray-800 border-l-4 border-l-primary p-4 mt-2">
+            {note}
+          </blockquote>
+        </section>
+      )}
       {/* Content Overview Trailer Section */}
       {trailer && (
         <section className="flex flex-col gap-1">

@@ -21,7 +21,6 @@ export async function PUT(request: Request) {
     endIntro: endIntro !== null ? TimeToSeconds(endIntro) : null,
     credits: TimeToSeconds(credits),
   };
-  console.log(NEW_BODY)
   // Update All Episodes Metadata From Season to internal API endpoint
   const EPISODES_METADATA_LIST = await fetch(
     `${API_HOST_IP}/api/series/metadata/all/${id}/season/${seasonNumber}`,

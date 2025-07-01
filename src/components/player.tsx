@@ -147,6 +147,13 @@ function Player({ id, name, description, series }: Props) {
               endIntro != null
             ) {
               VIDEO.currentTime = endIntro;
+            } else if (
+              beginIntro === 0 &&
+              endIntro !== null &&
+              beginSummary === endIntro + 1 &&
+              endSummary != null
+            ) {
+              VIDEO.currentTime = endSummary;
             } else if (beginSummary === 0 && endSummary != null) {
               VIDEO.currentTime = endSummary;
             } else if (beginIntro === 0 && endIntro != null) {
@@ -556,9 +563,9 @@ function Player({ id, name, description, series }: Props) {
       {/* Skip Summary Button */}
       <button
         onClick={Skip}
-        className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+        className={`absolute right-4 cursor-pointer shadow-md shadow-black transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
           videoStates.controlsHidden
-            ? "bottom-4"
+            ? "bottom-18"
             : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
         }`}
         aria-hidden={!skips.summary}
@@ -568,9 +575,9 @@ function Player({ id, name, description, series }: Props) {
       {/* Skip Intro Button */}
       <button
         onClick={Skip}
-        className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+        className={`absolute right-4 cursor-pointer shadow-md shadow-black transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
           videoStates.controlsHidden
-            ? "bottom-4"
+            ? "bottom-18"
             : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
         }`}
         aria-hidden={!skips.intro}
@@ -581,9 +588,9 @@ function Player({ id, name, description, series }: Props) {
       {series?.nextEpisode && (
         <a
           href={`/player?type=series&id=${id}&season=${series.nextEpisode.season}&episode=${series.nextEpisode.episode}`}
-          className={`absolute right-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
+          className={`absolute right-4 cursor-pointer shadow-md shadow-black transition-all duration-500 ease-in-out opacity-100 bg-gray-300 text-black text-sm px-4 py-2 rounded-md z-20 min-[615px]:right-10 md:text-base hover:bg-white aria-hidden:opacity-0 aria-hidden:pointer-events-none ${
             videoStates.controlsHidden
-              ? "bottom-4"
+              ? "bottom-18"
               : "bottom-25 min-[615px]:bottom-28 min-[865px]:bottom-36"
           }`}
           aria-hidden={!skips.credits}
@@ -790,7 +797,7 @@ function Player({ id, name, description, series }: Props) {
             />
           </div>
           {/* Player Content Title */}
-          <h1 className="hidden text-gray-300 min-[680px]:block min-[865px]:text-xl">
+          <h1 className="hidden text-gray-300 text-sm min-[940px]:block min-[1000px]:text-base min-[1090px]:text-xl">
             {name}
           </h1>
           {/* Player Second Controls Container */}

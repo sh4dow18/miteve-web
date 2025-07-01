@@ -40,6 +40,10 @@ function ContentAppPage() {
         submitButton="Solicitar Contenido"
         OnSubmit={OnSubmit}
         className="flex flex-col gap-3"
+        messages={{
+          success: "El Contenido ha sido solicitado",
+          loading: "Solicitando Contenido...",
+        }}
       >
         {/* Inputs Container */}
         <div className="flex flex-col gap-5 min-[660px]:grid min-[660px]:grid-cols-2">

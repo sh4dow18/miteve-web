@@ -35,6 +35,10 @@ function ReportBugPage() {
         submitButton="Reportar Problema"
         OnSubmit={OnSubmit}
         className="flex flex-col gap-3"
+        messages={{
+          success: "El Problema ha sido reportado",
+          loading: "Reportando Problema...",
+        }}
       >
         {/* Inputs Container */}
         <div className="flex flex-col gap-5 min-[660px]:grid min-[660px]:grid-cols-2">

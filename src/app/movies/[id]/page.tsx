@@ -51,6 +51,7 @@ async function MovieContentPage({ params }: Props) {
         }}
         trailer={CONTENT.trailer}
         soon={CONTENT.soon}
+        note={CONTENT.note}
       />
       {RECOMENDATIONS.length > 0 && (
         // Recomendations Slider

@@ -68,6 +68,7 @@ async function SeriesContentPage({ params, searchParams }: Props) {
         }}
         trailer={CONTENT.trailer}
         soon={CONTENT.soon}
+        note={CONTENT.note}
       />
       {CONTENT.seasonsList.length > 0 && CONTENT.soon === false && (
         // Display Seasons Component
