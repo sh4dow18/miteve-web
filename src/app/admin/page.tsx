@@ -37,6 +37,7 @@ function Admin() {
   ];
   // Admin Page Hooks
   const [selectedModel, SetSelectedModel] = useState<number>(1);
+  const [reload, SetReload] = useState(true);
   const [genresList, SetGenresList] = useState([]);
   const [containers, SetContainers] = useState({
     movies: [],
@@ -82,7 +83,8 @@ function Admin() {
     };
     GetGenres();
     GetContainers();
-  }, []);
+    SetReload(false);
+  }, [reload === true]);
   // Function that allows to get Movie Info from The Movie Database API
   const GetMovieInfo = async () => {
     // Check if exists TMDB movie id in input
@@ -236,7 +238,7 @@ function Admin() {
     // Set Body to Send the Request
     const BODY = {
       id: FORM.movieId.value,
-      soon: FORM.soon.value === "1"
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/movies/soon", {
       method: "PUT",
@@ -303,7 +305,7 @@ function Admin() {
     // Set Body to Send the Request
     const BODY = {
       id: FORM.seriesId.value,
-      soon: FORM.soon.value === "1"
+      soon: FORM.soon.value === "1",
     };
     return await fetch("/api/series/soon", {
       method: "PUT",
@@ -429,6 +431,11 @@ function Admin() {
           submitButton="Agregar Género"
           OnSubmit={GenreSubmit}
           className="w-full max-w-md"
+          messages={{
+            success: "El Género se ha agregado con Éxito",
+            loading: "Agregando Género...",
+          }}
+          AfterSubmit={() => SetReload(true)}
         >
           <Input
             label="Nombre"
@@ -448,6 +455,10 @@ function Admin() {
             submitButton="Agregar Película"
             extraValidation={contentInfo.title !== "No hay Información"}
             OnSubmit={MovieSubmit}
+            messages={{
+              success: "La Película se ha agregado con Éxito",
+              loading: "Agregando Película...",
+            }}
           >
             <Input
               label="The Movie Database Id"
@@ -603,6 +614,11 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Película"
             OnSubmit={UpdateMovieSubmit}
+            messages={{
+              success:
+                "La Película se ha puesto en el contenedor seleccionado con Éxito",
+              loading: "Actualizando Contenedor de Película...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row">
               {/* Series Id Input */}
@@ -638,6 +654,10 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Estado de Película"
             OnSubmit={UpdateSoonMovieSubmit}
+            messages={{
+              success: "Se ha cambiado el estado de la Película con Éxito",
+              loading: "Actualizando Estado de Película...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row">
               {/* Movie Id Input */}
@@ -671,6 +691,10 @@ function Admin() {
             submitButton="Agregar Serie"
             extraValidation={contentInfo.title !== "No hay Información"}
             OnSubmit={SeriesSubmit}
+            messages={{
+              success: "La Serie se ha agregado con Éxito",
+              loading: "Agregando Serie...",
+            }}
           >
             <Input
               label="The Movie Database Id"
@@ -820,6 +844,11 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Serie"
             OnSubmit={UpdateSeriesSubmit}
+            messages={{
+              success:
+                "La Serie se ha puesto en el contenedor seleccionado con Éxito",
+              loading: "Actualizando Contenedor de Serie...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row">
               {/* Series Id Input */}
@@ -855,6 +884,10 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Estado de Series"
             OnSubmit={UpdateSoonSeriesSubmit}
+            messages={{
+              success: "Se ha cambiado el estado de la Serie con Éxito",
+              loading: "Actualizando Estado de Serie...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row">
               {/* Series Id Input */}
@@ -886,6 +919,10 @@ function Admin() {
           className="flex flex-col gap-4 w-full max-w-xl"
           submitButton="Agregar Temporadas"
           OnSubmit={SeasonsSubmit}
+          messages={{
+            success: "Se han agregado las temporadas en la serie con Éxito",
+            loading: "Agregando Temporadas en Serie...",
+          }}
         >
           {/* Series Id Input */}
           <Input
@@ -945,6 +982,10 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Episodio"
             OnSubmit={EpisodesSubmit}
+            messages={{
+              success: "El Episodio Seleccionado se ha actualizado con Éxito",
+              loading: "Actualizando Episodio...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
               {/* Series Id Input */}
@@ -981,7 +1022,7 @@ function Admin() {
                 label="Empieza el Resumen"
                 placeholder="00:00:00"
                 name="beginSummary"
-                help="Tiempo en el que empieza el resumen del capitulo"
+                help="Tiempo en el que empieza el resumen del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -991,7 +1032,7 @@ function Admin() {
                 label="Termina el Resumen"
                 placeholder="00:01:00"
                 name="endSummary"
-                help="Tiempo en el que termina el resumen del capitulo"
+                help="Tiempo en el que termina el resumen del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1003,7 +1044,7 @@ function Admin() {
                 label="Empieza la Intro"
                 placeholder="00:00:00"
                 name="beginIntro"
-                help="Tiempo en el que empieza la intro del capitulo"
+                help="Tiempo en el que empieza la intro del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1013,7 +1054,7 @@ function Admin() {
                 label="Termina la Intro"
                 placeholder="00:01:00"
                 name="endIntro"
-                help="Tiempo en el que termina la intro del capitulo"
+                help="Tiempo en el que termina la intro del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1023,7 +1064,7 @@ function Admin() {
               label="Empiezan los Créditos"
               placeholder="00:00:00"
               name="beginCredits"
-              help="Tiempo en el que empiezan los créditos del capitulo"
+              help="Tiempo en el que empiezan los créditos del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
               validation="time"
               maxLength={8}
             />
@@ -1033,6 +1074,11 @@ function Admin() {
             className="flex flex-col gap-4 w-full max-w-xl"
             submitButton="Actualizar Multiples Episodios"
             OnSubmit={AllEpisodesSubmit}
+            messages={{
+              success:
+                "Todos los Episodios de la Temporada Seleccionada de la Serie han sido Actualizados con Éxito",
+              loading: "Actualizando Múltiples Episodios...",
+            }}
           >
             <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
               {/* Series Id Input */}
@@ -1060,7 +1106,7 @@ function Admin() {
                 label="Empieza el Resumen"
                 placeholder="00:00:00"
                 name="beginSummary"
-                help="Tiempo en el que empieza el resumen del capitulo"
+                help="Tiempo en el que empieza el resumen del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1070,7 +1116,7 @@ function Admin() {
                 label="Termina el Resumen"
                 placeholder="00:01:00"
                 name="endSummary"
-                help="Tiempo en el que termina el resumen del capitulo"
+                help="Tiempo en el que termina el resumen del capitulo. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1082,7 +1128,7 @@ function Admin() {
                 label="Empieza la Intro"
                 placeholder="00:00:00"
                 name="beginIntro"
-                help="Tiempo en el que empieza la intro de los capitulos"
+                help="Tiempo en el que empieza la intro de los capitulos. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1092,7 +1138,7 @@ function Admin() {
                 label="Termina la Intro"
                 placeholder="00:01:00"
                 name="endIntro"
-                help="Tiempo en el que termina la intro de los capitulos"
+                help="Tiempo en el que termina la intro de los capitulos. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
                 validation="time"
                 maxLength={8}
                 optional
@@ -1102,7 +1148,7 @@ function Admin() {
               label="Duración de los Créditos"
               placeholder="00:00:00"
               name="credits"
-              help="Tiempo que duran los créditos de los capitulos"
+              help="Tiempo que duran los créditos de los capitulos. Formato Válido: hh:mm:ss. El valor no puede ser mayor a 01:59:59"
               validation="time"
               maxLength={8}
             />
@@ -1115,6 +1161,11 @@ function Admin() {
           className="flex flex-col gap-4 w-full max-w-xl"
           submitButton="Agregar Contenedor"
           OnSubmit={ContainersSubmit}
+          AfterSubmit={() => SetReload(true)}
+          messages={{
+            success: "Se ha agregado el Contenedor con Éxito",
+            loading: "Agregando Contenedor...",
+          }}
         >
           {/* Container's Name Input */}
           <Input

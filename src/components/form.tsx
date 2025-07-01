@@ -8,16 +8,23 @@ interface Props {
   children: React.ReactNode;
   submitButton: string;
   OnSubmit: (event: FormEvent<HTMLFormElement>) => Promise<Response>;
+  messages: {
+    success: string;
+    loading: string;
+  };
   className?: string;
   extraValidation?: boolean;
+  AfterSubmit?: () => void;
 }
 // Form Main Function
 function Form({
   children,
   submitButton,
   OnSubmit,
+  messages,
   className,
   extraValidation,
+  AfterSubmit,
 }: Props) {
   // Form Hooks
   const [disabled, SetDisabled] = useState<boolean>(true);
@@ -93,6 +100,7 @@ function Form({
     SetModalSettings({
       ...modalSettings,
       open: true,
+      message: messages.loading,
     });
     // Execute the On Submit Function Submitted and get the Response from API
     const RESPONSE = await OnSubmit(event);
@@ -102,10 +110,7 @@ function Form({
     SetModalSettings({
       open: true,
       status: OK === true ? "success" : "error",
-      message:
-        OK === true
-          ? "Se ha realizado la operación con éxito"
-          : (await RESPONSE.json()).message,
+      message: OK === true ? messages.success : (await RESPONSE.json()).message,
     });
   };
   // Returns Form Component
@@ -139,8 +144,8 @@ function Form({
             status: "loading",
             message: "Cargando...",
           });
-          if (modalSettings.status === "success") {
-            location.reload();
+          if (modalSettings.status === "success" && AfterSubmit !== undefined) {
+            AfterSubmit();
           }
         }}
       />

@@ -47,7 +47,7 @@ const REGEX: Record<string, RegExp> = {
   file: /^[\w\s\-()\[\]]+\.[a-zA-Z0-9]{1,5}$/,
   // Only Time Format
   // Example: 00:45:23 or 01:00:21
-  time: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+  time: /^(00|01):[0-5]\d:[0-5]\d$/,
   // Only Youtube Video Code
   // Example: P8S3DKZCNeI or eMM_ssMgGOM
   code: /^[a-zA-Z0-9_-]+$/,
