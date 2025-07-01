@@ -1,7 +1,7 @@
 // Set this component as a client page
 "use client";
 // Admin Page Requirements
-import { Form, Input, Select } from "@/components";
+import { Form, Input, Select, Textarea } from "@/components";
 import { CONTAINER, TMBD_CONTENT } from "@/lib/types";
 import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -251,6 +251,23 @@ function Admin() {
       body: JSON.stringify(BODY),
     });
   };
+  // Update Note Movie Form On Submit Function
+  const UpdateNoteMovieSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    const NOTE = FORM.note.value.trim();
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.moviesId.value,
+      note: NOTE.length !== 0 ? NOTE : null,
+    };
+    return await fetch("/api/movies/note", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
   // Series Form On Submit Function
   const SeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
     const FORM = event.target as HTMLFormElement;
@@ -311,6 +328,23 @@ function Admin() {
       soon: FORM.soon.value === "1",
     };
     return await fetch("/api/series/soon", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Note Series Form On Submit Function
+  const UpdateNoteSeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const FORM = event.target as HTMLFormElement;
+    const NOTE = FORM.note.value.trim();
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.seriesId.value,
+      note: NOTE.length !== 0 ? NOTE : null,
+    };
+    return await fetch("/api/series/note", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -684,6 +718,36 @@ function Admin() {
               />
             </div>
           </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          {/* Update Movie Note Form */}
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Nota de Película"
+            OnSubmit={UpdateNoteMovieSubmit}
+            messages={{
+              success: "Se ha agregado la Nota a la Película con Éxito",
+              loading: "Actualizando Nota de Película...",
+            }}
+          >
+            {/* Series Id Input */}
+            <Input
+              label="Identificador de Película"
+              placeholder="603"
+              name="moviesId"
+              help="Número Entero Positivo que indica cuál película es"
+              validation="intNoCero"
+              maxLength={10}
+            />
+            {/* Note Textarea */}
+            <Textarea
+              label="Nota"
+              name="note"
+              help="Describe la nota que deseas que aparezca en el detalle de la película"
+              placeholder="Película basada en Hechos Reales. 10/10"
+              maxLength={500}
+              optional
+            />
+          </Form>
         </div>
       )}
       {/* Admin Page Series Form */}
@@ -913,6 +977,36 @@ function Admin() {
                 help="Estado de la serie para conocer si se debe poner en una sección especial llamada 'Próximamente'"
               />
             </div>
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          {/* Update Series Note form */}
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Nota de Serie"
+            OnSubmit={UpdateNoteSeriesSubmit}
+            messages={{
+              success: "Se ha agregado la Nota a la Serie con Éxito",
+              loading: "Actualizando Nota de Serie...",
+            }}
+          >
+            {/* Series Id Input */}
+            <Input
+              label="Identificador de Serie"
+              placeholder="1399"
+              name="seriesId"
+              help="Número Entero Positivo que indica cuál serie es"
+              validation="intNoCero"
+              maxLength={10}
+            />
+            {/* Note Textarea */}
+            <Textarea
+              label="Nota"
+              name="note"
+              help="Describe la nota que deseas que aparezca en el detalle de la serie"
+              placeholder="Actualmente se encuentran disponibles las temporadas 6 y 7, las demás temporadas se encuentran disponibles en Netflix. Si desea que se agreguen las temporadas faltantes, use el formulario de solicitar contenido"
+              maxLength={500}
+              optional
+            />
           </Form>
         </div>
       )}

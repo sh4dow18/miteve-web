@@ -10,9 +10,18 @@ interface Props {
   help: string;
   maxLength?: number;
   rows?: number;
+  optional?: boolean;
 }
 // Textarea Main Function
-function Textarea({ label, name, placeholder, help, maxLength, rows }: Props) {
+function Textarea({
+  label,
+  name,
+  placeholder,
+  help,
+  maxLength,
+  rows,
+  optional,
+}: Props) {
   // Textarea Hooks
   const [state, SetState] = useState<"Valid" | "Neutral">("Neutral");
   const [actualChars, SetActualChars] = useState<number>(0);
@@ -47,7 +56,7 @@ function Textarea({ label, name, placeholder, help, maxLength, rows }: Props) {
           rows={rows || 4}
           onChange={OnChange}
           aria-invalid={state === "Valid" ? false : undefined}
-          required
+          required={optional !== true}
           className="w-full resize-none text-black bg-transparent outline-hidden dark:text-white lowContrast:text-gray-500"
         />
         {/* Textarea Chars Container */}
@@ -56,7 +65,11 @@ function Textarea({ label, name, placeholder, help, maxLength, rows }: Props) {
         </div>
       </div>
       {/* Textarea Help */}
-      <small>{help}</small>
+      <small>{`${help}${
+        optional === true
+          ? ". Este Campo es Opcional. Si se deja vacio o con solo espacios, se tomará como nulo"
+          : ""
+      }`}</small>
     </div>
   );
 }
