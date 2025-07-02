@@ -39,14 +39,11 @@ function Textarea({
     // Textarea Main Container
     <div className="flex flex-col gap-1">
       {/* Textarea Label */}
-      <label
-        htmlFor={name}
-        className="text-black font-medium aria-disabled:text-gray-400 dark:text-white dark:aria-disabled:text-gray-700 lowContrast:text-gray-500"
-      >
+      <label htmlFor={name} className="text-white font-medium">
         {label}
       </label>
       {/* Textarea Second Container */}
-      <div className="rounded-md outline-2 py-2 px-1 bg-gray-50 outline-gray-300 focus-within:outline-mateoryPurple dark:bg-gray-800 dark:outline-gray-800 highContrast:bg-white highContrast:outline-black lowContrast:bg-gray-100 lowContrast:outline-gray-300 min-[344px]:px-3">
+      <div className="rounded-md outline-2 py-2 px-1 bg-gray-800 outline-gray-800 focus-within:outline-primary min-[344px]:px-3">
         {/* Main Textarea */}
         <textarea
           id={name}
@@ -57,7 +54,7 @@ function Textarea({
           onChange={OnChange}
           aria-invalid={state === "Valid" ? false : undefined}
           required={optional !== true}
-          className="w-full resize-none text-black bg-transparent outline-hidden dark:text-white lowContrast:text-gray-500"
+          className="w-full resize-none text-white bg-transparent outline-hidden"
         />
         {/* Textarea Chars Container */}
         <div className="text-right mr-2">
