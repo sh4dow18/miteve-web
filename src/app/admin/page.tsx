@@ -268,6 +268,25 @@ function Admin() {
       body: JSON.stringify(BODY),
     });
   };
+  // Update Extension Movie Form On Submit Function
+  const UpdateExtensionMovieSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
+    const FORM = event.target as HTMLFormElement;
+    const EXTENSION = FORM.extension.value.trim();
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.movieId.value,
+      extension: EXTENSION.length !== 0 ? EXTENSION : null,
+    };
+    return await fetch("/api/movies/extension", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
   // Series Form On Submit Function
   const SeriesSubmit = async (event: FormEvent<HTMLFormElement>) => {
     const FORM = event.target as HTMLFormElement;
@@ -345,6 +364,25 @@ function Admin() {
       note: NOTE.length !== 0 ? NOTE : null,
     };
     return await fetch("/api/series/note", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(BODY),
+    });
+  };
+  // Update Extension Series Form On Submit Function
+  const UpdateExtensionSeriesSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
+    const FORM = event.target as HTMLFormElement;
+    const EXTENSION = FORM.extension.value.trim();
+    // Set Body to Send the Request
+    const BODY = {
+      id: FORM.seriesId.value,
+      extension: EXTENSION.length !== 0 ? EXTENSION : null,
+    };
+    return await fetch("/api/series/extension", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -748,6 +786,39 @@ function Admin() {
               optional
             />
           </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Extensión de Película"
+            OnSubmit={UpdateExtensionMovieSubmit}
+            messages={{
+              success:
+                "Se ha actualizado la extensión de la película con Éxito",
+              loading: "Actualizando Extensión de Película...",
+            }}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Series Id Input */}
+              <Input
+                label="Película"
+                placeholder="603"
+                name="movieId"
+                help="Identificador de la Película Existente"
+                validation="int"
+                maxLength={10}
+              />
+              {/* Extension Input */}
+              <Input
+                label="Extensión"
+                placeholder="mp4"
+                name="extension"
+                help="Extensión de la Película. Si es nulo, se tomará como WEBM"
+                validation="text"
+                maxLength={6}
+                optional
+              />
+            </div>
+          </Form>
         </div>
       )}
       {/* Admin Page Series Form */}
@@ -1007,6 +1078,38 @@ function Admin() {
               maxLength={500}
               optional
             />
+          </Form>
+          <hr className="border-0 h-1 bg-gray-600 rounded-lg my-3" />
+          <Form
+            className="flex flex-col gap-4 w-full max-w-xl"
+            submitButton="Actualizar Extensión de Serie"
+            OnSubmit={UpdateExtensionSeriesSubmit}
+            messages={{
+              success: "Se ha actualizado la extensión de la serie con Éxito",
+              loading: "Actualizando Extensión de Serie...",
+            }}
+          >
+            <div className="flex flex-col gap-3 min-[530px]:flex-row min-[530px]:gap-5">
+              {/* Series Id Input */}
+              <Input
+                label="Serie"
+                placeholder="1399"
+                name="seriesId"
+                help="Identificador de la Serie Existente"
+                validation="int"
+                maxLength={10}
+              />
+              {/* Extension Input */}
+              <Input
+                label="Extensión"
+                placeholder="mp4"
+                name="extension"
+                help="Extensión de los Capítulos que posee la serie. Si es nulo, se tomará como WEBM"
+                validation="text"
+                maxLength={6}
+                optional
+              />
+            </div>
           </Form>
         </div>
       )}

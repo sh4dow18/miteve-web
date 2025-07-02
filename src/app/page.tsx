@@ -121,7 +121,7 @@ export default function Home() {
     {
       name: "¿Qué formatos de video soporta Miteve?",
       answer:
-        "Tiene como objetivo ser compatible con archivos WEBM, debido a que se busca que funcione en la mayor cantidad de dispositivos y navegadores, pero actualmente las versiones en menor calidad de los episodios se leen como MP4.",
+        "Tiene como objetivo usar por defecto archivos WEBM, ya que estos tipos de archivos son recomendados para Streaming, porque funcionan en la mayor cantidad de dispositivos y navegadores, además de que pueden tener una alta resolución con el menor peso posible, pero también el administrador puede elegir el formato de su contenido, ya sea MP4, MKV, AVI, entre otros",
     },
     {
       name: "¿Puedo personalizar la apariencia de Miteve?",
