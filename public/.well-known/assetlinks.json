@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.miteve.twa",
+      "sha256_cert_fingerprints": [
+        "3F:23:21:6A:25:33:D0:4A:9E:8E:83:65:7C:67:3C:AD:43:BB:91:CE:DB:02:96:98:8A:CB:FD:08:31:AA:95:38"
+      ]
+    }
+  }
+]
