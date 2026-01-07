@@ -6,3 +6,5 @@ package-lock.json
 # Environments
 .env
 public/videos/
+# Android TWA
+android-twa/
