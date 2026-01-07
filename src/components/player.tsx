@@ -533,6 +533,8 @@ function Player({ id, name, description, series }: Props) {
       <div
         className="absolute top-0 h-full w-full aria-hidden:hidden"
         aria-hidden={!videoStates.paused}
+        tabIndex={0}
+        role="button"
       >
         <Link
           className="absolute top-5 left-5 flex gap-1 select-none z-20 min-[865px]:left-7"
@@ -758,16 +760,22 @@ function Player({ id, name, description, series }: Props) {
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
               aria-disabled={videoStates.paused}
+              tabIndex={0}
+              role="button"
             />
             <PlayIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
               aria-disabled={!videoStates.paused}
+              tabIndex={0}
+              role="button"
             />
             {/* Less Ten Seconds Button */}
             <div
               className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
               onClick={() => AddTime(-10)}
+              tabIndex={0}
+              role="button"
             >
               <ArrowUturnLeftIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
               <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
@@ -778,6 +786,8 @@ function Player({ id, name, description, series }: Props) {
             <div
               className="group flex transition-all cursor-pointer select-none hover:scale-125 hover:text-white"
               onClick={() => AddTime(10)}
+              tabIndex={0}
+              role="button"
             >
               <ArrowUturnRightIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
               <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
@@ -789,11 +799,15 @@ function Player({ id, name, description, series }: Props) {
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={VolumeAndMute}
               aria-disabled={videoStates.muted}
+              tabIndex={0}
+              role="button"
             />
             <SpeakerXMarkIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={VolumeAndMute}
               aria-disabled={!videoStates.muted}
+              tabIndex={0}
+              role="button"
             />
           </div>
           {/* Player Content Title */}
@@ -817,22 +831,30 @@ function Player({ id, name, description, series }: Props) {
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PutSubtitles}
               aria-disabled={videoStates.subtitlesOn === false}
+              tabIndex={0}
+              role="button"
             />
             <ChatBubbleBottomCenterIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PutSubtitles}
               aria-disabled={videoStates.subtitlesOn === true}
+              tabIndex={0}
+              role="button"
             />
             {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={Fullscreen}
               aria-disabled={videoStates.fullscreen}
+              tabIndex={0}
+              role="button"
             />
             <ArrowsPointingInIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={Fullscreen}
               aria-disabled={!videoStates.fullscreen}
+              tabIndex={0}
+              role="button"
             />
           </div>
         </div>
