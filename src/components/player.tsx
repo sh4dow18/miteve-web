@@ -243,9 +243,27 @@ function Player({ id, name, description, series }: Props) {
       VIDEO.removeEventListener("seeked", ManageSkips);
     };
   }, [series]);
+  function isTVOrAndroidApp(): boolean {
+    if (typeof navigator === "undefined") return false;
+    const USER_AGENT = navigator.userAgent.toLowerCase();
+    return (
+      USER_AGENT.includes("android") &&
+      (USER_AGENT.includes("tv") ||
+        USER_AGENT.includes("aft") || // Fire TV
+        USER_AGENT.includes("smart-tv") ||
+        USER_AGENT.includes("tizen") ||
+        USER_AGENT.includes("webos") ||
+        USER_AGENT.includes("crkey") || // Chromecast
+        USER_AGENT.includes("shield") || // Nvidia Shield
+        USER_AGENT.includes("bravia") || // Sony
+        USER_AGENT.includes("mi tv") ||
+        USER_AGENT.includes("tcl"))
+    );
+  }
   // Execute this use effect when the page is loading
   useEffect(() => {
     const UserPress = (event: KeyboardEvent) => {
+      const isTV = isTVOrAndroidApp();
       switch (event.key) {
         case "f":
         case "F":
@@ -260,10 +278,14 @@ function Player({ id, name, description, series }: Props) {
           PutSubtitles();
           break;
         case "ArrowRight":
-          AddTime(10);
+          if (!isTV) {
+            AddTime(10);
+          }
           break;
         case "ArrowLeft":
-          AddTime(-10);
+          if (!isTV) {
+            AddTime(-10);
+          }
           break;
         case " ":
           event.preventDefault();
@@ -288,51 +310,6 @@ function Player({ id, name, description, series }: Props) {
     };
   }, []);
   // Execute this use effect to hide or display the controllers
-  // useEffect(() => {
-  //   const CONTAINER = containerRef.current;
-  //   const CONTROLS = controlsRef.current;
-  //   if (CONTAINER === null || CONTROLS === null) {
-  //     return;
-  //   }
-  //   let timeout: NodeJS.Timeout;
-  //   const MouseMove = () => {
-  //     SetVideoStates((prevVideoStates) => ({
-  //       ...prevVideoStates,
-  //       controlsHidden: false,
-  //     }));
-  //     clearTimeout(timeout);
-  //     if (
-  //       videoStates.paused === false &&
-  //       CONTROLS.matches(":hover") === false
-  //     ) {
-  //       timeout = setTimeout(() => {
-  //         SetVideoStates((prevVideoStates) => ({
-  //           ...prevVideoStates,
-  //           controlsHidden: true,
-  //         }));
-  //       }, 5000);
-  //     }
-  //   };
-  //   if (videoStates.paused === true) {
-  //     SetVideoStates((prevVideoStates) => ({
-  //       ...prevVideoStates,
-  //       controlsHidden: false,
-  //     }));
-  //   } else {
-  //     timeout = setTimeout(() => {
-  //       SetVideoStates((prevVideoStates) => ({
-  //         ...prevVideoStates,
-  //         controlsHidden: true,
-  //       }));
-  //     }, 5000);
-  //   }
-  //   CONTAINER.addEventListener("mousemove", MouseMove);
-  //   return () => {
-  //     CONTAINER.removeEventListener("mousemove", MouseMove);
-  //     clearTimeout(timeout);
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [videoStates.paused === false]);
   useEffect(() => {
     const CONTAINER = containerRef.current;
     const CONTROLS = controlsRef.current;
