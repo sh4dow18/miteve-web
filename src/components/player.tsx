@@ -20,6 +20,13 @@ import {
 import { LoaderCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+declare global {
+  interface Window {
+    Android?: {
+      fullscreenDiv: (divId: string) => void;
+    };
+  }
+}
 // Player Props
 interface Props {
   id: string;
@@ -440,6 +447,9 @@ function Player({ id, name, description, series }: Props) {
     }
     if (!document.fullscreenElement) {
       CONTAINER.requestFullscreen();
+      if (window.Android?.fullscreenDiv) {
+        window.Android.fullscreenDiv("video-container");
+      }
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
         fullscreen: true,
@@ -565,6 +575,7 @@ function Player({ id, name, description, series }: Props) {
     // Player Page Main Container
     <div
       ref={containerRef}
+      id="video-container"
       className={`h-full w-full relative ${
         videoStates.controlsHidden === true ? "cursor-none" : "cursor-pointer"
       }`}
