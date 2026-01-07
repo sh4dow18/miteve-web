@@ -555,6 +555,34 @@ function Player({ id, name, description, series }: Props) {
       });
     }
   };
+  const handleTVNavigation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const focusables = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-focusable]")
+    );
+
+    const index = focusables.indexOf(document.activeElement as HTMLElement);
+
+    if (index === -1) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        focusables[index + 1]?.focus();
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        focusables[index - 1]?.focus();
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        AddTime(-10);
+        break;
+      case "ArrowRight":
+        e.preventDefault();
+        AddTime(10);
+        break;
+    }
+  };
   // Returns Player Component
   return (
     // Player Page Main Container
@@ -667,6 +695,7 @@ function Player({ id, name, description, series }: Props) {
         }
         className="h-full w-full -z-10 max-[1024px]:object-cover"
         playsInline
+        data-focusable
         onClick={PlayAndPause}
         onSeeking={() => {
           SetVideoStates({
@@ -775,6 +804,8 @@ function Player({ id, name, description, series }: Props) {
                   : 0
               }
               onChange={ChangeTimeInProgressBar}
+              onKeyDown={handleTVNavigation}
+              data-focusable
               className="w-full h-2 appearance-none bg-transparent cursor-pointer range-thumb relative z-20"
             />
             {rangeStates.isHovering && (
@@ -815,6 +846,7 @@ function Player({ id, name, description, series }: Props) {
               className={`${ICONS_STYLE} aria-disabled:hidden`}
               onClick={PlayAndPause}
               aria-disabled={videoStates.paused}
+              data-focusable
               tabIndex={0}
               role="button"
               onKeyDown={(e) => {
