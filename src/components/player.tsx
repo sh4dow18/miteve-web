@@ -288,51 +288,106 @@ function Player({ id, name, description, series }: Props) {
     };
   }, []);
   // Execute this use effect to hide or display the controllers
+  // useEffect(() => {
+  //   const CONTAINER = containerRef.current;
+  //   const CONTROLS = controlsRef.current;
+  //   if (CONTAINER === null || CONTROLS === null) {
+  //     return;
+  //   }
+  //   let timeout: NodeJS.Timeout;
+  //   const MouseMove = () => {
+  //     SetVideoStates((prevVideoStates) => ({
+  //       ...prevVideoStates,
+  //       controlsHidden: false,
+  //     }));
+  //     clearTimeout(timeout);
+  //     if (
+  //       videoStates.paused === false &&
+  //       CONTROLS.matches(":hover") === false
+  //     ) {
+  //       timeout = setTimeout(() => {
+  //         SetVideoStates((prevVideoStates) => ({
+  //           ...prevVideoStates,
+  //           controlsHidden: true,
+  //         }));
+  //       }, 5000);
+  //     }
+  //   };
+  //   if (videoStates.paused === true) {
+  //     SetVideoStates((prevVideoStates) => ({
+  //       ...prevVideoStates,
+  //       controlsHidden: false,
+  //     }));
+  //   } else {
+  //     timeout = setTimeout(() => {
+  //       SetVideoStates((prevVideoStates) => ({
+  //         ...prevVideoStates,
+  //         controlsHidden: true,
+  //       }));
+  //     }, 5000);
+  //   }
+  //   CONTAINER.addEventListener("mousemove", MouseMove);
+  //   return () => {
+  //     CONTAINER.removeEventListener("mousemove", MouseMove);
+  //     clearTimeout(timeout);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [videoStates.paused === false]);
   useEffect(() => {
     const CONTAINER = containerRef.current;
     const CONTROLS = controlsRef.current;
-    if (CONTAINER === null || CONTROLS === null) {
-      return;
-    }
+
+    if (!CONTAINER || !CONTROLS) return;
+
     let timeout: NodeJS.Timeout;
-    const MouseMove = () => {
-      SetVideoStates((prevVideoStates) => ({
-        ...prevVideoStates,
+
+    const hideControls = () => {
+      SetVideoStates((prev) => ({
+        ...prev,
+        controlsHidden: true,
+      }));
+    };
+
+    const showControls = () => {
+      SetVideoStates((prev) => ({
+        ...prev,
         controlsHidden: false,
       }));
       clearTimeout(timeout);
-      if (
-        videoStates.paused === false &&
-        CONTROLS.matches(":hover") === false
-      ) {
-        timeout = setTimeout(() => {
-          SetVideoStates((prevVideoStates) => ({
-            ...prevVideoStates,
-            controlsHidden: true,
-          }));
-        }, 5000);
+
+      // NO ocultar si está pausado
+      if (videoStates.paused) return;
+
+      // NO ocultar si algún control tiene foco
+      const active = document.activeElement;
+      const isFocused = CONTROLS.contains(active);
+
+      if (!isFocused) {
+        timeout = setTimeout(hideControls, 5000);
       }
     };
-    if (videoStates.paused === true) {
-      SetVideoStates((prevVideoStates) => ({
-        ...prevVideoStates,
-        controlsHidden: false,
-      }));
+
+    // Interacciones válidas para TODOS los dispositivos
+    CONTAINER.addEventListener("mousemove", showControls);
+    CONTAINER.addEventListener("keydown", showControls);
+    CONTAINER.addEventListener("focusin", showControls);
+    CONTAINER.addEventListener("touchstart", showControls);
+
+    // Estado inicial
+    if (videoStates.paused) {
+      showControls();
     } else {
-      timeout = setTimeout(() => {
-        SetVideoStates((prevVideoStates) => ({
-          ...prevVideoStates,
-          controlsHidden: true,
-        }));
-      }, 5000);
+      timeout = setTimeout(hideControls, 5000);
     }
-    CONTAINER.addEventListener("mousemove", MouseMove);
+
     return () => {
-      CONTAINER.removeEventListener("mousemove", MouseMove);
       clearTimeout(timeout);
+      CONTAINER.removeEventListener("mousemove", showControls);
+      CONTAINER.removeEventListener("keydown", showControls);
+      CONTAINER.removeEventListener("focusin", showControls);
+      CONTAINER.removeEventListener("touchstart", showControls);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoStates.paused === false]);
+  }, [videoStates.paused]);
   // Execute this use effect when the page is loading to set the buffered video
   useEffect(() => {
     const VIDEO = videoRef.current;
@@ -762,6 +817,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={videoStates.paused}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  PlayAndPause();
+                }
+              }}
             />
             <PlayIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -769,6 +830,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={!videoStates.paused}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  PlayAndPause();
+                }
+              }}
             />
             {/* Less Ten Seconds Button */}
             <div
@@ -776,6 +843,12 @@ function Player({ id, name, description, series }: Props) {
               onClick={() => AddTime(-10)}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  AddTime(-10);
+                }
+              }}
             >
               <ArrowUturnLeftIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
               <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
@@ -788,6 +861,12 @@ function Player({ id, name, description, series }: Props) {
               onClick={() => AddTime(10)}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  AddTime(10);
+                }
+              }}
             >
               <ArrowUturnRightIcon className="w-5 h-5 fill-gray-300 group-hover:fill-white min-[425px]:w-7 min-[425px]:h-7 min-[865px]:w-12 min-[865px]:h-12" />
               <span className="font-semibold max-[425px]:text-xs min-[865px]:text-xl">
@@ -801,6 +880,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={videoStates.muted}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  VolumeAndMute();
+                }
+              }}
             />
             <SpeakerXMarkIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -808,6 +893,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={!videoStates.muted}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  VolumeAndMute();
+                }
+              }}
             />
           </div>
           {/* Player Content Title */}
@@ -833,6 +924,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={videoStates.subtitlesOn === false}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  PutSubtitles();
+                }
+              }}
             />
             <ChatBubbleBottomCenterIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -840,6 +937,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={videoStates.subtitlesOn === true}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  PutSubtitles();
+                }
+              }}
             />
             {/* Fullscreen Buttons */}
             <ArrowsPointingOutIcon
@@ -848,6 +951,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={videoStates.fullscreen}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  Fullscreen();
+                }
+              }}
             />
             <ArrowsPointingInIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
@@ -855,6 +964,12 @@ function Player({ id, name, description, series }: Props) {
               aria-disabled={!videoStates.fullscreen}
               tabIndex={0}
               role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  Fullscreen();
+                }
+              }}
             />
           </div>
         </div>
