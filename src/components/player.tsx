@@ -249,7 +249,6 @@ function Player({ id, name, description, series }: Props) {
     return (
       USER_AGENT.includes("android") &&
       (USER_AGENT.includes("tv") ||
-        USER_AGENT.includes("aft") || // Fire TV
         USER_AGENT.includes("smart-tv") ||
         USER_AGENT.includes("tizen") ||
         USER_AGENT.includes("webos") ||
@@ -257,7 +256,8 @@ function Player({ id, name, description, series }: Props) {
         USER_AGENT.includes("shield") || // Nvidia Shield
         USER_AGENT.includes("bravia") || // Sony
         USER_AGENT.includes("mi tv") ||
-        USER_AGENT.includes("tcl"))
+        USER_AGENT.includes("tcl") ||
+        USER_AGENT.includes("tivo"))
     );
   }
   // Execute this use effect when the page is loading
@@ -439,9 +439,18 @@ function Player({ id, name, description, series }: Props) {
       return;
     }
     if (!document.fullscreenElement && videoStates.fullscreen === false) {
+      if (!CONTAINER.hasAttribute("tabindex")) {
+        CONTAINER.setAttribute("tabindex", "-1");
+      }
       CONTAINER.requestFullscreen();
       CONTAINER.style.width = "100vw";
       CONTAINER.style.height = "100vh";
+      CONTAINER.focus();
+      CONTAINER.scrollIntoView({
+        block: "center",
+        inline: "center",
+        behavior: "auto",
+      });
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
         fullscreen: true,
