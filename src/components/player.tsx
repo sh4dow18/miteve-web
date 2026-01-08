@@ -20,6 +20,13 @@ import {
 import { LoaderCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+declare global {
+  interface Window {
+    AndroidApp?: {
+      isAndroidApp: () => boolean;
+    };
+  }
+}
 // Player Props
 interface Props {
   id: string;
@@ -244,22 +251,12 @@ function Player({ id, name, description, series }: Props) {
     };
   }, [series]);
   function isTVOrAndroidApp(): boolean {
-    if (typeof navigator === "undefined") return false;
+    if (typeof window === "undefined") return false;
+    if (window.AndroidApp?.isAndroidApp()) {
+      return true;
+    }
     const USER_AGENT = navigator.userAgent.toLowerCase();
-    return (
-      USER_AGENT.includes("android") &&
-      (USER_AGENT.includes("tv") ||
-        USER_AGENT.includes("aft") || // Fire TV
-        USER_AGENT.includes("smart-tv") ||
-        USER_AGENT.includes("tizen") ||
-        USER_AGENT.includes("webos") ||
-        USER_AGENT.includes("crkey") || // Chromecast
-        USER_AGENT.includes("shield") || // Nvidia Shield
-        USER_AGENT.includes("bravia") || // Sony
-        USER_AGENT.includes("mi tv") ||
-        USER_AGENT.includes("tcl") ||
-        USER_AGENT.includes("tivo"))
-    );
+    return USER_AGENT.includes("aft");
   }
   // Execute this use effect when the page is loading
   useEffect(() => {
