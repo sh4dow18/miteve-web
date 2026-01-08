@@ -249,6 +249,7 @@ function Player({ id, name, description, series }: Props) {
     return (
       USER_AGENT.includes("android") &&
       (USER_AGENT.includes("tv") ||
+        USER_AGENT.includes("aft") || // Fire TV
         USER_AGENT.includes("smart-tv") ||
         USER_AGENT.includes("tizen") ||
         USER_AGENT.includes("webos") ||
@@ -443,14 +444,17 @@ function Player({ id, name, description, series }: Props) {
         CONTAINER.setAttribute("tabindex", "-1");
       }
       CONTAINER.requestFullscreen();
-      CONTAINER.style.width = "100vw";
-      CONTAINER.style.height = "100vh";
-      CONTAINER.focus();
-      CONTAINER.scrollIntoView({
-        block: "center",
-        inline: "center",
-        behavior: "auto",
-      });
+      const USER_AGENT = navigator.userAgent.toLowerCase();
+      if (!USER_AGENT.includes("aft")) {
+        CONTAINER.style.width = "100vw";
+        CONTAINER.style.height = "100vh";
+        CONTAINER.focus();
+        CONTAINER.scrollIntoView({
+          block: "center",
+          inline: "center",
+          behavior: "auto",
+        });
+      }
       SetVideoStates((prevVideoStates) => ({
         ...prevVideoStates,
         fullscreen: true,
