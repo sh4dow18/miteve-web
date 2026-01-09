@@ -51,7 +51,7 @@ function Seasons({ seriesId, seasonsList, displaySeason }: Props) {
           name="seasons"
           onChange={ChangeSeason}
           value={selectedSeason}
-          className="w-full bg-gray-800 px-2 py-3 rounded-lg text-gray-300 cursor-pointer focus:outline-none min-[600px]:w-fit"
+          className="w-full bg-gray-800 px-2 py-3 rounded-lg text-gray-300 cursor-pointer min-[600px]:w-fit"
         >
           {seasonsList.map((seasonNumber, index) => (
             <option key={index} className="text-gray-300" value={seasonNumber}>
