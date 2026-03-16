@@ -1,0 +1,10 @@
+# Node
+node_modules/
+package-lock.json
+# NextJS
+.next/
+# Environments
+.env
+public/videos/
+# Android TWA
+android-twa/
