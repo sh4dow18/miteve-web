@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   description:
     "Aquí se pueden ver todas las películas que ofrece Miteve para reproducir",
 };
-
+// Force Dynamic in Build
+export const dynamic = "force-dynamic";
 export default async function Movies() {
   const CONTAINERS_LIST = await FindAllContainers();
   const HERO_CONTENT = await FindContentById(CONTAINERS_LIST[0].elementsList[0].content.id);
