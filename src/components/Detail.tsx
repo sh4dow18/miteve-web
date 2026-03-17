@@ -137,6 +137,7 @@ export default function Detail({ content }: Props) {
             <Link
               href={`/player/${content.id}`}
               className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded text-xl font-semibold hover:bg-gray-200 transition-colors"
+              tabIndex={0}
             >
               <Play className="w-7 h-7" fill="currentColor" />
               Reproducir
