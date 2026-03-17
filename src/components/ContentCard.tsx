@@ -36,6 +36,11 @@ export function ContentCard({ content, index, rowIndex, onFocus }: Props) {
       transition={{ delay: index * 0.05 }}
       whileHover={{ scale: 1.1, zIndex: 10 }}
       whileFocus={{ scale: 1.1, zIndex: 10 }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          router.push(`/content/${content.id}`);
+        }
+      }}
     >
       <div
         className={`relative rounded overflow-hidden transition-all duration-300 ${
