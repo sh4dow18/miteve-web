@@ -17,7 +17,7 @@ export default async function Movies() {
     <div className="min-h-screen">
       <HeroSection content={HERO_CONTENT} />
 
-      <div className="-mt-32 relative z-10 space-y-8 pb-12">
+      <div className="-mt-16 relative z-10 space-y-8 pb-12">
         {CONTAINERS_LIST.map((container, index) => (
           <ContentRow
             key={container.id}
