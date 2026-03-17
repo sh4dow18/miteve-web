@@ -23,14 +23,15 @@ function YoutubeVideo({ id, title, thumbnail, mute, duration }: Props) {
   }, []);
 
   const sendCommand = (func: string) => {
-    const iframe =
-      containerRef.current?.querySelector("iframe") as HTMLIFrameElement;
+    const iframe = containerRef.current?.querySelector(
+      "iframe"
+    ) as HTMLIFrameElement;
 
     iframe?.contentWindow?.postMessage(
       JSON.stringify({
         event: "command",
         func,
-        args: []
+        args: [],
       }),
       "*"
     );
@@ -44,7 +45,7 @@ function YoutubeVideo({ id, title, thumbnail, mute, duration }: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setEnded(true);
-      sendCommand("mute")
+      sendCommand("mute");
     }, duration * 1000);
 
     return () => clearTimeout(timer);
@@ -52,7 +53,7 @@ function YoutubeVideo({ id, title, thumbnail, mute, duration }: Props) {
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-
+      {/* VIDEO */}
       {/* VIDEO */}
       <div
         ref={containerRef}
@@ -60,12 +61,23 @@ function YoutubeVideo({ id, title, thumbnail, mute, duration }: Props) {
           ended ? "opacity-0" : "opacity-100"
         }`}
       >
-        <LiteYouTubeEmbed
-          id={id}
-          title={title}
-          thumbnail={thumbnail}
-          params="autoplay=1&mute=1&controls=0&enablejsapi=1&rel=0"
-        />
+        {/* Wrapper que hace el "crop" lateral en pantallas pequeñas */}
+        <div
+          className="absolute inset-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full
+                  [@media(max-width:1110px)]:overflow-hidden"
+        >
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 h-full
+                    w-[177.78vh] min-w-full"
+          >
+            <LiteYouTubeEmbed
+              id={id}
+              title={title}
+              thumbnail={thumbnail}
+              params="autoplay=1&mute=1&controls=0&enablejsapi=1&rel=0"
+            />
+          </div>
+        </div>
       </div>
 
       {/* THUMBNAIL */}

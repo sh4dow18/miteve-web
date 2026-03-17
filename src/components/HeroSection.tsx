@@ -5,6 +5,24 @@ import Link from "next/link";
 import { useState } from "react";
 import Stars from "./Stars";
 import YoutubeVideo from "./YoutubeVideo";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Variantes reutilizables
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
+
+const container = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+};
 
 interface Props {
   content: Content;
@@ -30,22 +48,24 @@ export function HeroSection({ content }: Props) {
 
       {/* Content */}
       <div className="relative h-full flex flex-col justify-center px-12 max-w-3xl">
-        <h1 className="text-6xl font-bold mb-4 drop-shadow-lg">
+        <h1 className="text-3xl font-bold mb-4 drop-shadow-lg md:text-4xl lg:text-5xl xl:text-6xl">
           {content.title}
         </h1>
 
+        {/* Descripción */}
         <p className="text-lg text-gray-200 mb-6 line-clamp-3 drop-shadow-md">
           {content.description}
         </p>
 
-        <div className="flex items-center gap-3 mb-8">
-          {/* Star Rating instead of Match */}
+        {/* Meta */}
+        <div className="flex items-center gap-3 mb-8 flex-wrap">
           <div className="flex items-center gap-2">
             <Stars rating={content.rating} />
-            <span className="text-gray-400">({content.rating.toFixed(1)})</span>
+            <span className="hidden text-gray-400 sm:block">
+              ({content.rating.toFixed(1)})
+            </span>
           </div>
 
-          {/* Content Rating Badge */}
           <span className="px-3 py-1 border-2 border-gray-400 text-sm font-semibold">
             +{content.age}
           </span>
@@ -53,29 +73,36 @@ export function HeroSection({ content }: Props) {
           <span>{content.year}</span>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <Link
             href={`/player/${content.id}`}
-            className="flex items-center gap-3 bg-white text-black px-8 py-3 rounded text-xl font-semibold hover:bg-gray-200 transition-all hover:scale-105"
+            className="flex items-center gap-3 bg-white text-black px-3 py-3 rounded text-xl font-semibold hover:bg-gray-200 transition-all hover:scale-105 min-[350px]:px-8"
           >
             <Play className="w-8 h-8" fill="currentColor" />
-            Reproducir
+            <span className="hidden sm:block">Reproducir</span>
           </Link>
 
           <Link
             href={`/content/${content.id}`}
-            className="flex items-center gap-3 bg-gray-500/70 text-white px-8 py-3 rounded text-xl font-semibold hover:bg-gray-500/50 transition-all hover:scale-105"
+            className="flex items-center gap-3 bg-gray-500/70 text-white px-3 py-3 rounded text-xl font-semibold hover:bg-gray-500/50 transition-all hover:scale-105 min-[350px]:px-8"
           >
             <Info className="w-8 h-8" />
-            Más información
+            <span className="hidden sm:block">Más información</span>
           </Link>
+          <button onClick={() => setIsMuted(!isMuted)} className="sm:hidden">
+            {isMuted ? (
+              <VolumeX className="w-6 h-6" />
+            ) : (
+              <Volume2 className="w-6 h-6" />
+            )}
+          </button>
         </div>
       </div>
 
       {/* Mute Button */}
       <button
         onClick={() => setIsMuted(!isMuted)}
-        className="absolute bottom-32 right-12 p-3 border-2 border-gray-400 rounded-full hover:bg-gray-400/20 transition-colors"
+        className="hidden absolute bottom-32 right-12 p-3 border-2 border-gray-400 rounded-full hover:bg-gray-400/20 transition-colors sm:block"
       >
         {isMuted ? (
           <VolumeX className="w-6 h-6" />

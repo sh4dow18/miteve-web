@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Sidebar />
-      <main className="ml-20">{children}</main>
+      <main className="md:ml-20">{children}</main>
     </div>
   );
 }
