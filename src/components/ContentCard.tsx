@@ -19,8 +19,7 @@ export function ContentCard({ content, index, rowIndex, onFocus }: Props) {
     <Link href={`/content/${content.id}`}>
       <motion.div
         ref={cardRef}
-        className="group relative shrink-0 cursor-pointer"
-        style={{ width: "280px" }}
+        className="group relative shrink-0 cursor-pointer w-55 sm:w-60 md:w-65 lg:w-70"
         onFocus={() => {
           setIsFocused(true);
           onFocus?.();
@@ -46,7 +45,7 @@ export function ContentCard({ content, index, rowIndex, onFocus }: Props) {
           <img
             src={GetTmdbImage(content.cover, 500)}
             alt={content.title}
-            className="w-full h-105 object-cover"
+            className="w-full aspect-2/3 object-cover"
           />
 
           {/* Overlay on hover/focus */}
@@ -56,7 +55,9 @@ export function ContentCard({ content, index, rowIndex, onFocus }: Props) {
             animate={{ opacity: isFocused ? 1 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <h3 className="text-lg font-semibold mb-2 line-clamp-2">{content.title}</h3>
+            <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+              {content.title}
+            </h3>
           </motion.div>
         </div>
       </motion.div>
