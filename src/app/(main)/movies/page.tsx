@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export default async function Movies() {
   const CONTAINERS_LIST = await FindAllContainers();
-  const HERO_CONTENT = await FindContentById(CONTAINERS_LIST[0].elementsList[0].content.id);
+  const HERO_CONTENT = await FindContentById(
+    CONTAINERS_LIST[0].elementsList[0].content.id
+  );
   return (
     <div className="min-h-screen">
       <HeroSection content={HERO_CONTENT} />
@@ -25,6 +27,7 @@ export default async function Movies() {
             title={container.name}
             contentsList={container.elementsList}
             rowIndex={index}
+            totalRows={CONTAINERS_LIST.length} // ← agregar esto
           />
         ))}
       </div>
