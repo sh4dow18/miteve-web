@@ -99,6 +99,13 @@ export function ContentRow({
               `[data-row="${rowIndex - 1}"]`
             ) as HTMLElement;
             (prevRowCard || fallback)?.focus({ preventScroll: false });
+          } else {
+            // rowIndex === 0 → volver al hero
+            const heroBtn = document.querySelector(
+              "[data-hero-btn]"
+            ) as HTMLElement;
+            heroBtn?.focus({ preventScroll: false });
+            window.scrollTo({ top: 0, behavior: "smooth" });
           }
           break;
       }
