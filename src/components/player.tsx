@@ -17,7 +17,11 @@ import {
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
 } from "@heroicons/react/16/solid";
-import { LoaderCircleIcon } from "lucide-react";
+import {
+  LoaderCircleIcon,
+  PictureInPicture,
+  PictureInPicture2,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 declare global {
@@ -97,6 +101,26 @@ function Player({ id, name, description, series }: Props) {
     intro: false,
     credits: false,
   });
+  const [isPiP, setIsPiP] = useState(false);
+
+  const togglePiP = async () => {
+    try {
+      const video = videoRef.current;
+      if (!video) return;
+
+      // Si ya está en PiP → salir
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPiP(false);
+      } else {
+        // Entrar en PiP
+        await video.requestPictureInPicture();
+        setIsPiP(true);
+      }
+    } catch (error) {
+      console.error("Error con PiP:", error);
+    }
+  };
   // Execute this use effect when the page is loading to know if can autoplay or not
   // Also, check if needs the HD version or low quality version
   useEffect(() => {
@@ -941,6 +965,32 @@ function Player({ id, name, description, series }: Props) {
                 <ForwardIcon className={ICONS_STYLE} />
               </a>
             )}
+            <PictureInPicture
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={togglePiP}
+              aria-disabled={!isPiP}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  togglePiP();
+                }
+              }}
+            />
+            <PictureInPicture2
+              className={`${ICONS_STYLE} aria-disabled:hidden`}
+              onClick={togglePiP}
+              aria-disabled={isPiP}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  togglePiP();
+                }
+              }}
+            />
             {/* Subtitles Buttons */}
             <ChatBubbleBottomCenterTextIcon
               className={`${ICONS_STYLE} aria-disabled:hidden`}
