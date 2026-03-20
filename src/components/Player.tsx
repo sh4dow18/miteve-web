@@ -9,6 +9,8 @@ import {
   Maximize2,
   Minimize2,
   Pause,
+  PictureInPicture,
+  PictureInPicture2,
   Play,
   Rewind,
   Subtitles,
@@ -73,6 +75,25 @@ function Player({ content }: Props) {
     hoverX: 0,
     buffered: 0,
   });
+  const [isPip, setIsPiP] = useState(false);
+  const togglePiP = async () => {
+    try {
+      const video = videoRef.current;
+      if (!video) return;
+
+      // Si ya está en PiP → salir
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPiP(false);
+      } else {
+        // Entrar en PiP
+        await video.requestPictureInPicture();
+        setIsPiP(true);
+      }
+    } catch (error) {
+      console.error("Error con PiP:", error);
+    }
+  };
 
   // ─── Shaka init + source load ────────────────────────────────────────────────
   useEffect(() => {
@@ -92,7 +113,9 @@ function Player({ content }: Props) {
       let ip = API_HOST_IP;
 
       fetch(`${ip}/${API}`, { method: "HEAD", signal: controller.signal })
-        .catch(() => { ip = API_HOST_IP; })
+        .catch(() => {
+          ip = API_HOST_IP;
+        })
         .finally(async () => {
           clearTimeout(timeout);
           const src = `${STREAM_HOST_IP}/${API}`;
@@ -105,10 +128,15 @@ function Player({ content }: Props) {
                 );
                 shaka.default.polyfill.installAll();
                 if (!shaka.default.Player.isBrowserSupported()) {
-                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    paused: true,
+                    waiting: false,
+                  }));
                   return;
                 }
-                if (shakaPlayerRef.current) await shakaPlayerRef.current.destroy();
+                if (shakaPlayerRef.current)
+                  await shakaPlayerRef.current.destroy();
 
                 const player = new shaka.default.Player(VIDEO);
                 shakaPlayerRef.current = player;
@@ -142,16 +170,33 @@ function Player({ content }: Props) {
                 if (track?.height) {
                   const h = track.height;
                   const label =
-                    h >= 2160 ? "4K" :
-                    h >= 1080 ? "FHD" :
-                    h >= 720  ? "HD"  :
-                    h >= 480  ? "SD"  : "LD";
+                    h >= 2160
+                      ? "4K"
+                      : h >= 1080
+                      ? "FHD"
+                      : h >= 720
+                      ? "HD"
+                      : h >= 480
+                      ? "SD"
+                      : "LD";
                   setVideoStates((p) => ({ ...p, resolution: label }));
                 }
 
                 VIDEO.play()
-                  .then(() => setVideoStates((p) => ({ ...p, paused: false, waiting: false })))
-                  .catch(() => setVideoStates((p) => ({ ...p, paused: true, waiting: false })));
+                  .then(() =>
+                    setVideoStates((p) => ({
+                      ...p,
+                      paused: false,
+                      waiting: false,
+                    }))
+                  )
+                  .catch(() =>
+                    setVideoStates((p) => ({
+                      ...p,
+                      paused: true,
+                      waiting: false,
+                    }))
+                  );
 
                 return; // éxito
               } catch (e) {
@@ -160,7 +205,11 @@ function Player({ content }: Props) {
                   await new Promise((res) => setTimeout(res, delay));
                 } else {
                   console.error("Shaka error tras todos los intentos", e);
-                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    paused: true,
+                    waiting: false,
+                  }));
                 }
               }
             }
@@ -189,16 +238,35 @@ function Player({ content }: Props) {
     const onKey = (e: KeyboardEvent) => {
       const tv = isTVOrAndroid();
       switch (e.key) {
-        case "f": case "F": toggleFullscreen(); break;
-        case "m": case "M": toggleMute(); break;
-        case "c": case "C": toggleSubtitles(); break;
-        case "ArrowRight": if (!tv) seek(10); break;
-        case "ArrowLeft": if (!tv) seek(-10); break;
-        case " ": e.preventDefault(); togglePlay(); break;
+        case "f":
+        case "F":
+          toggleFullscreen();
+          break;
+        case "m":
+        case "M":
+          toggleMute();
+          break;
+        case "c":
+        case "C":
+          toggleSubtitles();
+          break;
+        case "ArrowRight":
+          if (!tv) seek(10);
+          break;
+        case "ArrowLeft":
+          if (!tv) seek(-10);
+          break;
+        case " ":
+          e.preventDefault();
+          togglePlay();
+          break;
       }
     };
     const onFS = () =>
-      setVideoStates((p) => ({ ...p, fullscreen: !!document.fullscreenElement }));
+      setVideoStates((p) => ({
+        ...p,
+        fullscreen: !!document.fullscreenElement,
+      }));
     document.addEventListener("keydown", onKey);
     document.addEventListener("fullscreenchange", onFS);
     return () => {
@@ -249,7 +317,10 @@ function Player({ content }: Props) {
       const d = VIDEO.duration || 1;
       let ahead = 0;
       for (let i = 0; i < buf.length; i++) {
-        if (t >= buf.start(i) && t <= buf.end(i)) { ahead = buf.end(i) - t; break; }
+        if (t >= buf.start(i) && t <= buf.end(i)) {
+          ahead = buf.end(i) - t;
+          break;
+        }
       }
       setRangeStates((p) => ({ ...p, buffered: ((t + ahead) / d) * 100 }));
     };
@@ -261,8 +332,13 @@ function Player({ content }: Props) {
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) { v.play(); setVideoStates((p) => ({ ...p, paused: false })); }
-    else { v.pause(); setVideoStates((p) => ({ ...p, paused: true, controlsHidden: false })); }
+    if (v.paused) {
+      v.play();
+      setVideoStates((p) => ({ ...p, paused: false }));
+    } else {
+      v.pause();
+      setVideoStates((p) => ({ ...p, paused: true, controlsHidden: false }));
+    }
   };
 
   const toggleMute = () => {
@@ -304,7 +380,10 @@ function Player({ content }: Props) {
     const h = Math.floor(t / 3600);
     const m = Math.floor((t % 3600) / 60);
     const s = Math.floor(t % 60);
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(
+      2,
+      "0"
+    )}:${String(s).padStart(2, "0")}`;
   };
 
   const onSeekBar = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,13 +394,27 @@ function Player({ content }: Props) {
   };
 
   const handleTVNav = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-focusable]"));
+    const els = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-focusable]")
+    );
     const i = els.indexOf(document.activeElement as HTMLElement);
     if (i === -1) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); els[i + 1]?.focus(); }
-    if (e.key === "ArrowUp") { e.preventDefault(); els[i - 1]?.focus(); }
-    if (e.key === "ArrowLeft") { e.preventDefault(); seek(-10); }
-    if (e.key === "ArrowRight") { e.preventDefault(); seek(10); }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      els[i + 1]?.focus();
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      els[i - 1]?.focus();
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      seek(-10);
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      seek(10);
+    }
   };
 
   const iconBtn =
@@ -330,12 +423,13 @@ function Player({ content }: Props) {
   // ── Colores por calidad ───────────────────────────────────────────────────────
   const resolutionColor: Record<string, string> = {
     "4K": "text-yellow-400 border-yellow-400/40",
-    "FHD": "text-blue-400 border-blue-400/40",
-    "HD": "text-green-400 border-green-400/40",
-    "SD": "text-orange-400 border-orange-400/40",
-    "LD": "text-red-400 border-red-400/40",
+    FHD: "text-blue-400 border-blue-400/40",
+    HD: "text-green-400 border-green-400/40",
+    SD: "text-orange-400 border-orange-400/40",
+    LD: "text-red-400 border-red-400/40",
   };
-  const resColor = resolutionColor[videoStates.resolution] ?? "text-white/60 border-white/15";
+  const resColor =
+    resolutionColor[videoStates.resolution] ?? "text-white/60 border-white/15";
 
   return (
     <div
@@ -371,7 +465,10 @@ function Player({ content }: Props) {
         aria-hidden={!videoStates.waiting}
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none aria-hidden:hidden"
       >
-        <Loader2 className="h-12 w-12 text-white/50 animate-spin" strokeWidth={1.5} />
+        <Loader2
+          className="h-12 w-12 text-white/50 animate-spin"
+          strokeWidth={1.5}
+        />
       </div>
 
       {/* TOP GRADIENT + HEADER */}
@@ -388,7 +485,10 @@ function Player({ content }: Props) {
             href={`/content/${content.id}`}
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors group"
           >
-            <ArrowLeft className="w-6 h-6 transition-transform group-hover:-translate-x-0.5" strokeWidth={2} />
+            <ArrowLeft
+              className="w-6 h-6 transition-transform group-hover:-translate-x-0.5"
+              strokeWidth={2}
+            />
           </Link>
 
           {/* Título + badge de calidad juntos arriba a la derecha */}
@@ -427,8 +527,10 @@ function Player({ content }: Props) {
         {/* SEEKBAR */}
         <div className="flex items-center gap-3 mb-4">
           <div className="relative w-full h-8 group/bar">
-            <div className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
-                            group-hover/bar:h-1.25 transition-all duration-150" />
+            <div
+              className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
+                            group-hover/bar:h-1.25 transition-all duration-150"
+            />
             <div
               className="absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25
                          group-hover/bar:h-1.25 transition-all duration-150"
@@ -458,17 +560,26 @@ function Player({ content }: Props) {
                   hoverX: x,
                 }));
               }}
-              onMouseLeave={() => setRangeStates((p) => ({ ...p, isHovering: false }))}
+              onMouseLeave={() =>
+                setRangeStates((p) => ({ ...p, isHovering: false }))
+              }
               onClick={(e) => {
                 const v = videoRef.current;
                 if (!v) return;
                 const r = e.currentTarget.getBoundingClientRect();
-                v.currentTime = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * v.duration;
+                v.currentTime =
+                  Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) *
+                  v.duration;
               }}
             />
             <input
-              type="range" min="0" max="100" step="0.1"
-              value={!Number.isNaN(videoStates.progress) ? videoStates.progress : 0}
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value={
+                !Number.isNaN(videoStates.progress) ? videoStates.progress : 0
+              }
               onChange={onSeekBar}
               onKeyDown={handleTVNav}
               data-focusable
@@ -476,7 +587,10 @@ function Player({ content }: Props) {
             />
             {rangeStates.isHovering && (
               <div className="pointer-events-none absolute inset-0 z-30">
-                <div className="absolute top-0 bottom-0 w-px bg-white/50" style={{ left: rangeStates.hoverX }} />
+                <div
+                  className="absolute top-0 bottom-0 w-px bg-white/50"
+                  style={{ left: rangeStates.hoverX }}
+                />
                 <div
                   className="absolute -top-8 -translate-x-1/2 bg-black/80 backdrop-blur-sm
                              text-white text-xs px-2 py-1 rounded whitespace-nowrap"
@@ -503,26 +617,69 @@ function Player({ content }: Props) {
         <div className="flex items-center justify-between">
           {/* Left */}
           <div className="flex items-center gap-0.5 min-[425px]:gap-1">
-            <button className={iconBtn} onClick={togglePlay} data-focusable tabIndex={0}
-              aria-label={videoStates.paused ? "Play" : "Pause"}>
-              {videoStates.paused
-                ? <Play className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />
-                : <Pause className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />}
+            <button
+              className={iconBtn}
+              onClick={togglePlay}
+              data-focusable
+              tabIndex={0}
+              aria-label={videoStates.paused ? "Play" : "Pause"}
+            >
+              {videoStates.paused ? (
+                <Play
+                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
+              ) : (
+                <Pause
+                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
+              )}
             </button>
 
-            <button className={iconBtn} onClick={() => seek(-10)} tabIndex={0} aria-label="Retroceder 10s">
-              <Rewind className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+            <button
+              className={iconBtn}
+              onClick={() => seek(-10)}
+              tabIndex={0}
+              aria-label="Retroceder 10s"
+            >
+              <Rewind
+                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                strokeWidth={2}
+              />
             </button>
 
-            <button className={iconBtn} onClick={() => seek(10)} tabIndex={0} aria-label="Adelantar 10s">
-              <FastForward className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+            <button
+              className={iconBtn}
+              onClick={() => seek(10)}
+              tabIndex={0}
+              aria-label="Adelantar 10s"
+            >
+              <FastForward
+                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                strokeWidth={2}
+              />
             </button>
 
-            <button className={iconBtn} onClick={toggleMute} tabIndex={0}
-              aria-label={videoStates.muted ? "Activar sonido" : "Silenciar"}>
-              {videoStates.muted
-                ? <VolumeX className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
-                : <Volume2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />}
+            <button
+              className={iconBtn}
+              onClick={toggleMute}
+              tabIndex={0}
+              aria-label={videoStates.muted ? "Activar sonido" : "Silenciar"}
+            >
+              {videoStates.muted ? (
+                <VolumeX
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              ) : (
+                <Volume2
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              )}
             </button>
 
             <span className="text-white/50 text-xs tabular-nums pl-1 min-[581px]:hidden">
@@ -537,18 +694,72 @@ function Player({ content }: Props) {
 
           {/* Right */}
           <div className="flex items-center gap-0.5 min-[425px]:gap-1">
-            <button className={iconBtn} onClick={toggleSubtitles} tabIndex={0}
-              aria-label={videoStates.subtitlesOn ? "Ocultar subtítulos" : "Mostrar subtítulos"}>
-              {videoStates.subtitlesOn
-                ? <Subtitles className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
-                : <SubtitlesIcon className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6 opacity-35" strokeWidth={2} />}
+            <button
+              onClick={togglePiP}
+              className={iconBtn}
+              tabIndex={0}
+              aria-label={
+                isPip
+                  ? "Activar Picture-in-Picture"
+                  : "Desactivar Picture-in-Picture"
+              }
+            >
+              {isPip ? (
+                <PictureInPicture
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              ) : (
+                <PictureInPicture2
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              )}
+            </button>
+            <button
+              className={iconBtn}
+              onClick={toggleSubtitles}
+              tabIndex={0}
+              aria-label={
+                videoStates.subtitlesOn
+                  ? "Ocultar subtítulos"
+                  : "Mostrar subtítulos"
+              }
+            >
+              {videoStates.subtitlesOn ? (
+                <Subtitles
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              ) : (
+                <SubtitlesIcon
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6 opacity-35"
+                  strokeWidth={2}
+                />
+              )}
             </button>
 
-            <button className={iconBtn} onClick={toggleFullscreen} tabIndex={0}
-              aria-label={videoStates.fullscreen ? "Salir pantalla completa" : "Pantalla completa"}>
-              {videoStates.fullscreen
-                ? <Minimize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
-                : <Maximize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />}
+            <button
+              className={iconBtn}
+              onClick={toggleFullscreen}
+              tabIndex={0}
+              aria-label={
+                videoStates.fullscreen
+                  ? "Salir pantalla completa"
+                  : "Pantalla completa"
+              }
+            >
+              {videoStates.fullscreen ? (
+                <Minimize2
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              ) : (
+                <Maximize2
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              )}
             </button>
           </div>
         </div>
