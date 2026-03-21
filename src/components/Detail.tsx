@@ -1,16 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Play,
-  ArrowLeft,
-  Volume2,
-  VolumeX,
-  Star,
-  StarHalf,
-} from "lucide-react";
+import { Play, ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GetTmdbImage } from "@/services/api";
 import YoutubeVideo from "./YoutubeVideo";
@@ -22,7 +14,12 @@ interface Props {
 
 export default function Detail({ content }: Props) {
   const [isMuted, setIsMuted] = useState(true);
-
+  const [selectedSeason, setSelectedSeason] = useState(
+    content.seasonsList[0] ? content.seasonsList[0].seasonNumber : undefined
+  );
+  const currentSeasonData = content.seasonsList.find(
+    (s) => s.seasonNumber === selectedSeason
+  );
   return (
     <div className="min-h-screen bg-[#141414] text-white pb-12">
       {/* Hero Section */}
@@ -136,7 +133,11 @@ export default function Detail({ content }: Props) {
               className="flex gap-4"
             >
               <Link
-                href={`/player/${content.id}`}
+                href={
+                  currentSeasonData
+                    ? `/player/${content.id}?season=${currentSeasonData.seasonNumber}&episode=${currentSeasonData.episodesList[0].episodeNumber}`
+                    : `/player/${content.id}`
+                }
                 className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded text-xl font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Play className="w-7 h-7" fill="currentColor" />
@@ -146,6 +147,101 @@ export default function Detail({ content }: Props) {
           </div>
         </div>
       </div>
+      {content.seasonsList.length > 0 && (
+        <div className="bg-[#0a0a0a] px-4 sm:px-8 lg:px-16 py-10">
+          {/* Título */}
+          <h2
+            className="text-white mb-6 tracking-widest uppercase"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
+            }}
+          >
+            Episodios
+          </h2>
+
+          {/* Selector de temporadas */}
+          <div className="flex gap-2 mb-8 flex-wrap">
+            {content.seasonsList.map((season, index) => (
+              <button
+                key={season.id}
+                onClick={() => setSelectedSeason(index)}
+                className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
+                  season.seasonNumber === selectedSeason
+                    ? "bg-red-600 border-red-600 text-white"
+                    : "bg-transparent border-white/10 text-gray-500 hover:text-white hover:border-white/30"
+                }`}
+              >
+                Temporada {season.seasonNumber}
+              </button>
+            ))}
+          </div>
+
+          {/* Lista de episodios */}
+          {currentSeasonData && (
+            <div className="flex flex-col gap-0">
+              {currentSeasonData.episodesList.map((episode, index) => (
+                <div key={episode.id}>
+                  <Link
+                    href={`/player/${content.id}?season=${currentSeasonData.seasonNumber}&episode=${episode.episodeNumber}`}
+                    className={`
+                    group cursor-pointer text-decoration-none
+                    /* Desktop: fila horizontal */
+                    sm:grid sm:grid-cols-[3rem_180px_1fr_auto] sm:items-center
+                    sm:gap-4 sm:px-4 sm:py-3 sm:rounded-sm sm:hover:bg-white/5
+
+                    /* Mobile: columna, imagen arriba */
+                    flex flex-col gap-2 px-1 py-3
+                    sm:flex-none
+                    transition-colors duration-200
+                  `}
+                    style={{
+                      gridTemplateColumns: "2.5rem 180px 1fr auto",
+                    }}
+                  >
+                    {/* Número */}
+                    <span className="hidden sm:block text-gray-500 text-2xl font-light text-center">
+                      {episode.episodeNumber}
+                    </span>
+
+                    {/* Thumbnail */}
+                    <div className="relative aspect-video bg-[#1e1e1e] rounded-sm overflow-hidden w-full sm:w-auto sm:shrink-0">
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500/${episode.cover}`}
+                        alt={episode.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-200">
+                          <div className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center">
+                            <Play className="w-4 h-4 fill-white text-white ml-0.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="min-w-0 px-1 sm:px-0">
+                      <h3 className="text-white font-medium mb-1">
+                        {episode.episodeNumber}. {episode.title}
+                      </h3>
+                      <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 sm:line-clamp-2">
+                        {episode.description ??
+                          "No ha Información disponible de este capítulo"}
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/* Divisor */}
+                  {index < currentSeasonData.episodesList.length - 1 && (
+                    <div className="mx-3 h-px bg-white/5" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

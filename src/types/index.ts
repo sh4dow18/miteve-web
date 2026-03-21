@@ -32,9 +32,35 @@ interface Content {
   note: string | null;
   genresList: Genre[];
   type: string;
+  seasonsList: Season[];
 }
 
 interface Genre {
   id: number;
   name: string;
+}
+
+interface Season {
+  id: string;
+  seasonNumber: number;
+  episodesList: Episode[];
+}
+
+interface Episode {
+  id: string;
+  episodeNumber: number;
+  title: string;
+  description: string | null;
+  cover: string;
+}
+
+interface EpisodeMetadata {
+  id: string;
+  title: string;
+  episodeNumber: number;
+  beginSummary: number | null;
+  endSummary: number | null;
+  beginIntro: number | null;
+  endIntro: number | null;
+  beginCredits: number | null;
 }

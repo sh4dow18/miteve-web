@@ -1,6 +1,7 @@
 "use client";
 
 import { API_HOST_IP, STREAM_HOST_IP } from "@/services/admin";
+import { AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Clapperboard,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 declare global {
   interface Window {
@@ -31,11 +33,13 @@ declare global {
 
 interface Props {
   content: Content;
+  tvShow?: {
+    season: number;
+    episode: EpisodeMetadata;
+  };
 }
 
-function Player({ content }: Props) {
-  const TYPE = "movies";
-
+function Player({ content, tvShow }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
@@ -76,6 +80,11 @@ function Player({ content }: Props) {
     buffered: 0,
   });
   const [isPip, setIsPiP] = useState(false);
+  const [skips, SetSkips] = useState({
+    summary: false,
+    intro: false,
+    credits: false,
+  });
   const togglePiP = async () => {
     try {
       const video = videoRef.current;
@@ -94,7 +103,41 @@ function Player({ content }: Props) {
       console.error("Error con PiP:", error);
     }
   };
-
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (tvShow === undefined) {
+      return;
+    }
+    // Function that allow to display and hide the skips buttons
+    const ManageSkips = () => {
+      const CURRENT_TIME = VIDEO.currentTime;
+      const BEGIN_SUMMARY = tvShow.episode.beginSummary;
+      const END_SUMMARY = tvShow.episode.endSummary;
+      const BEGIN_INTRO = tvShow.episode.beginIntro;
+      const END_INTRO = tvShow.episode.endIntro;
+      const BEGIN_CREDITS = tvShow.episode.beginCredits;
+      SetSkips({
+        summary:
+          BEGIN_SUMMARY !== null && END_SUMMARY !== null
+            ? CURRENT_TIME > BEGIN_SUMMARY && CURRENT_TIME < END_SUMMARY
+            : false,
+        intro:
+          BEGIN_INTRO !== null && END_INTRO !== null
+            ? CURRENT_TIME > BEGIN_INTRO && CURRENT_TIME < END_INTRO
+            : false,
+        credits: BEGIN_CREDITS !== null ? CURRENT_TIME > BEGIN_CREDITS : false,
+      });
+    };
+    VIDEO.addEventListener("timeupdate", ManageSkips);
+    VIDEO.addEventListener("seeked", ManageSkips);
+    return () => {
+      VIDEO.removeEventListener("timeupdate", ManageSkips);
+      VIDEO.removeEventListener("seeked", ManageSkips);
+    };
+  }, [tvShow]);
   // ─── Shaka init + source load ────────────────────────────────────────────────
   useEffect(() => {
     const loadVideo = async () => {
@@ -105,7 +148,11 @@ function Player({ content }: Props) {
       const slow = speed < 4;
       const lowQ = videoStates.resolution === "SD" || slow;
 
-      const API = `${content.id}/manifest.mpd`;
+      const API = `${
+        tvShow
+          ? `${content.id}/season-${tvShow.season}/episode-${tvShow.episode.episodeNumber}`
+          : content.id
+      }/manifest.mpd`;
       setVideoStates((p) => ({ ...p, resolution: lowQ ? "SD" : "HD" }));
 
       const controller = new AbortController();
@@ -119,7 +166,6 @@ function Player({ content }: Props) {
         .finally(async () => {
           clearTimeout(timeout);
           const src = `${STREAM_HOST_IP}/${API}`;
-
           const loadWithRetry = async (attempts = 3, delay = 1500) => {
             for (let i = 0; i < attempts; i++) {
               try {
@@ -162,6 +208,39 @@ function Player({ content }: Props) {
                 });
 
                 await player.load(src);
+                // Esperar a que el video tenga metadatos antes de hacer seek
+                await new Promise<void>((resolve) => {
+                  if (VIDEO.readyState >= 1) {
+                    resolve();
+                  } else {
+                    VIDEO.addEventListener("loadedmetadata", () => resolve(), {
+                      once: true,
+                    });
+                  }
+                });
+                if (tvShow !== undefined) {
+                  const { beginSummary, endSummary, beginIntro, endIntro } =
+                    tvShow.episode;
+                  if (
+                    beginSummary === 0 &&
+                    endSummary !== null &&
+                    beginIntro === endSummary + 1 &&
+                    endIntro != null
+                  ) {
+                    VIDEO.currentTime = endIntro;
+                  } else if (
+                    beginIntro === 0 &&
+                    endIntro !== null &&
+                    beginSummary === endIntro + 1 &&
+                    endSummary != null
+                  ) {
+                    VIDEO.currentTime = endSummary;
+                  } else if (beginSummary === 0 && endSummary != null) {
+                    VIDEO.currentTime = endSummary;
+                  } else if (beginIntro === 0 && endIntro != null) {
+                    VIDEO.currentTime = endIntro;
+                  }
+                }
 
                 // Resolución inicial tras cargar
                 const track = player
@@ -430,7 +509,29 @@ function Player({ content }: Props) {
   };
   const resColor =
     resolutionColor[videoStates.resolution] ?? "text-white/60 border-white/15";
-
+  const Skip = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null) {
+      return;
+    }
+    if (tvShow === undefined) {
+      return;
+    }
+    if (skips.summary === true && tvShow.episode.endSummary !== null) {
+      VIDEO.currentTime = tvShow.episode.endSummary;
+      SetSkips({
+        ...skips,
+        summary: false,
+      });
+    }
+    if (skips.intro === true && tvShow.episode.endIntro !== null) {
+      VIDEO.currentTime = tvShow.episode.endIntro;
+      SetSkips({
+        ...skips,
+        intro: false,
+      });
+    }
+  };
   return (
     <div
       ref={containerRef}
@@ -509,10 +610,56 @@ function Player({ content }: Props) {
               <h1 className="text-white font-semibold text-lg leading-tight min-[865px]:text-2xl">
                 {content.title}
               </h1>
+              {tvShow && (
+                <span className="italic text-gray-300">{`T${tvShow.season}E${tvShow.episode.episodeNumber} <<${tvShow.episode.title}>>`}</span>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Skip Buttons */}
+      <AnimatePresence>
+        {skips.intro && (
+          <motion.button
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            onClick={Skip}
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40"
+          >
+            Omitir Intro
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {skips.summary && (
+          <motion.button
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            onClick={Skip}
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40"
+          >
+            Omitir Resumen
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {skips.credits && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={Skip}
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-8 py-4 rounded font-semibold transition-colors z-40"
+          >
+            Siguiente Episodio
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* BOTTOM CONTROLS */}
       <div

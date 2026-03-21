@@ -1,18 +1,18 @@
 import { ContentRow } from "@/components/ContentRow";
 import { HeroSection } from "@/components/HeroSection";
-import { FindAllMovies, FindContentById } from "@/services/api";
+import { FindAllTvShows, FindContentById } from "@/services/api";
 import { Metadata } from "next";
 
 // Movies Page Metadata
 export const metadata: Metadata = {
-  title: "Peliculas",
+  title: "Series",
   description:
-    "Aquí se pueden ver todas las películas que ofrece Miteve para reproducir",
+    "Aquí se pueden ver todas las series que ofrece Miteve para reproducir",
 };
 // Force Dynamic in Build
 export const dynamic = "force-dynamic";
 export default async function Movies() {
-  const CONTAINERS_LIST = await FindAllMovies();
+  const CONTAINERS_LIST = await FindAllTvShows();
   const HERO_CONTENT = await FindContentById(
     CONTAINERS_LIST[0].elementsList[0].content.id
   );
