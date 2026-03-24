@@ -328,9 +328,7 @@ function Player({ content, tvShow }: Props) {
         case "Enter":
           e.preventDefault();
           if (tv && videoStates.controlsHidden) {
-            // Mostrar controles y hacer focus al botón de play
             setVideoStates((p) => ({ ...p, controlsHidden: false }));
-            // Pequeño delay para que el botón sea visible antes del focus
             setTimeout(() => {
               document
                 .querySelector<HTMLButtonElement>("[data-play-btn]")
