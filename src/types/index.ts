@@ -28,6 +28,7 @@ interface Content {
   background: string;
   trailer: string;
   trailerDuration: number;
+  comingSoon: boolean;
   createdDate: string;
   note: string | null;
   genresList: Genre[];
