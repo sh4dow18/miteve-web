@@ -7,6 +7,7 @@ import Link from "next/link";
 import { GetTmdbImage } from "@/services/api";
 import YoutubeVideo from "./YoutubeVideo";
 import Stars from "./Stars";
+import Image from "next/image";
 
 interface Props {
   content: Content;
@@ -147,6 +148,23 @@ export default function Detail({ content }: Props) {
           </div>
         </div>
       </div>
+      {content.note !== null && (
+        <div className="bg-gray-900 rounded-xl p-6 border-white/10 border mx-10">
+          <div className="flex items-start gap-4">
+            <Image
+              src="/logo.png"
+              alt="Miteve Note"
+              className="w-12 h-12 rounded-full"
+              width={100}
+              height={100}
+            />
+            <div className="flex-1">
+              <p className="font-semibold mb-2">Nota de Miteve</p>
+              <p className="text-gray-300 mb-3">{content.note}</p>
+            </div>
+          </div>
+        </div>
+      )}
       {content.seasonsList.length > 0 && (
         <div className="bg-[#0a0a0a] px-4 sm:px-8 lg:px-16 py-10">
           {/* Título */}
@@ -169,7 +187,7 @@ export default function Detail({ content }: Props) {
                 className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
                   season.seasonNumber === selectedSeason
                     ? "bg-primary border-primary text-white"
-                    : "bg-transparent border-white/10 text-gray-500 hover:text-white hover:border-white/30"
+                    : "bg-gray-900 border-white/30 text-primary hover:text-white hover:border-white/30"
                 }`}
               >
                 Temporada {season.seasonNumber}
