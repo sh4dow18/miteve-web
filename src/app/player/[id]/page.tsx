@@ -1,5 +1,12 @@
 import { default as PlayerComponent } from "@/components/Player";
 import { FindContentById, FindEpisodeMetadataById } from "@/services/api";
+import { Metadata } from "next";
+
+// Movies Page Metadata
+export const metadata: Metadata = {
+  title: "Reproductor",
+  description: "Aquí se puede visualizar el contenido seleccionado",
+};
 
 type Props = {
   params: {

@@ -168,7 +168,7 @@ export default function Detail({ content }: Props) {
                 onClick={() => setSelectedSeason(index)}
                 className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
                   season.seasonNumber === selectedSeason
-                    ? "bg-red-600 border-red-600 text-white"
+                    ? "bg-primary border-primary text-white"
                     : "bg-transparent border-white/10 text-gray-500 hover:text-white hover:border-white/30"
                 }`}
               >
