@@ -15,12 +15,14 @@ export async function FindContentById(id: string): Promise<Content> {
     response.json()
   );
 }
-export async function FindEpisodeMetadataById(id: string): Promise<EpisodeMetadata> {
-  return await fetch(`${API_HOST_IP}/episodes/metadata/${id}`).then((response) =>
-    response.json()
+export async function FindEpisodeMetadataById(
+  id: string
+): Promise<EpisodeMetadata> {
+  return await fetch(`${API_HOST_IP}/episodes/metadata/${id}`).then(
+    (response) => response.json()
   );
 }
 
-export function GetTmdbImage(url: string, size: number): string {
-  return `https://image.tmdb.org/t/p/w${size}/${url}`
+export function GetTmdbImage(url: string, size?: number): string {
+  return `https://image.tmdb.org/t/p/${size ? `w${size}` : "original"}/${url}`;
 }

@@ -31,7 +31,7 @@ export default function Detail({ content }: Props) {
           <YoutubeVideo
             id={content.trailer}
             title={content.title}
-            thumbnail={GetTmdbImage(content.background, 780)}
+            thumbnail={GetTmdbImage(content.background)}
             mute={isMuted}
             duration={content.trailerDuration}
           />
