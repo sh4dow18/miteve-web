@@ -8,12 +8,14 @@ import { GetTmdbImage } from "@/services/api";
 import YoutubeVideo from "./YoutubeVideo";
 import Stars from "./Stars";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Props {
   content: Content;
 }
 
 export default function Detail({ content }: Props) {
+  const router = useRouter();
   const [isMuted, setIsMuted] = useState(true);
   const [selectedSeason, setSelectedSeason] = useState(
     content.seasonsList[0] ? content.seasonsList[0].seasonNumber : undefined
@@ -133,22 +135,29 @@ export default function Detail({ content }: Props) {
               transition={{ delay: 0.3 }}
               className="flex gap-4"
             >
-              <Link
-                href={
-                  currentSeasonData
-                    ? `/player/${content.id}?season=${currentSeasonData.seasonNumber}&episode=${currentSeasonData.episodesList[0].episodeNumber}`
-                    : `/player/${content.id}`
+              <button
+                onClick={() =>
+                  content.comingSoon === false
+                    ? currentSeasonData &&
+                      currentSeasonData.episodesList.length > 0
+                      ? router.push(
+                          `/player/${content.id}?season=${currentSeasonData.seasonNumber}&episode=${currentSeasonData.episodesList[0].episodeNumber}`
+                        )
+                      : content.type === "movie"
+                      ? router.push(`/player/${content.id}`)
+                      : undefined
+                    : undefined
                 }
                 className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded text-xl font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Play className="w-7 h-7" fill="currentColor" />
-                Reproducir
-              </Link>
+                {content.comingSoon ? "Próximamente" : "Reproducir"}
+              </button>
             </motion.div>
           </div>
         </div>
       </div>
-      {content.note !== null && (
+      {content.note !== null && !content.comingSoon && (
         <div className="bg-gray-900 rounded-xl p-6 border-white/10 border mx-10">
           <div className="flex items-start gap-4">
             <Image
@@ -165,38 +174,39 @@ export default function Detail({ content }: Props) {
           </div>
         </div>
       )}
-      {content.seasonsList.length > 0 && (
-        <div className="bg-[#0a0a0a] px-4 sm:px-8 lg:px-16 py-10">
-          {/* Título */}
-          <h2
-            className="text-white mb-6 tracking-widest uppercase"
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
-            }}
-          >
-            Episodios
-          </h2>
+      {currentSeasonData &&
+        currentSeasonData.episodesList.length > 0 &&
+        !content.comingSoon && (
+          <div className="bg-[#0a0a0a] px-4 sm:px-8 lg:px-16 py-10">
+            {/* Título */}
+            <h2
+              className="text-white mb-6 tracking-widest uppercase"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
+              }}
+            >
+              Episodios
+            </h2>
 
-          {/* Selector de temporadas */}
-          <div className="flex gap-2 mb-8 flex-wrap">
-            {content.seasonsList.map((season, index) => (
-              <button
-                key={season.id}
-                onClick={() => setSelectedSeason(index)}
-                className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
-                  season.seasonNumber === selectedSeason
-                    ? "bg-primary border-primary text-white"
-                    : "bg-gray-900 border-white/30 text-primary hover:text-white hover:border-white/30"
-                }`}
-              >
-                Temporada {season.seasonNumber}
-              </button>
-            ))}
-          </div>
+            {/* Selector de temporadas */}
+            <div className="flex gap-2 mb-8 flex-wrap">
+              {content.seasonsList.map((season, index) => (
+                <button
+                  key={season.id}
+                  onClick={() => setSelectedSeason(index)}
+                  className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
+                    season.seasonNumber === selectedSeason
+                      ? "bg-primary border-primary text-white"
+                      : "bg-gray-900 border-white/30 text-primary hover:text-white hover:border-white/30"
+                  }`}
+                >
+                  Temporada {season.seasonNumber}
+                </button>
+              ))}
+            </div>
 
-          {/* Lista de episodios */}
-          {currentSeasonData && (
+            {/* Lista de episodios */}
             <div className="flex flex-col gap-0">
               {currentSeasonData.episodesList.map((episode, index) => (
                 <div key={episode.id}>
@@ -204,11 +214,8 @@ export default function Detail({ content }: Props) {
                     href={`/player/${content.id}?season=${currentSeasonData.seasonNumber}&episode=${episode.episodeNumber}`}
                     className={`
                     group cursor-pointer text-decoration-none
-                    /* Desktop: fila horizontal */
                     sm:grid sm:grid-cols-[3rem_180px_1fr_auto] sm:items-center
                     sm:gap-4 sm:px-4 sm:py-3 sm:rounded-sm sm:hover:bg-white/5
-
-                    /* Mobile: columna, imagen arriba */
                     flex flex-col gap-2 px-1 py-3
                     sm:flex-none
                     transition-colors duration-200
@@ -257,9 +264,8 @@ export default function Detail({ content }: Props) {
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 }
