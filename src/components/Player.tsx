@@ -195,11 +195,9 @@ function Player({ content, tvShow }: Props) {
                   if (!track) return;
                   const height = track.height ?? 0;
                   let label = "SD";
-                  if (height >= 2160) label = "4K";
-                  else if (height >= 1080) label = "FHD";
-                  else if (height >= 720) label = "HD";
-                  else if (height >= 480) label = "SD";
-                  else label = "LD";
+                  if (height > 720) {
+                    label = "FHD";
+                  }
                   setVideoStates((p) => ({ ...p, resolution: label }));
                 });
 
@@ -248,16 +246,7 @@ function Player({ content, tvShow }: Props) {
                   .find((t: { active: boolean }) => t.active);
                 if (track?.height) {
                   const h = track.height;
-                  const label =
-                    h >= 2160
-                      ? "4K"
-                      : h >= 1080
-                      ? "FHD"
-                      : h >= 720
-                      ? "HD"
-                      : h >= 480
-                      ? "SD"
-                      : "LD";
+                  const label = h > 720 ? "FHD" : "SD";
                   setVideoStates((p) => ({ ...p, resolution: label }));
                 }
 
@@ -501,11 +490,8 @@ function Player({ content, tvShow }: Props) {
 
   // ── Colores por calidad ───────────────────────────────────────────────────────
   const resolutionColor: Record<string, string> = {
-    "4K": "text-yellow-400 border-yellow-400/40",
     FHD: "text-blue-400 border-blue-400/40",
-    HD: "text-green-400 border-green-400/40",
     SD: "text-orange-400 border-orange-400/40",
-    LD: "text-red-400 border-red-400/40",
   };
   const resColor =
     resolutionColor[videoStates.resolution] ?? "text-white/60 border-white/15";
