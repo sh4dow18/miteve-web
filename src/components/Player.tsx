@@ -325,9 +325,20 @@ function Player({ content, tvShow }: Props) {
           if (!tv) seek(-10);
           break;
         case " ":
+        case "Enter":
           e.preventDefault();
-          togglePlay();
-          break;
+          if (tv && videoStates.controlsHidden) {
+            // Mostrar controles y hacer focus al botón de play
+            setVideoStates((p) => ({ ...p, controlsHidden: false }));
+            // Pequeño delay para que el botón sea visible antes del focus
+            setTimeout(() => {
+              document
+                .querySelector<HTMLButtonElement>("[data-play-btn]")
+                ?.focus();
+            }, 50);
+          } else {
+            togglePlay();
+          }
       }
     };
     const onFS = () =>
