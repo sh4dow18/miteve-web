@@ -1,11 +1,12 @@
 "use client";
-import { Film, Menu, Tv, X } from "lucide-react";
+import { Film, Home, Menu, Tv, X } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
 const menuItems = [
+  { icon: Home, label: "Inicio", path: "/home" },
   { icon: Film, label: "Películas", path: "/movies" },
   { icon: Tv, label: "Series", path: "/tv-shows" },
 ];

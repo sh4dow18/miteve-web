@@ -5,7 +5,7 @@ import { ContentCard } from "./ContentCard";
 
 interface ContentRowProps {
   title: string;
-  contentsList: ContainerElement[];
+  contentsList: ContainerElement[] | Content[];
   rowIndex: number;
   // Permite al padre saber qué row tiene foco para manejar ArrowUp/Down
   onRowFocus?: (rowIndex: number) => void;
@@ -164,7 +164,13 @@ export function ContentRow({
               onKeyDown={(e) => handleCardKeyDown(e, index)}
             >
               <ContentCard
-                content={element.content}
+                content={
+                  typeof element === "object" &&
+                  element !== null &&
+                  "content" in element
+                    ? element.content
+                    : element
+                }
                 index={index}
                 rowIndex={rowIndex}
                 onFocus={() => {
