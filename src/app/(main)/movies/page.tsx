@@ -13,9 +13,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export default async function Movies() {
   const CONTAINERS_LIST = await FindAllMovies();
-  const HERO_CONTENT = await FindContentById(
-    CONTAINERS_LIST[0].elementsList[0].content.id
-  );
+  const RANDOM_CONTAINER =
+    CONTAINERS_LIST[Math.floor(Math.random() * CONTAINERS_LIST.length)];
+  const RANDOM_ELEMENT =
+    RANDOM_CONTAINER.elementsList[
+      Math.floor(Math.random() * RANDOM_CONTAINER.elementsList.length)
+    ];
+  const HERO_CONTENT = await FindContentById(RANDOM_ELEMENT.content.id);
   return (
     <div className="min-h-screen">
       <HeroSection content={HERO_CONTENT} />
