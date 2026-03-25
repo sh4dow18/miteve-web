@@ -16,13 +16,13 @@ export default function MaintenancePage() {
         aria-hidden="true"
         className="pointer-events-none absolute z-0 maintenance-bg-gradient"
       />
-      <header className="relative z-10 animate-[fadeDown_0.6s_ease_both] -mb-8">
+      <header className="relative z-10 animate-[fadeDown_0.6s_ease_both] mb-8">
         <Image
           src="/logo-letters.png"
           alt="Miteve"
-          height={768}
-          width={1408}
-          className="w-auto h-40 sm:h-48"
+          height={187}
+          width={674}
+          className="w-auto h-16"
         />
       </header>
       <div className="relative z-10 w-full max-w-md text-center animate-[fadeUp_0.7s_ease_both] maintenance-main-animation-delay">

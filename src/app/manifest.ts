@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Miteve",
     short_name: "Miteve",
-    description: 'Miteve"',
+    description: "Miteve es una app web de Streaming para ver películas y series en un solo lugar y a través de internet",
     start_url: "/",
     display: "standalone",
     orientation: "any",

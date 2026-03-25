@@ -7,6 +7,7 @@ export async function proxy(request: NextRequest) {
   const PAGE_NAME = request.nextUrl.pathname;
   // Check if the page is a async page that needs the internal API
   if (
+    PAGE_NAME.includes("/home") ||
     PAGE_NAME.includes("/movies") ||
     PAGE_NAME.includes("/series") ||
     PAGE_NAME.includes("/content") ||
@@ -33,7 +34,7 @@ export async function proxy(request: NextRequest) {
     }
     // If API is up and the current page is "Maintenance", redirect to movies page
     if (apiOk === true && PAGE_NAME === "/maintenance") {
-      return NextResponse.redirect(new URL("/movies", request.url));
+      return NextResponse.redirect(new URL("/home", request.url));
     }
     // If API is down and the current page is not "Maintenance", redirect to Maintenance page
     if (apiOk === false && PAGE_NAME !== "/maintenance") {
@@ -44,6 +45,7 @@ export async function proxy(request: NextRequest) {
 // Proxy Config
 export const config = {
   matcher: [
+    "/home/:path*",
     "/movies/:path*",
     "/series/:path*",
     "/content/:path*",
