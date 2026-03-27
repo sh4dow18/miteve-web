@@ -328,15 +328,29 @@ function Player({ content, tvShow }: Props) {
         case "Enter":
           e.preventDefault();
           if (tv && videoStates.controlsHidden) {
+            // Controles ocultos → mostrarlos y enfocar play
             setVideoStates((p) => ({ ...p, controlsHidden: false }));
             setTimeout(() => {
               document
                 .querySelector<HTMLButtonElement>("[data-play-btn]")
                 ?.focus();
             }, 50);
+          } else if (tv && !videoStates.controlsHidden) {
+            // Controles visibles → solo actuar si NO hay un botón enfocado
+            const focused = document.activeElement;
+            const controlsEl = controlsRef.current;
+            const isInsideControls = controlsEl?.contains(focused);
+            if (!isInsideControls) {
+              // El foco está en el video o fuera → toggle play
+              togglePlay();
+            }
+            // Si el foco está dentro de los controles, el Enter nativo
+            // del browser ya activará el botón enfocado — no hacemos nada
           } else {
+            // Desktop/web normal
             togglePlay();
           }
+          break;
       }
     };
     const onFS = () =>
