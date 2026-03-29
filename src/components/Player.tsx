@@ -13,7 +13,6 @@ import {
   PictureInPicture,
   PictureInPicture2,
   Play,
-  Rewind,
   RotateCcw,
   RotateCw,
   Subtitles,
@@ -854,28 +853,30 @@ function Player({ content, tvShow }: Props) {
                 />
               </button>
             )}
-            <button
-              onClick={togglePiP}
-              className={iconBtn}
-              tabIndex={0}
-              aria-label={
-                isPip
-                  ? "Activar Picture-in-Picture"
-                  : "Desactivar Picture-in-Picture"
-              }
-            >
-              {isPip ? (
-                <PictureInPicture
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
-              ) : (
-                <PictureInPicture2
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
-              )}
-            </button>
+            {!isTVOrAndroid() && (
+              <button
+                onClick={togglePiP}
+                className={iconBtn}
+                tabIndex={0}
+                aria-label={
+                  isPip
+                    ? "Activar Picture-in-Picture"
+                    : "Desactivar Picture-in-Picture"
+                }
+              >
+                {isPip ? (
+                  <PictureInPicture
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <PictureInPicture2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
+                )}
+              </button>
+            )}
             <button
               className={iconBtn}
               onClick={toggleSubtitles}
@@ -899,28 +900,30 @@ function Player({ content, tvShow }: Props) {
               )}
             </button>
 
-            <button
-              className={iconBtn}
-              onClick={toggleFullscreen}
-              tabIndex={0}
-              aria-label={
-                videoStates.fullscreen
-                  ? "Salir pantalla completa"
-                  : "Pantalla completa"
-              }
-            >
-              {videoStates.fullscreen ? (
-                <Minimize2
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
-              ) : (
-                <Maximize2
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
-              )}
-            </button>
+            {!isTVOrAndroid() && (
+              <button
+                className={iconBtn}
+                onClick={toggleFullscreen}
+                tabIndex={0}
+                aria-label={
+                  videoStates.fullscreen
+                    ? "Salir pantalla completa"
+                    : "Pantalla completa"
+                }
+              >
+                {videoStates.fullscreen ? (
+                  <Minimize2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <Maximize2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
