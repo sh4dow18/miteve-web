@@ -14,6 +14,8 @@ import {
   PictureInPicture2,
   Play,
   Rewind,
+  RotateCcw,
+  RotateCw,
   Subtitles,
   SubtitlesIcon,
   Volume2,
@@ -22,6 +24,7 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window {
@@ -36,6 +39,7 @@ interface Props {
   tvShow?: {
     season: number;
     episode: EpisodeMetadata;
+    nextEpisode: NextEpisode | null;
   };
 }
 
@@ -43,6 +47,7 @@ function Player({ content, tvShow }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const shakaPlayerRef = useRef<any>(null);
 
@@ -319,10 +324,13 @@ function Player({ content, tvShow }: Props) {
           toggleSubtitles();
           break;
         case "ArrowRight":
-          if (!tv) seek(10);
+          seek(10);
           break;
         case "ArrowLeft":
-          if (!tv) seek(-10);
+          seek(-10);
+          break;
+        case " ":
+          togglePlay();
           break;
       }
     };
@@ -482,7 +490,7 @@ function Player({ content, tvShow }: Props) {
   };
 
   const iconBtn =
-    "p-2 rounded-full transition-all duration-150 text-white/70 hover:text-white hover:bg-white/10 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40";
+    "cursor-pointer p-2 rounded-full transition-all duration-150 text-white/70 hover:text-white hover:bg-white/10 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40";
 
   // ── Colores por calidad ───────────────────────────────────────────────────────
   const resolutionColor: Record<string, string> = {
@@ -593,7 +601,7 @@ function Player({ content, tvShow }: Props) {
                 {content.title}
               </h1>
               {tvShow && (
-                <span className="italic text-gray-300">{`T${tvShow.season}E${tvShow.episode.episodeNumber} <<${tvShow.episode.title}>>`}</span>
+                <span className="italic text-gray-300">{`T${tvShow.season}E${tvShow.episode.episodeNumber} «${tvShow.episode.title}»`}</span>
               )}
             </div>
           </div>
@@ -630,12 +638,16 @@ function Player({ content, tvShow }: Props) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {skips.credits && (
+        {skips.credits && tvShow && tvShow.nextEpisode !== null && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            onClick={Skip}
+            onClick={() =>
+              router.push(
+                `/player/${content.id}?season=${tvShow.nextEpisode?.seasonNumber}&episode=${tvShow.nextEpisode?.episodeNumber}`
+              )
+            }
             className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-8 py-4 rounded font-semibold transition-colors z-40"
           >
             Siguiente Episodio
@@ -769,27 +781,29 @@ function Player({ content, tvShow }: Props) {
             </button>
 
             <button
-              className={iconBtn}
+              className={`${iconBtn} flex gap-1 items-center`}
               onClick={() => seek(-10)}
               tabIndex={0}
               aria-label="Retroceder 10s"
             >
-              <Rewind
+              <RotateCcw
                 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
                 strokeWidth={2}
               />
+              <span className="text-sm">-10s</span>
             </button>
 
             <button
-              className={iconBtn}
+              className={`${iconBtn} flex gap-1 items-center`}
               onClick={() => seek(10)}
               tabIndex={0}
               aria-label="Adelantar 10s"
             >
-              <FastForward
+              <RotateCw
                 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
                 strokeWidth={2}
               />
+              <span className="text-sm">-10s</span>
             </button>
 
             <button
@@ -823,6 +837,23 @@ function Player({ content, tvShow }: Props) {
 
           {/* Right */}
           <div className="flex items-center gap-0.5 min-[425px]:gap-1">
+            {tvShow && tvShow.nextEpisode !== null && (
+              <button
+                className={`${iconBtn} flex gap-1 items-center`}
+                onClick={() =>
+                  router.push(
+                    `/player/${content.id}?season=${tvShow.nextEpisode?.seasonNumber}&episode=${tvShow.nextEpisode?.episodeNumber}`
+                  )
+                }
+                tabIndex={0}
+                aria-label="Siguiente Episodio"
+              >
+                <FastForward
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
+              </button>
+            )}
             <button
               onClick={togglePiP}
               className={iconBtn}

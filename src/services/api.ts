@@ -27,6 +27,15 @@ export async function FindEpisodeMetadataById(
     (response) => response.json()
   );
 }
+export async function FindNextEpisodeById(
+  id: string
+): Promise<NextEpisode | null> {
+  const response = await fetch(`${API_HOST_IP}/episodes/next/${id}`);
+  if (!response.ok) {
+    return null;
+  }
+  return await response.json();
+}
 
 export function GetTmdbImage(url: string, size?: number): string {
   return `https://image.tmdb.org/t/p/${size ? `w${size}` : "original"}/${url}`;

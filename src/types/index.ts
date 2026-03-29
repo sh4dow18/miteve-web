@@ -65,3 +65,8 @@ interface EpisodeMetadata {
   endIntro: number | null;
   beginCredits: number | null;
 }
+interface NextEpisode {
+  id: string;
+  seasonNumber: number;
+  episodeNumber: number;
+}

@@ -1,5 +1,9 @@
 import { default as PlayerComponent } from "@/components/Player";
-import { FindContentById, FindEpisodeMetadataById } from "@/services/api";
+import {
+  FindContentById,
+  FindEpisodeMetadataById,
+  FindNextEpisodeById,
+} from "@/services/api";
 import { Metadata } from "next";
 
 // Movies Page Metadata
@@ -22,6 +26,7 @@ export default async function Player({ params, searchParams }: Props) {
   const episodeMetadata = await FindEpisodeMetadataById(
     `${id}-${season}-${episode}`
   );
+  const nextEpisode = await FindNextEpisodeById(`${id}-${season}-${episode}`);
   return (
     <div className="h-screen w-screen overflow-hidden">
       <PlayerComponent
@@ -31,6 +36,7 @@ export default async function Player({ params, searchParams }: Props) {
             ? {
                 season: Number.parseInt(season),
                 episode: episodeMetadata,
+                nextEpisode: nextEpisode
               }
             : undefined
         }
