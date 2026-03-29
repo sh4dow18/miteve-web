@@ -324,10 +324,10 @@ function Player({ content, tvShow }: Props) {
           toggleSubtitles();
           break;
         case "ArrowRight":
-          seek(10);
+          if (!tv) seek(10);
           break;
         case "ArrowLeft":
-          seek(-10);
+          if (!tv) seek(-10);
           break;
         case " ":
           togglePlay();
