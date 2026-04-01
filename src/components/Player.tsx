@@ -802,7 +802,7 @@ function Player({ content, tvShow }: Props) {
                 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
                 strokeWidth={2}
               />
-              <span className="text-sm">-10s</span>
+              <span className="text-sm">+10s</span>
             </button>
 
             <button
