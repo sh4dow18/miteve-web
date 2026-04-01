@@ -20,6 +20,11 @@ export async function FindRecentContent(): Promise<Content[]> {
     response.json()
   );
 }
+export async function FindComingSoonContent(): Promise<Content[]> {
+  return await fetch(`${API_HOST_IP}/contents/soon`).then((response) =>
+    response.json()
+  );
+}
 export async function FindEpisodeMetadataById(
   id: string
 ): Promise<EpisodeMetadata> {

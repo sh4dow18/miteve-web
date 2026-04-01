@@ -1,10 +1,11 @@
 import { ContentRow } from "@/components/ContentRow";
 import { HeroSection } from "@/components/HeroSection";
-import { FindContentById, FindRecentContent } from "@/services/api";
+import { FindComingSoonContent, FindContentById, FindRecentContent } from "@/services/api";
 // Force Dynamic in Build
 export const dynamic = "force-dynamic";
 export default async function Movies() {
   const RECENT_CONTENTS_LIST = await FindRecentContent();
+  const COMING_SOON_LIST = await FindComingSoonContent();
   const RANDOM_CONTENT =
     RECENT_CONTENTS_LIST[
       Math.floor(Math.random() * RECENT_CONTENTS_LIST.length)
@@ -20,6 +21,12 @@ export default async function Movies() {
           contentsList={RECENT_CONTENTS_LIST}
           rowIndex={0}
           totalRows={RECENT_CONTENTS_LIST.length}
+        />
+        <ContentRow
+          title="Próximamente en Miteve"
+          contentsList={COMING_SOON_LIST}
+          rowIndex={1}
+          totalRows={COMING_SOON_LIST.length}
         />
       </div>
     </div>
