@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Stars from "./Stars";
 import YoutubeVideo from "./YoutubeVideo";
+import { useRouter } from "next/navigation";
 
 interface Props {
   content: Content;
@@ -12,6 +13,7 @@ interface Props {
 
 export function HeroSection({ content }: Props) {
   const [isMuted, setIsMuted] = useState(true);
+  const router = useRouter();
   // Función helper para ir al primer card
   const focusFirstCard = () => {
     const firstCard = document.querySelector(
@@ -70,15 +72,29 @@ export function HeroSection({ content }: Props) {
         </div>
 
         <div className="flex gap-4 flex-wrap">
-          <Link
-            href={`/player/${content.id}`}
+          <button
+            onClick={
+              !content.comingSoon
+                ? () =>
+                    router.push(
+                      `/player/${content.id}${
+                        content.type !== "movie" &&
+                        content.seasonsList.length > 0
+                          ? `?season=${content.seasonsList[0].seasonNumber}&episode=${content.seasonsList[0].episodesList[0].episodeNumber}`
+                          : ""
+                      }`.trimEnd()
+                    )
+                : undefined
+            }
             data-hero-btn
             onKeyDown={handleHeroBtnKeyDown}
             className="flex items-center gap-3 bg-white text-black px-3 py-3 rounded text-xl font-semibold hover:bg-gray-200 transition-all hover:scale-105 min-[350px]:px-8"
           >
             <Play className="w-8 h-8" fill="currentColor" />
-            <span className="hidden sm:block">Reproducir</span>
-          </Link>
+            <span className="hidden sm:block">
+              {content.comingSoon ? "Próximamente" : "Reproducir"}
+            </span>
+          </button>
 
           <Link
             href={`/content/${content.id}`}
