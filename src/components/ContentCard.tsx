@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { GetTmdbImage } from "@/services/api";
 import { useRouter } from "next/navigation";
+import { MiniContent } from "@/types";
 
 interface Props {
   content: MiniContent;

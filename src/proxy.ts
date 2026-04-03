@@ -1,15 +1,22 @@
 // Proxy Requirements
 import { NextResponse, NextRequest } from "next/server";
-import { API_HOST_IP } from "./services/admin";
+import { API_HOST_IP, SECURITY_PASSWORD } from "./services/admin";
 // Proxy Main Function
 export async function proxy(request: NextRequest) {
   // Proxy Main Constants
   const PAGE_NAME = request.nextUrl.pathname;
+  // If it is the admin page, check if the secret password was sent, if not, redirect to 404
+  if (
+    PAGE_NAME === "/admin" &&
+    request.nextUrl.searchParams.get("secret") !== SECURITY_PASSWORD
+  ) {
+    return NextResponse.redirect(new URL("/404", request.url));
+  }
   // Check if the page is a async page that needs the internal API
   if (
     PAGE_NAME.includes("/home") ||
     PAGE_NAME.includes("/movies") ||
-    PAGE_NAME.includes("/series") ||
+    PAGE_NAME.includes("/tv-shows") ||
     PAGE_NAME.includes("/content") ||
     PAGE_NAME.includes("/player") ||
     PAGE_NAME === "/admin" ||
@@ -47,7 +54,7 @@ export const config = {
   matcher: [
     "/home/:path*",
     "/movies/:path*",
-    "/series/:path*",
+    "/tv-shows/:path*",
     "/content/:path*",
     "/player/:path*",
     "/admin",

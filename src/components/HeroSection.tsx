@@ -6,6 +6,7 @@ import { useState } from "react";
 import Stars from "./Stars";
 import YoutubeVideo from "./YoutubeVideo";
 import { useRouter } from "next/navigation";
+import { Content } from "@/types";
 
 interface Props {
   content: Content;

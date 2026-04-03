@@ -9,6 +9,7 @@ import YoutubeVideo from "./YoutubeVideo";
 import Stars from "./Stars";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Content } from "@/types";
 
 interface Props {
   content: Content;
