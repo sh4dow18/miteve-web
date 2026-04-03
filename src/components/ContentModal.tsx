@@ -4,6 +4,7 @@ import { X, Save, Info, ChevronUp, ChevronDown } from "lucide-react";
 import { Genre, ShortContent, ContentRequest, MiniContainer } from "../types";
 import { TMDB_API_KEY } from "@/services/admin";
 import { FindContentById } from "@/services/api";
+import { secondsToTime, timeToSeconds } from "@/libs/utils";
 
 interface ContentModalProps {
   item: ShortContent | null;
@@ -21,6 +22,7 @@ export function ContentModal({
   onClose,
 }: ContentModalProps) {
   const [tmdbId, SetTmdbId] = useState<number | null>(null);
+  const [trailerDuration, SetTrailerDuration] = useState<string>("");
   const [formData, setFormData] = useState<ContentRequest>({
     tmdbId: 0,
     title: "",
@@ -119,7 +121,7 @@ export function ContentModal({
           console.error("Contenido no encontrado");
           return;
         }
-
+        SetTrailerDuration(secondsToTime(existingContent.trailerDuration || 0));
         setFormData({
           tmdbId: existingContent.tmdbId || 0,
           title: existingContent.title || "",
@@ -168,9 +170,12 @@ export function ContentModal({
       return;
     }
 
+    const trailerSeconds = timeToSeconds(trailerDuration);
+
     setError(null);
     onSave({
       ...formData,
+      trailerDuration: trailerSeconds !== null ? trailerSeconds : 0,
       tmdbId: tmdbId !== null ? tmdbId : 0,
     });
   };
@@ -335,7 +340,7 @@ export function ContentModal({
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm text-gray-400 mb-2">
                 Duración de Trailer (segundos)
               </label>
@@ -348,6 +353,18 @@ export function ContentModal({
                 }
                 className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
                 placeholder="Ej: 120"
+              />
+            </div> */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">
+                Duración de Trailer
+              </label>
+              <input
+                type="text"
+                value={trailerDuration}
+                onChange={(e) => SetTrailerDuration(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
+                placeholder="00:00"
               />
             </div>
           </div>
