@@ -190,7 +190,7 @@ export default function Admin() {
         <div className="px-12 py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate.push("/browse")}
+              onClick={() => navigate.push("/home")}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
               tabIndex={0}
             >
