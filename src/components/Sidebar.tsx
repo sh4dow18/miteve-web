@@ -1,5 +1,5 @@
 "use client";
-import { Film, Home, Menu, Tv, X } from "lucide-react";
+import { Film, Home, Menu, Settings, Tv, X } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";

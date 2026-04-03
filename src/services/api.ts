@@ -1,3 +1,4 @@
+import { Container, Content, Episode, EpisodeMetadata, FullEpisode, Genre, MiniContainer, MiniSeason, NextEpisode, ShortContent } from "@/types";
 import { API_HOST_IP } from "./admin";
 
 export async function FindAllMovies(): Promise<Container[]> {
@@ -40,6 +41,31 @@ export async function FindNextEpisodeById(
     return null;
   }
   return await response.json();
+}
+export async function FindAllContents(): Promise<ShortContent[]> {
+  return await fetch(`${API_HOST_IP}/contents`).then(
+    (response) => response.json()
+  );
+}
+export async function FindAllContainers(): Promise<MiniContainer[]> {
+  return await fetch(`${API_HOST_IP}/containers`).then(
+    (response) => response.json()
+  );
+}
+export async function FindAllGenres(): Promise<Genre[]> {
+  return await fetch(`${API_HOST_IP}/genres`).then(
+    (response) => response.json()
+  );
+}
+export async function FindSeasonsByContentId(id: string): Promise<MiniSeason[]> {
+  return await fetch(`${API_HOST_IP}/contents/${id}/seasons`).then(
+    (response) => response.json()
+  );
+}
+export async function FindEpisodesBySeasonId(id: string): Promise<FullEpisode[]> {
+  return await fetch(`${API_HOST_IP}/seasons/${id}/episodes`).then(
+    (response) => response.json()
+  );
 }
 
 export function GetTmdbImage(url: string, size?: number): string {

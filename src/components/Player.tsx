@@ -24,6 +24,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { Content, EpisodeMetadata, NextEpisode } from "@/types";
 
 declare global {
   interface Window {

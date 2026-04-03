@@ -2,6 +2,7 @@
 import { useRef, useCallback, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ContentCard } from "./ContentCard";
+import { ContainerElement, Content } from "@/types";
 
 interface ContentRowProps {
   title: string;
