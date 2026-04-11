@@ -43,6 +43,35 @@ interface Props {
   };
 }
 
+// ── Helpers subtítulos — Shaka 5.x usa textTracks nativos ────────────────────
+
+function getSubtitleTrack(video: HTMLVideoElement): TextTrack | null {
+  for (let i = 0; i < video.textTracks.length; i++) {
+    const t = video.textTracks[i];
+    if (t.kind === "subtitles" || t.kind === "captions") return t;
+  }
+  return null;
+}
+
+function enableSubtitles(video: HTMLVideoElement) {
+  for (let i = 0; i < video.textTracks.length; i++) {
+    const t = video.textTracks[i];
+    if (t.kind === "subtitles" || t.kind === "captions") {
+      t.mode = "showing";
+    } else {
+      t.mode = "disabled";
+    }
+  }
+}
+
+function disableSubtitles(video: HTMLVideoElement) {
+  for (let i = 0; i < video.textTracks.length; i++) {
+    video.textTracks[i].mode = "hidden";
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function Player({ content, tvShow }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -84,23 +113,23 @@ function Player({ content, tvShow }: Props) {
     hoverX: 0,
     buffered: 0,
   });
+
   const [isPip, setIsPiP] = useState(false);
+  const [hasSubtitles, setHasSubtitles] = useState(false);
   const [skips, SetSkips] = useState({
     summary: false,
     intro: false,
     credits: false,
   });
+
   const togglePiP = async () => {
     try {
       const video = videoRef.current;
       if (!video) return;
-
-      // Si ya está en PiP → salir
       if (document.pictureInPictureElement) {
         await document.exitPictureInPicture();
         setIsPiP(false);
       } else {
-        // Entrar en PiP
         await video.requestPictureInPicture();
         setIsPiP(true);
       }
@@ -108,32 +137,24 @@ function Player({ content, tvShow }: Props) {
       console.error("Error con PiP:", error);
     }
   };
+
   useEffect(() => {
     const VIDEO = videoRef.current;
-    if (VIDEO === null) {
-      return;
-    }
-    if (tvShow === undefined) {
-      return;
-    }
-    // Function that allow to display and hide the skips buttons
+    if (VIDEO === null || tvShow === undefined) return;
     const ManageSkips = () => {
       const CURRENT_TIME = VIDEO.currentTime;
-      const BEGIN_SUMMARY = tvShow.episode.beginSummary;
-      const END_SUMMARY = tvShow.episode.endSummary;
-      const BEGIN_INTRO = tvShow.episode.beginIntro;
-      const END_INTRO = tvShow.episode.endIntro;
-      const BEGIN_CREDITS = tvShow.episode.beginCredits;
+      const { beginSummary, endSummary, beginIntro, endIntro, beginCredits } =
+        tvShow.episode;
       SetSkips({
         summary:
-          BEGIN_SUMMARY !== null && END_SUMMARY !== null
-            ? CURRENT_TIME > BEGIN_SUMMARY && CURRENT_TIME < END_SUMMARY
+          beginSummary !== null && endSummary !== null
+            ? CURRENT_TIME > beginSummary && CURRENT_TIME < endSummary
             : false,
         intro:
-          BEGIN_INTRO !== null && END_INTRO !== null
-            ? CURRENT_TIME > BEGIN_INTRO && CURRENT_TIME < END_INTRO
+          beginIntro !== null && endIntro !== null
+            ? CURRENT_TIME > beginIntro && CURRENT_TIME < endIntro
             : false,
-        credits: BEGIN_CREDITS !== null ? CURRENT_TIME > BEGIN_CREDITS : false,
+        credits: beginCredits !== null ? CURRENT_TIME > beginCredits : false,
       });
     };
     VIDEO.addEventListener("timeupdate", ManageSkips);
@@ -143,6 +164,7 @@ function Player({ content, tvShow }: Props) {
       VIDEO.removeEventListener("seeked", ManageSkips);
     };
   }, [tvShow]);
+
   // ─── Shaka init + source load ────────────────────────────────────────────────
   useEffect(() => {
     const loadVideo = async () => {
@@ -165,12 +187,11 @@ function Player({ content, tvShow }: Props) {
       let ip = API_HOST_IP;
 
       fetch(`${ip}/${API}`, { method: "HEAD", signal: controller.signal })
-        .catch(() => {
-          ip = API_HOST_IP;
-        })
+        .catch(() => { ip = API_HOST_IP; })
         .finally(async () => {
           clearTimeout(timeout);
           const src = `${STREAM_HOST_IP}/${API}`;
+
           const loadWithRetry = async (attempts = 3, delay = 1500) => {
             for (let i = 0; i < attempts; i++) {
               try {
@@ -179,11 +200,7 @@ function Player({ content, tvShow }: Props) {
                 );
                 shaka.default.polyfill.installAll();
                 if (!shaka.default.Player.isBrowserSupported()) {
-                  setVideoStates((p) => ({
-                    ...p,
-                    paused: true,
-                    waiting: false,
-                  }));
+                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
                   return;
                 }
                 if (shakaPlayerRef.current)
@@ -198,12 +215,10 @@ function Player({ content, tvShow }: Props) {
                     .getVariantTracks()
                     .find((t: { active: boolean }) => t.active);
                   if (!track) return;
-                  const height = track.height ?? 0;
-                  let label = "SD";
-                  if (height > 720) {
-                    label = "FHD";
-                  }
-                  setVideoStates((p) => ({ ...p, resolution: label }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    resolution: (track.height ?? 0) > 720 ? "FHD" : "SD",
+                  }));
                 });
 
                 player.addEventListener("error", (e: unknown) => {
@@ -211,16 +226,46 @@ function Player({ content, tvShow }: Props) {
                 });
 
                 await player.load(src);
-                // Esperar a que el video tenga metadatos antes de hacer seek
+
+                // Esperar metadatos antes de hacer seek
                 await new Promise<void>((resolve) => {
-                  if (VIDEO.readyState >= 1) {
-                    resolve();
-                  } else {
+                  if (VIDEO.readyState >= 1) resolve();
+                  else
                     VIDEO.addEventListener("loadedmetadata", () => resolve(), {
                       once: true,
                     });
-                  }
                 });
+
+                // ── Auto-activar subtítulos ─────────────────────────────────
+                // Intentar activar inmediatamente
+                const subtitleTrack = getSubtitleTrack(VIDEO);
+                if (subtitleTrack) {
+                  enableSubtitles(VIDEO);
+                  setHasSubtitles(true);
+                  setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                } else {
+                  // Shaka puede tardar un tick en añadir los tracks
+                  let trackTimeout: NodeJS.Timeout;
+                  const onTrackAdded = () => {
+                    const t = getSubtitleTrack(VIDEO);
+                    if (t) {
+                      enableSubtitles(VIDEO);
+                      setHasSubtitles(true);
+                      setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                      VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                      clearTimeout(trackTimeout);
+                    }
+                  };
+                  VIDEO.textTracks.addEventListener("addtrack", onTrackAdded);
+                  // Si en 3s no aparece ningún track, este contenido no tiene subs
+                  trackTimeout = setTimeout(() => {
+                    VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                    setHasSubtitles(false);
+                    setVideoStates((p) => ({ ...p, subtitlesOn: false }));
+                  }, 3000);
+                }
+
+                // Skip intro/summary al inicio
                 if (tvShow !== undefined) {
                   const { beginSummary, endSummary, beginIntro, endIntro } =
                     tvShow.episode;
@@ -245,14 +290,15 @@ function Player({ content, tvShow }: Props) {
                   }
                 }
 
-                // Resolución inicial tras cargar
+                // Resolución inicial
                 const track = player
                   .getVariantTracks()
                   .find((t: { active: boolean }) => t.active);
                 if (track?.height) {
-                  const h = track.height;
-                  const label = h > 720 ? "FHD" : "SD";
-                  setVideoStates((p) => ({ ...p, resolution: label }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    resolution: track.height !== null && track.height > 720 ? "FHD" : "SD",
+                  }));
                 }
 
                 VIDEO.play()
@@ -271,7 +317,7 @@ function Player({ content, tvShow }: Props) {
                     }))
                   );
 
-                return; // éxito
+                return;
               } catch (e) {
                 console.warn(`Shaka intento ${i + 1} fallido`, e);
                 if (i < attempts - 1) {
@@ -311,27 +357,12 @@ function Player({ content, tvShow }: Props) {
     const onKey = (e: KeyboardEvent) => {
       const tv = isTVOrAndroid();
       switch (e.key) {
-        case "f":
-        case "F":
-          toggleFullscreen();
-          break;
-        case "m":
-        case "M":
-          toggleMute();
-          break;
-        case "c":
-        case "C":
-          toggleSubtitles();
-          break;
-        case "ArrowRight":
-          if (!tv) seek(10);
-          break;
-        case "ArrowLeft":
-          if (!tv) seek(-10);
-          break;
-        case " ":
-          togglePlay();
-          break;
+        case "f": case "F": toggleFullscreen(); break;
+        case "m": case "M": toggleMute(); break;
+        case "c": case "C": if (hasSubtitles) toggleSubtitles(); break;
+        case "ArrowRight": if (!tv) seek(10); break;
+        case "ArrowLeft": if (!tv) seek(-10); break;
+        case " ": togglePlay(); break;
       }
     };
     const onFS = () =>
@@ -346,7 +377,7 @@ function Player({ content, tvShow }: Props) {
       document.removeEventListener("fullscreenchange", onFS);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hasSubtitles]);
 
   // ─── Controls auto-hide ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -420,7 +451,6 @@ function Player({ content, tvShow }: Props) {
     setVideoStates((p) => ({ ...p, muted: v.muted }));
   };
 
-  // ── Fullscreen fix: no tocar style inline, dejar que fixed inset-0 del padre maneje el tamaño ──
   const toggleFullscreen = () => {
     const c = containerRef.current;
     if (!c) return;
@@ -441,21 +471,22 @@ function Player({ content, tvShow }: Props) {
   };
 
   const toggleSubtitles = () => {
-    const v = videoRef.current;
-    if (!v || !v.textTracks[0]) return;
-    const on = v.textTracks[0].mode === "showing";
-    v.textTracks[0].mode = on ? "disabled" : "showing";
-    setVideoStates((p) => ({ ...p, subtitlesOn: !on }));
+    const VIDEO = videoRef.current;
+    if (!VIDEO) return;
+    const newState = !videoStates.subtitlesOn;
+    if (newState) {
+      enableSubtitles(VIDEO);
+    } else {
+      disableSubtitles(VIDEO);
+    }
+    setVideoStates((p) => ({ ...p, subtitlesOn: newState }));
   };
 
   const fmt = (t: number) => {
     const h = Math.floor(t / 3600);
     const m = Math.floor((t % 3600) / 60);
     const s = Math.floor(t % 60);
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(
-      2,
-      "0"
-    )}:${String(s).padStart(2, "0")}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
   const onSeekBar = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -471,57 +502,35 @@ function Player({ content, tvShow }: Props) {
     );
     const i = els.indexOf(document.activeElement as HTMLElement);
     if (i === -1) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      els[i + 1]?.focus();
+    if (e.key === "ArrowDown") { e.preventDefault(); els[i + 1]?.focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); els[i - 1]?.focus(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); seek(-10); }
+    if (e.key === "ArrowRight") { e.preventDefault(); seek(10); }
+  };
+
+  const Skip = () => {
+    const VIDEO = videoRef.current;
+    if (VIDEO === null || tvShow === undefined) return;
+    if (skips.summary && tvShow.episode.endSummary !== null) {
+      VIDEO.currentTime = tvShow.episode.endSummary;
+      SetSkips((p) => ({ ...p, summary: false }));
     }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      els[i - 1]?.focus();
-    }
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      seek(-10);
-    }
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      seek(10);
+    if (skips.intro && tvShow.episode.endIntro !== null) {
+      VIDEO.currentTime = tvShow.episode.endIntro;
+      SetSkips((p) => ({ ...p, intro: false }));
     }
   };
 
   const iconBtn =
     "cursor-pointer p-2 rounded-full transition-all duration-150 text-white/70 hover:text-white hover:bg-white/10 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40";
 
-  // ── Colores por calidad ───────────────────────────────────────────────────────
   const resolutionColor: Record<string, string> = {
     FHD: "text-blue-400 border-blue-400/40",
     SD: "text-orange-400 border-orange-400/40",
   };
   const resColor =
     resolutionColor[videoStates.resolution] ?? "text-white/60 border-white/15";
-  const Skip = () => {
-    const VIDEO = videoRef.current;
-    if (VIDEO === null) {
-      return;
-    }
-    if (tvShow === undefined) {
-      return;
-    }
-    if (skips.summary === true && tvShow.episode.endSummary !== null) {
-      VIDEO.currentTime = tvShow.episode.endSummary;
-      SetSkips({
-        ...skips,
-        summary: false,
-      });
-    }
-    if (skips.intro === true && tvShow.episode.endIntro !== null) {
-      VIDEO.currentTime = tvShow.episode.endIntro;
-      SetSkips({
-        ...skips,
-        intro: false,
-      });
-    }
-  };
+
   return (
     <div
       ref={containerRef}
@@ -556,10 +565,7 @@ function Player({ content, tvShow }: Props) {
         aria-hidden={!videoStates.waiting}
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none aria-hidden:hidden"
       >
-        <Loader2
-          className="h-12 w-12 text-white/50 animate-spin"
-          strokeWidth={1.5}
-        />
+        <Loader2 className="h-12 w-12 text-white/50 animate-spin" strokeWidth={1.5} />
       </div>
 
       {/* TOP GRADIENT + HEADER */}
@@ -582,9 +588,7 @@ function Player({ content, tvShow }: Props) {
             />
           </Link>
 
-          {/* Título + badge de calidad juntos arriba a la derecha */}
           <div className="flex items-center gap-3">
-            {/* Badge calidad — visible siempre cuando los controles están visibles */}
             <div
               className={`flex items-center gap-1.5
                 bg-black/40 backdrop-blur-sm border
@@ -668,10 +672,8 @@ function Player({ content, tvShow }: Props) {
         {/* SEEKBAR */}
         <div className="flex items-center gap-3 mb-4">
           <div className="relative w-full h-8 group/bar">
-            <div
-              className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
-                            group-hover/bar:h-1.25 transition-all duration-150"
-            />
+            <div className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
+                            group-hover/bar:h-1.25 transition-all duration-150" />
             <div
               className="absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25
                          group-hover/bar:h-1.25 transition-all duration-150"
@@ -718,9 +720,7 @@ function Player({ content, tvShow }: Props) {
               min="0"
               max="100"
               step="0.1"
-              value={
-                !Number.isNaN(videoStates.progress) ? videoStates.progress : 0
-              }
+              value={!Number.isNaN(videoStates.progress) ? videoStates.progress : 0}
               onChange={onSeekBar}
               onKeyDown={handleTVNav}
               data-focusable
@@ -766,17 +766,9 @@ function Player({ content, tvShow }: Props) {
               aria-label={videoStates.paused ? "Play" : "Pause"}
             >
               {videoStates.paused ? (
-                <Play
-                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
-                  fill="currentColor"
-                  strokeWidth={0}
-                />
+                <Play className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />
               ) : (
-                <Pause
-                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
-                  fill="currentColor"
-                  strokeWidth={0}
-                />
+                <Pause className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />
               )}
             </button>
 
@@ -786,10 +778,7 @@ function Player({ content, tvShow }: Props) {
               tabIndex={0}
               aria-label="Retroceder 10s"
             >
-              <RotateCcw
-                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                strokeWidth={2}
-              />
+              <RotateCcw className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
               <span className="text-sm">-10s</span>
             </button>
 
@@ -799,10 +788,7 @@ function Player({ content, tvShow }: Props) {
               tabIndex={0}
               aria-label="Adelantar 10s"
             >
-              <RotateCw
-                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                strokeWidth={2}
-              />
+              <RotateCw className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
               <span className="text-sm">+10s</span>
             </button>
 
@@ -813,15 +799,9 @@ function Player({ content, tvShow }: Props) {
               aria-label={videoStates.muted ? "Activar sonido" : "Silenciar"}
             >
               {videoStates.muted ? (
-                <VolumeX
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
+                <VolumeX className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
               ) : (
-                <Volume2
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
+                <Volume2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
               )}
             </button>
 
@@ -848,80 +828,52 @@ function Player({ content, tvShow }: Props) {
                 tabIndex={0}
                 aria-label="Siguiente Episodio"
               >
-                <FastForward
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
+                <FastForward className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
               </button>
             )}
+
             {!isTVOrAndroid() && (
               <button
                 onClick={togglePiP}
                 className={iconBtn}
                 tabIndex={0}
-                aria-label={
-                  isPip
-                    ? "Activar Picture-in-Picture"
-                    : "Desactivar Picture-in-Picture"
-                }
+                aria-label={isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"}
               >
                 {isPip ? (
-                  <PictureInPicture
-                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                    strokeWidth={2}
-                  />
+                  <PictureInPicture className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
                 ) : (
-                  <PictureInPicture2
-                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                    strokeWidth={2}
-                  />
+                  <PictureInPicture2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
                 )}
               </button>
             )}
-            <button
-              className={iconBtn}
-              onClick={toggleSubtitles}
-              tabIndex={0}
-              aria-label={
-                videoStates.subtitlesOn
-                  ? "Ocultar subtítulos"
-                  : "Mostrar subtítulos"
-              }
-            >
-              {videoStates.subtitlesOn ? (
-                <Subtitles
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                  strokeWidth={2}
-                />
-              ) : (
-                <SubtitlesIcon
-                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6 opacity-35"
-                  strokeWidth={2}
-                />
-              )}
-            </button>
+
+            {/* Botón subs — solo aparece si el contenido tiene subtítulos */}
+            {hasSubtitles && (
+              <button
+                className={`${iconBtn} ${videoStates.subtitlesOn ? "text-white" : "text-white/40"}`}
+                onClick={toggleSubtitles}
+                tabIndex={0}
+                aria-label={videoStates.subtitlesOn ? "Ocultar subtítulos" : "Mostrar subtítulos"}
+              >
+                {videoStates.subtitlesOn ? (
+                  <Subtitles className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                ) : (
+                  <SubtitlesIcon className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                )}
+              </button>
+            )}
 
             {!isTVOrAndroid() && (
               <button
                 className={iconBtn}
                 onClick={toggleFullscreen}
                 tabIndex={0}
-                aria-label={
-                  videoStates.fullscreen
-                    ? "Salir pantalla completa"
-                    : "Pantalla completa"
-                }
+                aria-label={videoStates.fullscreen ? "Salir pantalla completa" : "Pantalla completa"}
               >
                 {videoStates.fullscreen ? (
-                  <Minimize2
-                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                    strokeWidth={2}
-                  />
+                  <Minimize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
                 ) : (
-                  <Maximize2
-                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
-                    strokeWidth={2}
-                  />
+                  <Maximize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
                 )}
               </button>
             )}

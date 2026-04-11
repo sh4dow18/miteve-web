@@ -64,3 +64,15 @@
     width: 75%;
   }
 }
+/* Subtitles */
+video::cue {
+  background: transparent;
+  background-color: transparent;
+  text-shadow:
+    -1px -1px 2px #000,
+     1px -1px 2px #000,
+    -1px  1px 2px #000,
+     1px  1px 2px #000;
+  color: white;
+  font-size: 1em;
+}
