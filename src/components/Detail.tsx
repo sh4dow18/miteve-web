@@ -252,8 +252,9 @@ export default function Detail({ content }: Props) {
                         {episode.episodeNumber}. {episode.title}
                       </h3>
                       <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 sm:line-clamp-2">
-                        {episode.description ??
-                          "No ha Información disponible de este capítulo"}
+                        {episode.description && episode.description !== ""
+                          ? episode.description
+                          : "No ha Información disponible de este capítulo"}
                       </p>
                     </div>
                   </Link>
