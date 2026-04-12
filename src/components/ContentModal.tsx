@@ -175,6 +175,8 @@ export function ContentModal({
     setError(null);
     onSave({
       ...formData,
+      tagline: formData.tagline !== "" ? formData.tagline : null,
+      note: formData.note !== "" ? formData.note : null,
       trailerDuration: trailerSeconds !== null ? trailerSeconds : 0,
       tmdbId: tmdbId !== null ? tmdbId : 0,
     });
