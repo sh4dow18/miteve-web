@@ -4,6 +4,8 @@ import { API_HOST_IP, STREAM_HOST_IP } from "@/services/admin";
 import { AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
+  Captions,
+  CaptionsOff,
   Clapperboard,
   FastForward,
   Loader2,
@@ -187,7 +189,9 @@ function Player({ content, tvShow }: Props) {
       let ip = API_HOST_IP;
 
       fetch(`${ip}/${API}`, { method: "HEAD", signal: controller.signal })
-        .catch(() => { ip = API_HOST_IP; })
+        .catch(() => {
+          ip = API_HOST_IP;
+        })
         .finally(async () => {
           clearTimeout(timeout);
           const src = `${STREAM_HOST_IP}/${API}`;
@@ -200,7 +204,11 @@ function Player({ content, tvShow }: Props) {
                 );
                 shaka.default.polyfill.installAll();
                 if (!shaka.default.Player.isBrowserSupported()) {
-                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    paused: true,
+                    waiting: false,
+                  }));
                   return;
                 }
                 if (shakaPlayerRef.current)
@@ -252,14 +260,20 @@ function Player({ content, tvShow }: Props) {
                       enableSubtitles(VIDEO);
                       setHasSubtitles(true);
                       setVideoStates((p) => ({ ...p, subtitlesOn: true }));
-                      VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                      VIDEO.textTracks.removeEventListener(
+                        "addtrack",
+                        onTrackAdded
+                      );
                       clearTimeout(trackTimeout);
                     }
                   };
                   VIDEO.textTracks.addEventListener("addtrack", onTrackAdded);
                   // Si en 3s no aparece ningún track, este contenido no tiene subs
                   trackTimeout = setTimeout(() => {
-                    VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                    VIDEO.textTracks.removeEventListener(
+                      "addtrack",
+                      onTrackAdded
+                    );
                     setHasSubtitles(false);
                     setVideoStates((p) => ({ ...p, subtitlesOn: false }));
                   }, 3000);
@@ -297,7 +311,10 @@ function Player({ content, tvShow }: Props) {
                 if (track?.height) {
                   setVideoStates((p) => ({
                     ...p,
-                    resolution: track.height !== null && track.height > 720 ? "FHD" : "SD",
+                    resolution:
+                      track.height !== null && track.height > 720
+                        ? "FHD"
+                        : "SD",
                   }));
                 }
 
@@ -357,12 +374,27 @@ function Player({ content, tvShow }: Props) {
     const onKey = (e: KeyboardEvent) => {
       const tv = isTVOrAndroid();
       switch (e.key) {
-        case "f": case "F": toggleFullscreen(); break;
-        case "m": case "M": toggleMute(); break;
-        case "c": case "C": if (hasSubtitles) toggleSubtitles(); break;
-        case "ArrowRight": if (!tv) seek(10); break;
-        case "ArrowLeft": if (!tv) seek(-10); break;
-        case " ": togglePlay(); break;
+        case "f":
+        case "F":
+          toggleFullscreen();
+          break;
+        case "m":
+        case "M":
+          toggleMute();
+          break;
+        case "c":
+        case "C":
+          if (hasSubtitles) toggleSubtitles();
+          break;
+        case "ArrowRight":
+          if (!tv) seek(10);
+          break;
+        case "ArrowLeft":
+          if (!tv) seek(-10);
+          break;
+        case " ":
+          togglePlay();
+          break;
       }
     };
     const onFS = () =>
@@ -486,7 +518,10 @@ function Player({ content, tvShow }: Props) {
     const h = Math.floor(t / 3600);
     const m = Math.floor((t % 3600) / 60);
     const s = Math.floor(t % 60);
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(
+      2,
+      "0"
+    )}:${String(s).padStart(2, "0")}`;
   };
 
   const onSeekBar = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -502,10 +537,22 @@ function Player({ content, tvShow }: Props) {
     );
     const i = els.indexOf(document.activeElement as HTMLElement);
     if (i === -1) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); els[i + 1]?.focus(); }
-    if (e.key === "ArrowUp") { e.preventDefault(); els[i - 1]?.focus(); }
-    if (e.key === "ArrowLeft") { e.preventDefault(); seek(-10); }
-    if (e.key === "ArrowRight") { e.preventDefault(); seek(10); }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      els[i + 1]?.focus();
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      els[i - 1]?.focus();
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      seek(-10);
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      seek(10);
+    }
   };
 
   const Skip = () => {
@@ -565,7 +612,10 @@ function Player({ content, tvShow }: Props) {
         aria-hidden={!videoStates.waiting}
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none aria-hidden:hidden"
       >
-        <Loader2 className="h-12 w-12 text-white/50 animate-spin" strokeWidth={1.5} />
+        <Loader2
+          className="h-12 w-12 text-white/50 animate-spin"
+          strokeWidth={1.5}
+        />
       </div>
 
       {/* TOP GRADIENT + HEADER */}
@@ -672,8 +722,10 @@ function Player({ content, tvShow }: Props) {
         {/* SEEKBAR */}
         <div className="flex items-center gap-3 mb-4">
           <div className="relative w-full h-8 group/bar">
-            <div className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
-                            group-hover/bar:h-1.25 transition-all duration-150" />
+            <div
+              className="absolute top-1/2 inset-x-0 h-0.75 -translate-y-1/2 rounded-full bg-white/15
+                            group-hover/bar:h-1.25 transition-all duration-150"
+            />
             <div
               className="absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25
                          group-hover/bar:h-1.25 transition-all duration-150"
@@ -720,7 +772,9 @@ function Player({ content, tvShow }: Props) {
               min="0"
               max="100"
               step="0.1"
-              value={!Number.isNaN(videoStates.progress) ? videoStates.progress : 0}
+              value={
+                !Number.isNaN(videoStates.progress) ? videoStates.progress : 0
+              }
               onChange={onSeekBar}
               onKeyDown={handleTVNav}
               data-focusable
@@ -766,9 +820,17 @@ function Player({ content, tvShow }: Props) {
               aria-label={videoStates.paused ? "Play" : "Pause"}
             >
               {videoStates.paused ? (
-                <Play className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />
+                <Play
+                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
               ) : (
-                <Pause className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9" fill="currentColor" strokeWidth={0} />
+                <Pause
+                  className="w-7 h-7 min-[865px]:w-9 min-[865px]:h-9"
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
               )}
             </button>
 
@@ -778,7 +840,10 @@ function Player({ content, tvShow }: Props) {
               tabIndex={0}
               aria-label="Retroceder 10s"
             >
-              <RotateCcw className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+              <RotateCcw
+                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                strokeWidth={2}
+              />
               <span className="text-sm">-10s</span>
             </button>
 
@@ -788,7 +853,10 @@ function Player({ content, tvShow }: Props) {
               tabIndex={0}
               aria-label="Adelantar 10s"
             >
-              <RotateCw className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+              <RotateCw
+                className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                strokeWidth={2}
+              />
               <span className="text-sm">+10s</span>
             </button>
 
@@ -799,9 +867,15 @@ function Player({ content, tvShow }: Props) {
               aria-label={videoStates.muted ? "Activar sonido" : "Silenciar"}
             >
               {videoStates.muted ? (
-                <VolumeX className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                <VolumeX
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
               ) : (
-                <Volume2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                <Volume2
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
               )}
             </button>
 
@@ -828,7 +902,10 @@ function Player({ content, tvShow }: Props) {
                 tabIndex={0}
                 aria-label="Siguiente Episodio"
               >
-                <FastForward className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                <FastForward
+                  className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                  strokeWidth={2}
+                />
               </button>
             )}
 
@@ -837,12 +914,20 @@ function Player({ content, tvShow }: Props) {
                 onClick={togglePiP}
                 className={iconBtn}
                 tabIndex={0}
-                aria-label={isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"}
+                aria-label={
+                  isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"
+                }
               >
                 {isPip ? (
-                  <PictureInPicture className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <PictureInPicture
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 ) : (
-                  <PictureInPicture2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <PictureInPicture2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 )}
               </button>
             )}
@@ -850,15 +935,27 @@ function Player({ content, tvShow }: Props) {
             {/* Botón subs — solo aparece si el contenido tiene subtítulos */}
             {hasSubtitles && (
               <button
-                className={`${iconBtn} ${videoStates.subtitlesOn ? "text-white" : "text-white/40"}`}
+                className={`${iconBtn} ${
+                  videoStates.subtitlesOn ? "text-white" : "text-white/40"
+                }`}
                 onClick={toggleSubtitles}
                 tabIndex={0}
-                aria-label={videoStates.subtitlesOn ? "Ocultar subtítulos" : "Mostrar subtítulos"}
+                aria-label={
+                  videoStates.subtitlesOn
+                    ? "Ocultar subtítulos"
+                    : "Mostrar subtítulos"
+                }
               >
                 {videoStates.subtitlesOn ? (
-                  <Subtitles className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <Captions
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 ) : (
-                  <SubtitlesIcon className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <CaptionsOff
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 )}
               </button>
             )}
@@ -868,12 +965,22 @@ function Player({ content, tvShow }: Props) {
                 className={iconBtn}
                 onClick={toggleFullscreen}
                 tabIndex={0}
-                aria-label={videoStates.fullscreen ? "Salir pantalla completa" : "Pantalla completa"}
+                aria-label={
+                  videoStates.fullscreen
+                    ? "Salir pantalla completa"
+                    : "Pantalla completa"
+                }
               >
                 {videoStates.fullscreen ? (
-                  <Minimize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <Minimize2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 ) : (
-                  <Maximize2 className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6" strokeWidth={2} />
+                  <Maximize2
+                    className="w-5 h-5 min-[865px]:w-6 min-[865px]:h-6"
+                    strokeWidth={2}
+                  />
                 )}
               </button>
             )}
