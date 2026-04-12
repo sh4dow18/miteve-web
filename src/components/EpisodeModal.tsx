@@ -221,10 +221,9 @@ export default function EpisodeModal({
 
           <div>
             <label className="block text-sm text-gray-400 mb-2">
-              Descripción *
+              Descripción
             </label>
             <textarea
-              required
               rows={3}
               maxLength={1000}
               value={formData.overview}
