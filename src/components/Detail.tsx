@@ -192,10 +192,10 @@ export default function Detail({ content }: Props) {
 
             {/* Selector de temporadas */}
             <div className="flex gap-2 mb-8 flex-wrap">
-              {content.seasonsList.map((season, index) => (
+              {content.seasonsList.map((season) => (
                 <button
                   key={season.id}
-                  onClick={() => setSelectedSeason(index)}
+                  onClick={() => setSelectedSeason(season.seasonNumber)}
                   className={`px-4 py-2 rounded-sm text-sm font-medium tracking-wide border transition-all duration-200 ${
                     season.seasonNumber === selectedSeason
                       ? "bg-primary border-primary text-white"
