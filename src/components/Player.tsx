@@ -118,11 +118,25 @@ function Player({ content, tvShow }: Props) {
 
   const [isPip, setIsPiP] = useState(false);
   const [hasSubtitles, setHasSubtitles] = useState(false);
+  const navigatingRef = useRef(false);
   const [skips, SetSkips] = useState({
     summary: false,
     intro: false,
     credits: false,
   });
+
+  // ─── Reset al cambiar de episodio ────────────────────────────────────────────
+  useEffect(() => {
+    navigatingRef.current = false;
+  }, [content.id, tvShow?.episode.episodeNumber, tvShow?.season]);
+  const navigateToNextEpisode = () => {
+    if (navigatingRef.current || !tvShow?.nextEpisode) return;
+    navigatingRef.current = true;
+    SetSkips((p) => ({ ...p, credits: false }));
+    router.push(
+      `/player/${content.id}?season=${tvShow.nextEpisode.seasonNumber}&episode=${tvShow.nextEpisode.episodeNumber}`
+    );
+  };
 
   const togglePiP = async () => {
     try {
@@ -144,6 +158,7 @@ function Player({ content, tvShow }: Props) {
     const VIDEO = videoRef.current;
     if (VIDEO === null || tvShow === undefined) return;
     const ManageSkips = () => {
+      if (navigatingRef.current) return;
       const CURRENT_TIME = VIDEO.currentTime;
       const { beginSummary, endSummary, beginIntro, endIntro, beginCredits } =
         tvShow.episode;
@@ -691,17 +706,14 @@ function Player({ content, tvShow }: Props) {
         )}
       </AnimatePresence>
 
+      {/* Siguiente Episodio — botón flotante (créditos) */}
       <AnimatePresence>
         {skips.credits && tvShow && tvShow.nextEpisode !== null && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            onClick={() =>
-              router.push(
-                `/player/${content.id}?season=${tvShow.nextEpisode?.seasonNumber}&episode=${tvShow.nextEpisode?.episodeNumber}`
-              )
-            }
+            onClick={navigateToNextEpisode}
             className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-8 py-4 rounded font-semibold transition-colors z-40"
           >
             Siguiente Episodio
@@ -891,14 +903,11 @@ function Player({ content, tvShow }: Props) {
 
           {/* Right */}
           <div className="flex items-center gap-0.5 min-[425px]:gap-1">
+            {/* Siguiente Episodio — botón de la barra de controles */}
             {tvShow && tvShow.nextEpisode !== null && (
               <button
-                className={`${iconBtn} flex gap-1 items-center`}
-                onClick={() =>
-                  router.push(
-                    `/player/${content.id}?season=${tvShow.nextEpisode?.seasonNumber}&episode=${tvShow.nextEpisode?.episodeNumber}`
-                  )
-                }
+                className={iconBtn}
+                onClick={navigateToNextEpisode}
                 tabIndex={0}
                 aria-label="Siguiente Episodio"
               >
