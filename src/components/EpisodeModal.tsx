@@ -82,11 +82,6 @@ export default function EpisodeModal({
       return;
     }
 
-    if (!formData.overview.trim()) {
-      setError("La descripción es requerida");
-      return;
-    }
-
     // Validar formato de tiempos
     const timeFields = [
       { name: "beginIntro", value: formData.beginIntro },
@@ -108,7 +103,7 @@ export default function EpisodeModal({
     const data: EpisodeRequest = {
       episodeNumber: formData.episodeNumber,
       title: formData.name.trim(),
-      description: formData.overview.trim(),
+      description: formData.overview !== "" ? formData.overview.trim() : "",
       beginIntro: timeToSeconds(formData.beginIntro),
       endIntro: timeToSeconds(formData.endIntro),
       beginSummary: timeToSeconds(formData.beginSummary),
