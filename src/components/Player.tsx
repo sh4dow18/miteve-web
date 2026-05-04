@@ -140,9 +140,10 @@ function disableSubtitles(video: HTMLVideoElement): void {
 }
 
 function isTVOrAndroid(): boolean {
-  if (typeof window === "undefined") return false;
-  if (window.AndroidApp?.isAndroidApp()) return true;
-  return navigator.userAgent.toLowerCase().includes("aft");
+  // if (typeof window === "undefined") return false;
+  // if (window.AndroidApp?.isAndroidApp()) return true;
+  // return navigator.userAgent.toLowerCase().includes("aft");
+  return true;
 }
 
 function fmt(t: number): string {
@@ -1105,20 +1106,43 @@ function Player({ content, tvShow }: Props) {
             )}
 
             {/* Input range (accesible; navegación con teclado/D-pad en onKeyDown) */}
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="0.1"
-              value={
-                !Number.isNaN(videoStates.progress) ? videoStates.progress : 0
-              }
-              onChange={onSeekBar}
-              onKeyDown={handleSeekbarKeyDown}
-              data-focusable
-              className="absolute inset-0 w-full opacity-0 cursor-pointer z-20"
-              tabIndex={0}
-            />
+            {isTV ? (
+              // En TV el motor de navegación espacial omite elementos con opacity-0,
+              // por lo que se usa un div transparente pero visible para que el foco
+              // funcione con el D-pad correctamente.
+              <div
+                tabIndex={0}
+                role="slider"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={
+                  !Number.isNaN(videoStates.progress)
+                    ? Math.round(videoStates.progress)
+                    : 0
+                }
+                aria-label="Barra de progreso"
+                data-focusable
+                onKeyDown={handleSeekbarKeyDown}
+                className="absolute inset-0 w-full z-20 focus:outline-none"
+              />
+            ) : (
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="0.1"
+                value={
+                  !Number.isNaN(videoStates.progress)
+                    ? videoStates.progress
+                    : 0
+                }
+                onChange={onSeekBar}
+                onKeyDown={handleSeekbarKeyDown}
+                data-focusable
+                className="absolute inset-0 w-full opacity-0 cursor-pointer z-20"
+                tabIndex={0}
+              />
+            )}
 
             {/* Tooltip hover con ratón (PC, sin preview activo) */}
             {!isTV && rangeStates.isHovering && !seekPreview.active && (
