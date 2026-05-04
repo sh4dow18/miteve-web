@@ -62,7 +62,10 @@ interface ShakaPlayer {
   getVariantTracks(): ShakaVariantTrack[];
   selectVariantTrack(track: ShakaVariantTrack, clearBuffer?: boolean): void;
   configure(config: Record<string, unknown>): void;
-  addEventListener(event: "adaptation", handler: (e: ShakaAdaptationEvent) => void): void;
+  addEventListener(
+    event: "adaptation",
+    handler: (e: ShakaAdaptationEvent) => void
+  ): void;
   addEventListener(event: "error", handler: (e: ShakaErrorEvent) => void): void;
 }
 
@@ -146,7 +149,9 @@ function fmt(t: number): string {
   const h = Math.floor(t / 3600);
   const m = Math.floor((t % 3600) / 60);
   const s = Math.floor(t % 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(
+    s
+  ).padStart(2, "0")}`;
 }
 
 function qualityLabel(height: number): string {
@@ -217,7 +222,11 @@ function Player({ content, tvShow }: Props) {
   const navigatingRef = useRef(false);
   const isTV = isTVOrAndroid();
 
-  const [skips, SetSkips] = useState({ summary: false, intro: false, credits: false });
+  const [skips, SetSkips] = useState({
+    summary: false,
+    intro: false,
+    credits: false,
+  });
 
   // ─── Reset al cambiar de episodio ────────────────────────────────────────────
   useEffect(() => {
@@ -326,12 +335,17 @@ function Player({ content, tvShow }: Props) {
       let ip = API_HOST_IP;
 
       fetch(`${ip}/${API}`, { method: "HEAD", signal: controller.signal })
-        .catch(() => { ip = API_HOST_IP; })
+        .catch(() => {
+          ip = API_HOST_IP;
+        })
         .finally(async () => {
           clearTimeout(timeout);
           const src = `${STREAM_HOST_IP}/${API}`;
 
-          const loadWithRetry = async (attempts = 3, delay = 1500): Promise<void> => {
+          const loadWithRetry = async (
+            attempts = 3,
+            delay = 1500
+          ): Promise<void> => {
             for (let i = 0; i < attempts; i++) {
               try {
                 const shaka = (await import(
@@ -340,23 +354,33 @@ function Player({ content, tvShow }: Props) {
 
                 shaka.default.polyfill.installAll();
                 if (!shaka.default.Player.isBrowserSupported()) {
-                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    paused: true,
+                    waiting: false,
+                  }));
                   return;
                 }
-                if (shakaPlayerRef.current) await shakaPlayerRef.current.destroy();
+                if (shakaPlayerRef.current)
+                  await shakaPlayerRef.current.destroy();
 
                 const player = new shaka.default.Player(VIDEO);
                 shakaPlayerRef.current = player;
 
                 // Calidad en tiempo real (solo efectivo en modo Auto)
-                player.addEventListener("adaptation", (_e: ShakaAdaptationEvent) => {
-                  const active = player.getVariantTracks().find((t) => t.active);
-                  if (!active?.height) return;
-                  setVideoStates((p) => ({
-                    ...p,
-                    resolution: heightToResolution(active.height as number),
-                  }));
-                });
+                player.addEventListener(
+                  "adaptation",
+                  (_e: ShakaAdaptationEvent) => {
+                    const active = player
+                      .getVariantTracks()
+                      .find((t) => t.active);
+                    if (!active?.height) return;
+                    setVideoStates((p) => ({
+                      ...p,
+                      resolution: heightToResolution(active.height as number),
+                    }));
+                  }
+                );
 
                 player.addEventListener("error", (e: ShakaErrorEvent) => {
                   console.warn("Shaka player error", e.detail);
@@ -366,7 +390,10 @@ function Player({ content, tvShow }: Props) {
 
                 await new Promise<void>((resolve) => {
                   if (VIDEO.readyState >= 1) resolve();
-                  else VIDEO.addEventListener("loadedmetadata", () => resolve(), { once: true });
+                  else
+                    VIDEO.addEventListener("loadedmetadata", () => resolve(), {
+                      once: true,
+                    });
                 });
 
                 // Poblar lista de calidades únicas por altura
@@ -381,7 +408,9 @@ function Player({ content, tvShow }: Props) {
                     uniqueMap.set(t.height, t);
                   }
                 });
-                const uniqueQualities: QualityOption[] = Array.from(uniqueMap.values())
+                const uniqueQualities: QualityOption[] = Array.from(
+                  uniqueMap.values()
+                )
                   .sort((a, b) => (b.height ?? 0) - (a.height ?? 0))
                   .map((t) => ({
                     height: t.height as number,
@@ -405,13 +434,19 @@ function Player({ content, tvShow }: Props) {
                       enableSubtitles(VIDEO);
                       setHasSubtitles(true);
                       setVideoStates((p) => ({ ...p, subtitlesOn: true }));
-                      VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                      VIDEO.textTracks.removeEventListener(
+                        "addtrack",
+                        onTrackAdded
+                      );
                       clearTimeout(trackTimeout);
                     }
                   };
                   VIDEO.textTracks.addEventListener("addtrack", onTrackAdded);
                   trackTimeout = setTimeout(() => {
-                    VIDEO.textTracks.removeEventListener("addtrack", onTrackAdded);
+                    VIDEO.textTracks.removeEventListener(
+                      "addtrack",
+                      onTrackAdded
+                    );
                     setHasSubtitles(false);
                     setVideoStates((p) => ({ ...p, subtitlesOn: false }));
                   }, 3000);
@@ -419,10 +454,21 @@ function Player({ content, tvShow }: Props) {
 
                 // Skip intro/summary al inicio
                 if (tvShow !== undefined) {
-                  const { beginSummary, endSummary, beginIntro, endIntro } = tvShow.episode;
-                  if (beginSummary === 0 && endSummary !== null && beginIntro === endSummary + 1 && endIntro != null) {
+                  const { beginSummary, endSummary, beginIntro, endIntro } =
+                    tvShow.episode;
+                  if (
+                    beginSummary === 0 &&
+                    endSummary !== null &&
+                    beginIntro === endSummary + 1 &&
+                    endIntro != null
+                  ) {
                     VIDEO.currentTime = endIntro;
-                  } else if (beginIntro === 0 && endIntro !== null && beginSummary === endIntro + 1 && endSummary != null) {
+                  } else if (
+                    beginIntro === 0 &&
+                    endIntro !== null &&
+                    beginSummary === endIntro + 1 &&
+                    endSummary != null
+                  ) {
                     VIDEO.currentTime = endSummary;
                   } else if (beginSummary === 0 && endSummary != null) {
                     VIDEO.currentTime = endSummary;
@@ -432,17 +478,33 @@ function Player({ content, tvShow }: Props) {
                 }
 
                 // Resolución inicial desde la pista activa
-                const activeTrack = player.getVariantTracks().find((t) => t.active);
+                const activeTrack = player
+                  .getVariantTracks()
+                  .find((t) => t.active);
                 if (activeTrack?.height) {
                   setVideoStates((p) => ({
                     ...p,
-                    resolution: heightToResolution(activeTrack.height as number),
+                    resolution: heightToResolution(
+                      activeTrack.height as number
+                    ),
                   }));
                 }
 
                 VIDEO.play()
-                  .then(() => setVideoStates((p) => ({ ...p, paused: false, waiting: false })))
-                  .catch(() => setVideoStates((p) => ({ ...p, paused: true, waiting: false })));
+                  .then(() =>
+                    setVideoStates((p) => ({
+                      ...p,
+                      paused: false,
+                      waiting: false,
+                    }))
+                  )
+                  .catch(() =>
+                    setVideoStates((p) => ({
+                      ...p,
+                      paused: true,
+                      waiting: false,
+                    }))
+                  );
 
                 return;
               } catch (e) {
@@ -451,7 +513,11 @@ function Player({ content, tvShow }: Props) {
                   await new Promise((res) => setTimeout(res, delay));
                 } else {
                   console.error("Shaka error tras todos los intentos", e);
-                  setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+                  setVideoStates((p) => ({
+                    ...p,
+                    paused: true,
+                    waiting: false,
+                  }));
                 }
               }
             }
@@ -484,7 +550,11 @@ function Player({ content, tvShow }: Props) {
           e.preventDefault();
           if (qualityFocusIndex === 0) changeQuality(null);
           else changeQuality(qualities[qualityFocusIndex - 1].height);
-        } else if (e.key === "Escape" || e.key === "Backspace" || e.key === "GoBack") {
+        } else if (
+          e.key === "Escape" ||
+          e.key === "Backspace" ||
+          e.key === "GoBack"
+        ) {
           e.preventDefault();
           setQualityMenu(false);
         }
@@ -514,7 +584,10 @@ function Player({ content, tvShow }: Props) {
     };
 
     const onFS = (): void =>
-      setVideoStates((p) => ({ ...p, fullscreen: !!document.fullscreenElement }));
+      setVideoStates((p) => ({
+        ...p,
+        fullscreen: !!document.fullscreenElement,
+      }));
 
     document.addEventListener("keydown", onKey);
     document.addEventListener("fullscreenchange", onFS);
@@ -533,12 +606,14 @@ function Player({ content, tvShow }: Props) {
     let timer: NodeJS.Timeout;
     const HIDE_DELAY = isTV ? 8000 : 5000;
 
-    const hide = (): void => setVideoStates((p) => ({ ...p, controlsHidden: true }));
+    const hide = (): void =>
+      setVideoStates((p) => ({ ...p, controlsHidden: true }));
     const show = (): void => {
       setVideoStates((p) => ({ ...p, controlsHidden: false }));
       clearTimeout(timer);
       if (videoStates.paused) return;
-      if (!CTR.contains(document.activeElement)) timer = setTimeout(hide, HIDE_DELAY);
+      if (!CTR.contains(document.activeElement))
+        timer = setTimeout(hide, HIDE_DELAY);
     };
 
     C.addEventListener("mousemove", show);
@@ -582,7 +657,10 @@ function Player({ content, tvShow }: Props) {
   useEffect(() => {
     if (!qualityMenu) return;
     const close = (e: MouseEvent): void => {
-      if (qualityMenuRef.current && !qualityMenuRef.current.contains(e.target as Node)) {
+      if (
+        qualityMenuRef.current &&
+        !qualityMenuRef.current.contains(e.target as Node)
+      ) {
         setQualityMenu(false);
       }
     };
@@ -648,7 +726,12 @@ function Player({ content, tvShow }: Props) {
   // ─── Seek preview helpers ────────────────────────────────────────────────────
   const cancelSeekPreview = (): void => {
     if (seekPreviewTimerRef.current) clearTimeout(seekPreviewTimerRef.current);
-    setSeekPreview({ active: false, targetTime: 0, targetProgress: 0, direction: null });
+    setSeekPreview({
+      active: false,
+      targetTime: 0,
+      targetProgress: 0,
+      direction: null,
+    });
   };
 
   const commitSeekPreview = (): void => {
@@ -656,7 +739,12 @@ function Player({ content, tvShow }: Props) {
     if (!v || !seekPreview.active) return;
     v.currentTime = seekPreview.targetTime;
     if (seekPreviewTimerRef.current) clearTimeout(seekPreviewTimerRef.current);
-    setSeekPreview({ active: false, targetTime: 0, targetProgress: 0, direction: null });
+    setSeekPreview({
+      active: false,
+      targetTime: 0,
+      targetProgress: 0,
+      direction: null,
+    });
   };
 
   // ─── Seekbar keyboard handler ─────────────────────────────────────────────────
@@ -669,13 +757,17 @@ function Player({ content, tvShow }: Props) {
   // Funciona igual en TV (D-pad) y en PC (teclado). Tab se encarga de la
   // navegación estándar entre botones en PC.
 
-  const handleSeekbarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleSeekbarKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ): void => {
     const v = videoRef.current;
 
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       cancelSeekPreview();
-      const els = Array.from(document.querySelectorAll<HTMLElement>("[data-focusable]"));
+      const els = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-focusable]")
+      );
       const idx = els.indexOf(document.activeElement as HTMLElement);
       if (idx === -1) return;
       if (e.key === "ArrowDown") els[idx + 1]?.focus();
@@ -706,7 +798,8 @@ function Player({ content, tvShow }: Props) {
       const targetProgress = (targetTime / v.duration) * 100;
 
       // Reiniciar auto-cancelación: si el usuario para 3 s sin confirmar, se cancela
-      if (seekPreviewTimerRef.current) clearTimeout(seekPreviewTimerRef.current);
+      if (seekPreviewTimerRef.current)
+        clearTimeout(seekPreviewTimerRef.current);
       seekPreviewTimerRef.current = setTimeout(cancelSeekPreview, 3000);
 
       setSeekPreview({
@@ -791,7 +884,9 @@ function Player({ content, tvShow }: Props) {
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none aria-hidden:hidden"
       >
         <Loader2
-          className={`text-white/50 animate-spin ${isTV ? "h-20 w-20" : "h-12 w-12"}`}
+          className={`text-white/50 animate-spin ${
+            isTV ? "h-20 w-20" : "h-12 w-12"
+          }`}
           strokeWidth={1.5}
         />
       </div>
@@ -809,10 +904,16 @@ function Player({ content, tvShow }: Props) {
           <Link
             href={`/content/${content.id}`}
             className={`flex items-center gap-2 text-white/80 hover:text-white transition-colors group rounded-xl
-              ${isTV ? "p-2 focus-visible:ring-4 focus-visible:ring-white/60 focus-visible:outline-none focus-visible:bg-white/15" : ""}`}
+              ${
+                isTV
+                  ? "p-2 focus-visible:ring-4 focus-visible:ring-white/60 focus-visible:outline-none focus-visible:bg-white/15"
+                  : ""
+              }`}
           >
             <ArrowLeft
-              className={`transition-transform group-hover:-translate-x-0.5 ${isTV ? "w-8 h-8" : "w-6 h-6"}`}
+              className={`transition-transform group-hover:-translate-x-0.5 ${
+                isTV ? "w-8 h-8" : "w-6 h-6"
+              }`}
               strokeWidth={2}
             />
           </Link>
@@ -826,7 +927,10 @@ function Player({ content, tvShow }: Props) {
                 ${isTV ? "text-sm px-3.5 py-1.5" : "text-xs px-2.5 py-1"}
                 ${resColor}`}
             >
-              <Clapperboard className={isTV ? "w-4 h-4" : "w-3 h-3"} strokeWidth={2} />
+              <Clapperboard
+                className={isTV ? "w-4 h-4" : "w-3 h-3"}
+                strokeWidth={2}
+              />
               {videoStates.resolution}
             </div>
 
@@ -839,7 +943,9 @@ function Player({ content, tvShow }: Props) {
                 {content.title}
               </h1>
               {tvShow && (
-                <span className={`italic text-gray-300 ${isTV ? "text-lg" : ""}`}>
+                <span
+                  className={`italic text-gray-300 ${isTV ? "text-lg" : ""}`}
+                >
                   {`T${tvShow.season}E${tvShow.episode.episodeNumber} «${tvShow.episode.title}»`}
                 </span>
               )}
@@ -858,8 +964,8 @@ function Player({ content, tvShow }: Props) {
             onClick={Skip}
             data-focusable
             className={`absolute right-12 z-40 bg-white/90 hover:bg-white text-black font-semibold transition-colors
-              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded
-              ${isTV ? "bottom-40 px-10 py-5 text-xl" : "bottom-32 px-6 py-3"}`}
+              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded px-6 py-3
+              ${isTV ? "bottom-40" : "bottom-32"}`}
           >
             Omitir Intro
           </motion.button>
@@ -875,8 +981,8 @@ function Player({ content, tvShow }: Props) {
             onClick={Skip}
             data-focusable
             className={`absolute right-12 z-40 bg-white/90 hover:bg-white text-black font-semibold transition-colors
-              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded
-              ${isTV ? "bottom-40 px-10 py-5 text-xl" : "bottom-32 px-6 py-3"}`}
+              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded px-6 py-3
+              ${isTV ? "bottom-40" : "bottom-32"}`}
           >
             Omitir Resumen
           </motion.button>
@@ -892,8 +998,8 @@ function Player({ content, tvShow }: Props) {
             onClick={navigateToNextEpisode}
             data-focusable
             className={`absolute right-12 z-40 bg-white/90 hover:bg-white text-black font-semibold transition-colors
-              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded
-              ${isTV ? "bottom-40 px-12 py-6 text-xl" : "bottom-32 px-8 py-4"}`}
+              focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white rounded px-8 py-4
+              ${isTV ? "bottom-40" : "bottom-32"}`}
           >
             Siguiente Episodio
           </motion.button>
@@ -911,29 +1017,48 @@ function Player({ content, tvShow }: Props) {
                    ${isTV ? "px-10 pb-10 pt-24" : "px-5 pb-5 pt-20"}`}
       >
         {/* SEEKBAR */}
-        <div className={`flex items-center gap-3 ${isTV ? "mb-6" : "mb-4"}`}>
+        <div
+          className={
+            isTV
+              ? `relative w-full group/bar h-10 focus-within:ring-4 focus-within:ring-white/60 focus-within:rounded-lg`
+              : `flex items-center gap-3 mb-4`
+          }
+        >
           <div className={`relative w-full group/bar ${isTV ? "h-10" : "h-8"}`}>
-
             {/* Track base */}
             <div
               className={`absolute top-1/2 inset-x-0 -translate-y-1/2 rounded-full bg-white/15
                           transition-all duration-150
-                          ${isTV ? "h-1.5 group-hover/bar:h-2" : "h-0.75 group-hover/bar:h-1.25"}`}
+                          ${
+                            isTV
+                              ? "h-1.5 group-hover/bar:h-2"
+                              : "h-0.75 group-hover/bar:h-1.25"
+                          }`}
             />
 
             {/* Buffered */}
             <div
               className={`absolute top-1/2 left-0 -translate-y-1/2 rounded-full bg-white/25
                          transition-all duration-150
-                         ${isTV ? "h-1.5 group-hover/bar:h-2" : "h-0.75 group-hover/bar:h-1.25"}`}
+                         ${
+                           isTV
+                             ? "h-1.5 group-hover/bar:h-2"
+                             : "h-0.75 group-hover/bar:h-1.25"
+                         }`}
               style={{ width: `${rangeStates.buffered}%` }}
             />
 
             {/* Progress — rojo normal; blanco semitransparente en preview */}
             <div
               className={`absolute top-1/2 left-0 -translate-y-1/2 rounded-full transition-all duration-100
-                         ${isTV ? "h-1.5 group-hover/bar:h-2" : "h-0.75 group-hover/bar:h-1.25"}
-                         ${seekPreview.active ? "bg-white/60" : "bg-[#e50914]"}`}
+                         ${
+                           isTV
+                             ? "h-1.5 group-hover/bar:h-2"
+                             : "h-0.75 group-hover/bar:h-1.25"
+                         }
+                         ${
+                           seekPreview.active ? "bg-white/60" : "bg-[#e50914]"
+                         }`}
               style={{ width: `${displayProgress}%` }}
             />
 
@@ -941,7 +1066,11 @@ function Player({ content, tvShow }: Props) {
             <div
               className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2
                          rounded-full shadow-lg pointer-events-none transition-opacity duration-150
-                         ${seekPreview.active ? "bg-white opacity-100" : "bg-white opacity-0 group-hover/bar:opacity-100"}
+                         ${
+                           seekPreview.active
+                             ? "bg-white opacity-100"
+                             : "bg-white opacity-0 group-hover/bar:opacity-100"
+                         }
                          ${isTV ? "w-5 h-5" : "w-3.5 h-3.5"}`}
               style={{ left: `${displayProgress}%` }}
             />
@@ -981,11 +1110,14 @@ function Player({ content, tvShow }: Props) {
               min="0"
               max="100"
               step="0.1"
-              value={!Number.isNaN(videoStates.progress) ? videoStates.progress : 0}
+              value={
+                !Number.isNaN(videoStates.progress) ? videoStates.progress : 0
+              }
               onChange={onSeekBar}
               onKeyDown={handleSeekbarKeyDown}
               data-focusable
               className="absolute inset-0 w-full opacity-0 cursor-pointer z-20"
+              tabIndex={0}
             />
 
             {/* Tooltip hover con ratón (PC, sin preview activo) */}
@@ -1026,7 +1158,11 @@ function Player({ content, tvShow }: Props) {
                     className={`absolute -translate-x-1/2 bg-black/90 backdrop-blur-md
                                text-white font-semibold rounded-xl whitespace-nowrap shadow-2xl
                                border border-white/10 flex items-center gap-1.5
-                               ${isTV ? "-top-16 text-xl px-5 py-2.5" : "-top-10 text-sm px-3 py-1.5"}`}
+                               ${
+                                 isTV
+                                   ? "-top-16 text-xl px-5 py-2.5"
+                                   : "-top-10 text-sm px-3 py-1.5"
+                               }`}
                     style={{ left: `${seekPreview.targetProgress}%` }}
                   >
                     <span className="text-white/40 text-xs">
@@ -1053,7 +1189,11 @@ function Player({ content, tvShow }: Props) {
             className={`hidden items-center gap-1 shrink-0 tabular-nums select-none
               ${isTV ? "flex text-base" : "min-[581px]:flex text-xs"}`}
           >
-            <span className={`font-medium ${seekPreview.active ? "text-white" : "text-white/90"}`}>
+            <span
+              className={`font-medium ${
+                seekPreview.active ? "text-white" : "text-white/90"
+              }`}
+            >
               {displayTime}
             </span>
             <span className="text-white/30">/</span>
@@ -1134,13 +1274,21 @@ function Player({ content, tvShow }: Props) {
           {/* Center title */}
           <span
             className={`hidden text-white/40 tracking-wide truncate px-4
-              ${isTV ? "min-[940px]:block text-base max-w-sm" : "min-[940px]:block text-sm max-w-xs"}`}
+              ${
+                isTV
+                  ? "min-[940px]:block text-base max-w-sm"
+                  : "min-[940px]:block text-sm max-w-xs"
+              }`}
           >
             {content.title}
           </span>
 
           {/* Right */}
-          <div className={`flex items-center ${isTV ? "gap-2" : "gap-0.5 min-[425px]:gap-1"}`}>
+          <div
+            className={`flex items-center ${
+              isTV ? "gap-2" : "gap-0.5 min-[425px]:gap-1"
+            }`}
+          >
             {/* Siguiente Episodio */}
             {tvShow && tvShow.nextEpisode !== null && (
               <button
@@ -1160,7 +1308,9 @@ function Player({ content, tvShow }: Props) {
                 onClick={togglePiP}
                 className={iconBtn}
                 tabIndex={0}
-                aria-label={isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"}
+                aria-label={
+                  isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"
+                }
               >
                 {isPip ? (
                   <PictureInPicture className={iconSm} strokeWidth={2} />
@@ -1173,11 +1323,17 @@ function Player({ content, tvShow }: Props) {
             {/* Subtítulos */}
             {hasSubtitles && (
               <button
-                className={`${iconBtn} ${videoStates.subtitlesOn ? "text-white" : "text-white/40"}`}
+                className={`${iconBtn} ${
+                  videoStates.subtitlesOn ? "text-white" : "text-white/40"
+                }`}
                 onClick={toggleSubtitles}
                 tabIndex={0}
                 data-focusable
-                aria-label={videoStates.subtitlesOn ? "Ocultar subtítulos" : "Mostrar subtítulos"}
+                aria-label={
+                  videoStates.subtitlesOn
+                    ? "Ocultar subtítulos"
+                    : "Mostrar subtítulos"
+                }
               >
                 {videoStates.subtitlesOn ? (
                   <Captions className={iconSm} strokeWidth={2} />
@@ -1191,13 +1347,17 @@ function Player({ content, tvShow }: Props) {
             {qualities.length > 0 && (
               <div className="relative" ref={qualityMenuRef}>
                 <button
-                  className={`${iconBtn} ${qualityMenu ? "text-white bg-white/15" : ""}`}
+                  className={`${iconBtn} ${
+                    qualityMenu ? "text-white bg-white/15" : ""
+                  }`}
                   onClick={() => {
                     setQualityMenu((p) => !p);
                     setQualityFocusIndex(
                       selectedQuality === null
                         ? 0
-                        : qualities.findIndex((q) => q.height === selectedQuality) + 1
+                        : qualities.findIndex(
+                            (q) => q.height === selectedQuality
+                          ) + 1
                     );
                   }}
                   tabIndex={0}
@@ -1206,7 +1366,9 @@ function Player({ content, tvShow }: Props) {
                   aria-expanded={qualityMenu}
                 >
                   <Settings
-                    className={`${iconSm} transition-transform duration-300 ${qualityMenu ? "rotate-45" : ""}`}
+                    className={`${iconSm} transition-transform duration-300 ${
+                      qualityMenu ? "rotate-45" : ""
+                    }`}
                     strokeWidth={2}
                   />
                 </button>
@@ -1225,7 +1387,9 @@ function Player({ content, tvShow }: Props) {
                     >
                       <div
                         className={`px-4 py-3 text-white/40 font-semibold uppercase tracking-widest
-                                   border-b border-white/10 ${isTV ? "text-sm" : "text-xs"}`}
+                                   border-b border-white/10 ${
+                                     isTV ? "text-sm" : "text-xs"
+                                   }`}
                       >
                         Calidad de video
                       </div>
@@ -1235,11 +1399,21 @@ function Player({ content, tvShow }: Props) {
                         onClick={() => changeQuality(null)}
                         onMouseEnter={() => setQualityFocusIndex(0)}
                         className={`w-full flex items-center justify-between transition-colors
-                                   ${isTV ? "px-5 py-4 text-base" : "px-4 py-3 text-sm"}
-                                   ${qualityFocusIndex === 0
-                                     ? "bg-white/15 text-white"
-                                     : "hover:bg-white/10 text-white/70 hover:text-white"}
-                                   ${selectedQuality === null ? "font-semibold" : ""}`}
+                                   ${
+                                     isTV
+                                       ? "px-5 py-4 text-base"
+                                       : "px-4 py-3 text-sm"
+                                   }
+                                   ${
+                                     qualityFocusIndex === 0
+                                       ? "bg-white/15 text-white"
+                                       : "hover:bg-white/10 text-white/70 hover:text-white"
+                                   }
+                                   ${
+                                     selectedQuality === null
+                                       ? "font-semibold"
+                                       : ""
+                                   }`}
                       >
                         <div className="flex items-center gap-2">
                           {selectedQuality === null && (
@@ -1248,7 +1422,9 @@ function Player({ content, tvShow }: Props) {
                           <span>Automático</span>
                         </div>
                         {selectedQuality === null && (
-                          <span className={`font-bold ${resColor.split(" ")[0]}`}>
+                          <span
+                            className={`font-bold ${resColor.split(" ")[0]}`}
+                          >
                             {videoStates.resolution}
                           </span>
                         )}
@@ -1264,10 +1440,16 @@ function Player({ content, tvShow }: Props) {
                             onClick={() => changeQuality(q.height)}
                             onMouseEnter={() => setQualityFocusIndex(idx + 1)}
                             className={`w-full flex items-center justify-between transition-colors
-                                       ${isTV ? "px-5 py-4 text-base" : "px-4 py-3 text-sm"}
-                                       ${isFocused
-                                         ? "bg-white/15 text-white"
-                                         : "hover:bg-white/10 text-white/70 hover:text-white"}
+                                       ${
+                                         isTV
+                                           ? "px-5 py-4 text-base"
+                                           : "px-4 py-3 text-sm"
+                                       }
+                                       ${
+                                         isFocused
+                                           ? "bg-white/15 text-white"
+                                           : "hover:bg-white/10 text-white/70 hover:text-white"
+                                       }
                                        ${isActive ? "font-semibold" : ""}`}
                           >
                             <div className="flex items-center gap-2">
@@ -1294,7 +1476,11 @@ function Player({ content, tvShow }: Props) {
                 className={iconBtn}
                 onClick={toggleFullscreen}
                 tabIndex={0}
-                aria-label={videoStates.fullscreen ? "Salir pantalla completa" : "Pantalla completa"}
+                aria-label={
+                  videoStates.fullscreen
+                    ? "Salir pantalla completa"
+                    : "Pantalla completa"
+                }
               >
                 {videoStates.fullscreen ? (
                   <Minimize2 className={iconSm} strokeWidth={2} />
