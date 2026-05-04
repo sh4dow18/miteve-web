@@ -744,8 +744,8 @@ function Player({ content, tvShow }: Props) {
   };
   const resColor = resolutionColor[videoStates.resolution];
 
-  const iconSm = isTV ? "w-7 h-7" : "w-5 h-5 min-[865px]:w-6 min-[865px]:h-6";
-  const iconLg = isTV ? "w-10 h-10" : "w-7 h-7 min-[865px]:w-9 min-[865px]:h-9";
+  const iconSm = "w-5 h-5 min-[865px]:w-6 min-[865px]:h-6";
+  const iconLg = "w-7 h-7 min-[865px]:w-9 min-[865px]:h-9";
 
   // La barra de progreso muestra el punto destino cuando hay preview activo
   const displayProgress = seekPreview.active
@@ -1068,7 +1068,7 @@ function Player({ content, tvShow }: Props) {
         {/* BUTTON ROW */}
         <div className="flex items-center justify-between">
           {/* Left */}
-          <div className={`flex items-center ${isTV ? "gap-2" : "gap-0.5 min-[425px]:gap-1"}`}>
+          <div className={`flex items-center gap-0.5 min-[425px]:gap-1`}>
             <button
               className={iconBtn}
               onClick={togglePlay}
@@ -1091,7 +1091,7 @@ function Player({ content, tvShow }: Props) {
               aria-label="Retroceder 10s"
             >
               <RotateCcw className={iconSm} strokeWidth={2} />
-              <span className={isTV ? "text-base font-medium" : "text-sm"}>-10s</span>
+              <span className={"text-sm"}>-10s</span>
             </button>
 
             <button
@@ -1102,7 +1102,7 @@ function Player({ content, tvShow }: Props) {
               aria-label="Adelantar 10s"
             >
               <RotateCw className={iconSm} strokeWidth={2} />
-              <span className={isTV ? "text-base font-medium" : "text-sm"}>+10s</span>
+              <span className={"text-sm"}>+10s</span>
             </button>
 
             <button
