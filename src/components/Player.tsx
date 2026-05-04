@@ -140,10 +140,9 @@ function disableSubtitles(video: HTMLVideoElement): void {
 }
 
 function isTVOrAndroid(): boolean {
-  // if (typeof window === "undefined") return false;
-  // if (window.AndroidApp?.isAndroidApp()) return true;
-  // return navigator.userAgent.toLowerCase().includes("aft");
-  return true;
+  if (typeof window === "undefined") return false;
+  if (window.AndroidApp?.isAndroidApp()) return true;
+  return navigator.userAgent.toLowerCase().includes("aft");
 }
 
 function fmt(t: number): string {
