@@ -1,6 +1,6 @@
 // Proxy Requirements
 import { NextResponse, NextRequest } from "next/server";
-import { API_HOST_IP, SECURITY_PASSWORD } from "./services/admin";
+import { API_HOST_IP, SECURITY_PASSWORD } from "@/shared/config/env";
 // Proxy Main Function
 export async function proxy(request: NextRequest) {
   // Proxy Main Constants

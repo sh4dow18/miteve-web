@@ -1,4 +1,4 @@
-import { TMDB_API_KEY } from "@/services/admin";
+import { TMDB_API_KEY } from "@/shared/config/env";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

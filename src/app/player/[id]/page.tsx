@@ -1,46 +1,19 @@
-import { default as PlayerComponent } from "@/components/Player";
-import {
-  FindContentById,
-  FindEpisodeMetadataById,
-  FindNextEpisodeById,
-} from "@/services/api";
-import { Metadata } from "next";
+import PlayerFeaturePage from "@/features/player/page";
+import { ROUTES_MAP } from "@/shared/config/routes";
 
-// Movies Page Metadata
-export const metadata: Metadata = {
-  title: "Reproductor",
-  description: "Aquí se puede visualizar el contenido seleccionado",
+export const metadata = {
+  title: ROUTES_MAP["player/[id]"].metadata.title,
+  description: ROUTES_MAP["player/[id]"].metadata.description,
 };
 
-type Props = {
-  params: {
-    id: string;
-  };
-  searchParams: { season?: string; episode?: string };
-};
+interface Props {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ season?: string; episode?: string }>;
+}
 
-export default async function Player({ params, searchParams }: Props) {
-  const { id } = await params;
-  const { season, episode } = await searchParams;
-  const content = await FindContentById(id);
-  const episodeMetadata = await FindEpisodeMetadataById(
-    `${id}-${season}-${episode}`
-  );
-  const nextEpisode = await FindNextEpisodeById(`${id}-${season}-${episode}`);
-  return (
-    <div className="h-screen w-screen overflow-hidden">
-      <PlayerComponent
-        content={content}
-        tvShow={
-          content.type !== "movie" && season && episodeMetadata
-            ? {
-                season: Number.parseInt(season),
-                episode: episodeMetadata,
-                nextEpisode: nextEpisode
-              }
-            : undefined
-        }
-      />
-    </div>
-  );
+export default function PlayerPage({
+	params,
+	searchParams,
+}: Props) {
+	return <PlayerFeaturePage params={params} searchParams={searchParams} />;
 }

@@ -1,7 +1,7 @@
 // Seasons Endpoints Requirements
 
-import { API_HOST_IP, TMDB_API_KEY } from "@/services/admin";
-import { TMDB_EPISODE } from "@/types";
+import { API_HOST_IP, TMDB_API_KEY } from "@/shared/config/env";
+import { TMDB_EPISODE } from "@/entities/content/model/types";
 
 // Insert Seasons from Series Endpoint Main Function
 export async function POST(request: Request) {
