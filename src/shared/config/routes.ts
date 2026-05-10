@@ -3,6 +3,7 @@ import {
   Clapperboard,
   Film,
   Home,
+  Search,
   Shield,
   TriangleAlert,
   Tv,
@@ -71,6 +72,20 @@ export const ROUTES_LIST: Route[] = [
       title: "Series",
       description:
         "Aqui se pueden ver todas las series que ofrece Miteve para reproducir.",
+    },
+  },
+  {
+    path: "search",
+    title: "Buscar",
+    summary:
+      "Encuentra peliculas y series por nombre dentro del catalogo de Miteve.",
+    Icon: Search,
+    inSitemap: true,
+    inHome: true,
+    metadata: {
+      title: "Buscar",
+      description:
+        "Encuentra peliculas y series por nombre dentro del catalogo de Miteve.",
     },
   },
   {

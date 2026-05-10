@@ -29,6 +29,7 @@ export {
   FindAllTvShows,
   FindComingSoonContent,
   FindContentById,
+  FindContentsByNameLike,
   FindEpisodeMetadataById,
   FindEpisodesBySeasonId,
   FindNextEpisodeById,

@@ -88,3 +88,19 @@ export async function FindEpisodesBySeasonId(id: string): Promise<FullEpisode[]>
     (response) => response.json()
   );
 }
+
+export async function FindContentsByNameLike(name: string): Promise<Content[]> {
+  const term = name.trim();
+  if (!term) {
+    return [];
+  }
+
+  const encodedTerm = encodeURIComponent(term);
+  const response = await fetch(`${API_HOST_IP}/contents/like/${encodedTerm}`);
+
+  if (!response.ok) {
+    return [];
+  }
+
+  return await response.json();
+}

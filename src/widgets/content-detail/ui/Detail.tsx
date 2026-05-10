@@ -156,6 +156,7 @@ export default function Detail({ content }: Props) {
               className="w-12 h-12 rounded-full"
               width={100}
               height={100}
+              style={{ width: "auto", height: "auto" }}
             />
             <div className="flex-1">
               <p className="font-semibold mb-2">Nota de Miteve</p>

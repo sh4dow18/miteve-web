@@ -14,7 +14,13 @@ export function Sidebar() {
       <div className="hidden md:flex fixed left-0 top-0 h-full w-20 bg-black/95 flex-col items-center py-8 z-50">
         {/* Logo */}
         <div className="mb-12">
-          <Image src="/logo.png" alt="Miteve" width={40} height={40} />
+          <Image
+            src="/logo.png"
+            alt="Miteve"
+            width={40}
+            height={40}
+            style={{ width: "auto", height: "auto" }}
+          />
         </div>
 
         {/* Nav */}
@@ -48,7 +54,13 @@ export function Sidebar() {
       {/* ── Mobile top bar (< md) ─────────────────────────────────────────────── */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-black/95 flex items-center justify-between px-4 z-50">
         {/* Logo */}
-        <Image src="/logo.png" alt="Miteve" width={32} height={32} />
+        <Image
+          src="/logo.png"
+          alt="Miteve"
+          width={32}
+          height={32}
+          style={{ width: "auto", height: "auto" }}
+        />
 
         {/* Hamburger */}
         <button
@@ -78,7 +90,13 @@ export function Sidebar() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 mb-10">
-          <Image src="/logo.png" alt="Miteve" width={36} height={36} />
+          <Image
+            src="/logo.png"
+            alt="Miteve"
+            width={36}
+            height={36}
+            style={{ width: "auto", height: "auto" }}
+          />
           <button
             onClick={closeDrawer}
             aria-label="Cerrar menú"
