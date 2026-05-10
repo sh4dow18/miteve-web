@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { ROUTES_LIST, routeToHref } from "@/shared/config/routes";
+import { ROUTES_LIST, ROUTES_MAP, routeToHref } from "@/shared/config/routes";
 
 export const menuItems = ROUTES_LIST.filter((route) => route.inHome).map(
   (route) => ({
@@ -9,6 +9,12 @@ export const menuItems = ROUTES_LIST.filter((route) => route.inHome).map(
     path: routeToHref(route.path),
   })
 );
+
+export const authItem = {
+  icon: ROUTES_MAP.login.Icon,
+  label: ROUTES_MAP.login.title,
+  path: routeToHref(ROUTES_MAP.login.path),
+};
 
 export function useSidebar() {
   const location = usePathname();
@@ -21,6 +27,7 @@ export function useSidebar() {
 
   return {
     menuItems,
+    authItem,
     drawerOpen,
     isActive,
     openDrawer,

@@ -5,8 +5,9 @@ import Image from "next/image";
 import { useSidebar } from "@/widgets/sidebar/model/useSidebar";
 
 export function Sidebar() {
-  const { menuItems, drawerOpen, isActive, openDrawer, closeDrawer } =
+  const { menuItems, authItem, drawerOpen, isActive, openDrawer, closeDrawer } =
     useSidebar();
+  const AuthIcon = authItem.icon;
 
   return (
     <>
@@ -49,6 +50,27 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        <div className="pt-6 border-t border-white/10">
+          <Link
+            href={authItem.path}
+            className={`flex flex-col items-center gap-1 transition-all duration-200 relative group ${
+              isActive(authItem.path)
+                ? "text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            {isActive(authItem.path) && (
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
+            )}
+            <AuthIcon
+              className={`w-6 h-6 transition-transform group-hover:scale-110 ${
+                isActive(authItem.path) ? "scale-110" : ""
+              }`}
+            />
+            <span className="text-[10px] font-medium">{authItem.label}</span>
+          </Link>
+        </div>
       </div>
 
       {/* ── Mobile top bar (< md) ─────────────────────────────────────────────── */}
@@ -137,6 +159,29 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        <div className="mt-auto px-4 pt-6 border-t border-white/10">
+          <Link
+            href={authItem.path}
+            onClick={closeDrawer}
+            className={`flex items-center gap-4 px-4 py-3 rounded-lg relative
+                        transition-all duration-200 group
+                        ${isActive(authItem.path)
+                          ? "text-white bg-white/5"
+                          : "text-gray-400 hover:text-white hover:bg-white/5"
+                        }`}
+          >
+            {isActive(authItem.path) && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
+            )}
+            <AuthIcon
+              className={`w-5 h-5 transition-transform group-hover:scale-110 ${
+                isActive(authItem.path) ? "scale-110" : ""
+              }`}
+            />
+            <span className="text-sm font-medium">{authItem.label}</span>
+          </Link>
+        </div>
       </div>
     </>
   );

@@ -3,10 +3,12 @@ import {
   Clapperboard,
   Film,
   Home,
+  LogIn,
   Search,
   Shield,
   TriangleAlert,
   Tv,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 
@@ -137,6 +139,34 @@ export const ROUTES_LIST: Route[] = [
       title: "En mantenimiento",
       description:
         "Estamos mejorando tu experiencia. Volveremos pronto con novedades.",
+    },
+  },
+  {
+    path: "login",
+    title: "Login",
+    summary:
+      "Inicia sesion para sincronizar tus preferencias y continuar donde lo dejaste.",
+    Icon: LogIn,
+    inSitemap: false,
+    inHome: false,
+    metadata: {
+      title: "Login",
+      description:
+        "Inicia sesion para sincronizar tus preferencias y continuar donde lo dejaste.",
+    },
+  },
+  {
+    path: "register",
+    title: "Registrar usuario",
+    summary:
+      "Crea tu cuenta para guardar favoritos y recomendaciones personalizadas.",
+    Icon: UserPlus,
+    inSitemap: false,
+    inHome: false,
+    metadata: {
+      title: "Registrar usuario",
+      description:
+        "Crea tu cuenta para guardar favoritos y recomendaciones personalizadas.",
     },
   },
 ];
