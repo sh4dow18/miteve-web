@@ -45,6 +45,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
     seekPreviewPercent,
     qualityMenuRef,
     qualityButtonRef,
+    playButtonRef,
     qualityFocusedIndex,
     qualityMenuOpen,
     isAutoQuality,
@@ -125,6 +126,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
           {/* Back arrow */}
           <Link
             href={`/content/${content.id}`}
+            data-focusable
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors group
               focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-lg p-1"
           >
@@ -260,6 +262,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
           {/* Left — Play / Seek */}
           <div className="flex items-center gap-2">
             <button
+              ref={playButtonRef}
               className={tvBtn}
               onClick={togglePlay}
               data-focusable

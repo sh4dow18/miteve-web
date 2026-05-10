@@ -124,6 +124,7 @@ export type UsePlayerReturn = {
   qualityMenuOpen: boolean;
   qualityMenuRef: RefObject<HTMLDivElement | null>;
   qualityButtonRef: RefObject<HTMLButtonElement | null>;
+  playButtonRef: RefObject<HTMLButtonElement | null>;
   qualityFocusedIndex: number;
   isAutoQuality: boolean;
   qualityOptions: Array<{
@@ -178,7 +179,7 @@ export type UsePlayerReturn = {
   onSeekBarMouseMove: (e: ReactMouseEvent<HTMLElement>) => void;
   onSeekBarMouseLeave: () => void;
   onSeekBarTrackClick: (e: ReactMouseEvent<HTMLElement>) => void;
-  handleTVNav: (e: ReactKeyboardEvent<HTMLInputElement>) => void;
+  handleTVNav: (e: ReactKeyboardEvent<HTMLInputElement | HTMLButtonElement>) => void;
   toggleQualityMenu: () => void;
   onToggleQualityMenu: () => void;
   closeQualityMenu: () => void;
@@ -276,6 +277,7 @@ export function usePlayer({
   const [qualityOptions, setQualityOptions] = useState<QualityOption[]>([]);
   const qualityMenuRef = useRef<HTMLDivElement | null>(null);
   const qualityButtonRef = useRef<HTMLButtonElement | null>(null);
+  const playButtonRef = useRef<HTMLButtonElement | null>(null);
   const [qualityFocusedIndex, setQualityFocusedIndex] = useState(0);
   const [seekPreviewPercent, setSeekPreviewPercent] = useState<number | null>(
     null
@@ -1092,79 +1094,152 @@ export function usePlayer({
     }));
   };
 
-  const handleTVNav = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    const v = videoRef.current;
-    const input = e.currentTarget;
+  // ─── Global TV navigation (ArrowUp/ArrowDown between focusable elements) ─────
+  useEffect(() => {
+    const onArrowNav = (e: KeyboardEvent) => {
+      if (!isTVOrAndroid()) return;
 
+      const activeEl = document.activeElement;
+      if (!activeEl || !(activeEl as HTMLElement).hasAttribute("data-focusable")) {
+        return;
+      }
+
+      const els = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-focusable]")
+      );
+      const currentIndex = els.indexOf(activeEl as HTMLElement);
+      if (currentIndex === -1) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const nextIndex = Math.min(currentIndex + 1, els.length - 1);
+        els[nextIndex]?.focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const nextIndex = Math.max(currentIndex - 1, 0);
+        els[nextIndex]?.focus();
+      }
+    };
+
+    const C = containerRef.current;
+    if (C) {
+      C.addEventListener("keydown", onArrowNav);
+      return () => C.removeEventListener("keydown", onArrowNav);
+    }
+  }, []);
+
+  const handleTVNav = (e: ReactKeyboardEvent<HTMLInputElement | HTMLButtonElement>) => {
+    const v = videoRef.current;
+    const input = e.currentTarget as HTMLInputElement | HTMLButtonElement;
+    const isSeekbarInput = (input as HTMLInputElement).type === "range";
+
+    // Obtener todos los elementos focusables en orden del DOM
     const els = Array.from(
       document.querySelectorAll<HTMLElement>("[data-focusable]")
     );
-    const i = els.indexOf(document.activeElement as HTMLElement);
-    if (i === -1) return;
+    const currentIndex = els.indexOf(document.activeElement as HTMLElement);
+    if (currentIndex === -1) return;
+
+    // Navegación vertical (ArrowUp/ArrowDown) — Navega entre elementos focusables
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      els[i + 1]?.focus();
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < els.length) {
+        els[nextIndex]?.focus();
+      }
     }
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      els[i - 1]?.focus();
+      const prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        els[prevIndex]?.focus();
+      }
     }
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (!v || !v.duration) return;
-      const baseTime =
-        seekPreviewPercent !== null
-          ? (seekPreviewPercent / 100) * v.duration
-          : v.currentTime;
-      const nextTime = Math.max(0, baseTime - 10);
-      const nextPercent = (nextTime / v.duration) * 100;
-      const rect = input.getBoundingClientRect();
-      setSeekPreviewPercent(nextPercent);
-      setRangeStates((p) => ({
-        ...p,
-        hoverTime: nextTime,
-        isHovering: true,
-        hoverX: (nextPercent / 100) * rect.width,
-        hoverPercent: nextPercent,
-      }));
+
+    // Navegación horizontal (ArrowLeft/ArrowRight) — Solo en seekbar
+    if (isSeekbarInput) {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (!v || !v.duration) return;
+        const baseTime =
+          seekPreviewPercent !== null
+            ? (seekPreviewPercent / 100) * v.duration
+            : v.currentTime;
+        const nextTime = Math.max(0, baseTime - 10);
+        const nextPercent = (nextTime / v.duration) * 100;
+        const rect = input.getBoundingClientRect();
+        setSeekPreviewPercent(nextPercent);
+        setRangeStates((p) => ({
+          ...p,
+          hoverTime: nextTime,
+          isHovering: true,
+          hoverX: (nextPercent / 100) * rect.width,
+          hoverPercent: nextPercent,
+        }));
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        if (!v || !v.duration) return;
+        const baseTime =
+          seekPreviewPercent !== null
+            ? (seekPreviewPercent / 100) * v.duration
+            : v.currentTime;
+        const nextTime = Math.min(v.duration, baseTime + 10);
+        const nextPercent = (nextTime / v.duration) * 100;
+        const rect = input.getBoundingClientRect();
+        setSeekPreviewPercent(nextPercent);
+        setRangeStates((p) => ({
+          ...p,
+          hoverTime: nextTime,
+          isHovering: true,
+          hoverX: (nextPercent / 100) * rect.width,
+          hoverPercent: nextPercent,
+        }));
+      }
+
+      // Enter en seekbar — Confirmar selección
+      if (e.key === "Enter") {
+        if (!v || !v.duration || seekPreviewPercent === null) return;
+        e.preventDefault();
+        const nextTime = (seekPreviewPercent / 100) * v.duration;
+        v.currentTime = nextTime;
+        setVideoStates((p) => ({
+          ...p,
+          progress: seekPreviewPercent,
+          currentTime: fmt(nextTime),
+        }));
+        setSeekPreviewPercent(null);
+        setRangeStates((p) => ({ ...p, isHovering: false }));
+      }
     }
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      if (!v || !v.duration) return;
-      const baseTime =
-        seekPreviewPercent !== null
-          ? (seekPreviewPercent / 100) * v.duration
-          : v.currentTime;
-      const nextTime = Math.min(v.duration, baseTime + 10);
-      const nextPercent = (nextTime / v.duration) * 100;
-      const rect = input.getBoundingClientRect();
-      setSeekPreviewPercent(nextPercent);
-      setRangeStates((p) => ({
-        ...p,
-        hoverTime: nextTime,
-        isHovering: true,
-        hoverX: (nextPercent / 100) * rect.width,
-        hoverPercent: nextPercent,
-      }));
-    }
-    if (e.key === "Enter") {
-      if (!v || !v.duration || seekPreviewPercent === null) return;
-      e.preventDefault();
-      const nextTime = (seekPreviewPercent / 100) * v.duration;
-      v.currentTime = nextTime;
-      setVideoStates((p) => ({
-        ...p,
-        progress: seekPreviewPercent,
-        currentTime: fmt(nextTime),
-      }));
-      setSeekPreviewPercent(null);
-      setRangeStates((p) => ({ ...p, isHovering: false }));
-    }
+
+    // Escape — Cancelar preview de seekbar
     if (e.key === "Escape") {
       setSeekPreviewPercent(null);
       setRangeStates((p) => ({ ...p, isHovering: false }));
     }
   };
+
+  // Manejador global de Enter para mostrar controles cuando estén ocultos
+  useEffect(() => {
+    const onGlobalKeyDown = (e: KeyboardEvent) => {
+      const isConfirmKey = e.key === "Enter" || e.key === " ";
+
+      if (isConfirmKey && videoStates.controlsHidden) {
+        e.preventDefault();
+        e.stopPropagation();
+        setVideoStates((p) => ({ ...p, controlsHidden: false }));
+
+        // Esperar al siguiente frame para asegurar que los controles ya son visibles.
+        requestAnimationFrame(() => {
+          playButtonRef.current?.focus();
+        });
+      }
+    };
+
+    document.addEventListener("keydown", onGlobalKeyDown);
+    return () => document.removeEventListener("keydown", onGlobalKeyDown);
+  }, [videoStates.controlsHidden]);
 
   useEffect(() => {
     return () => {
@@ -1191,6 +1266,7 @@ export function usePlayer({
     qualityMenuOpen,
     qualityMenuRef,
     qualityButtonRef,
+    playButtonRef,
     qualityFocusedIndex,
     isAutoQuality,
     qualityOptions,
