@@ -19,6 +19,7 @@ export async function proxy(request: NextRequest) {
     PAGE_NAME.includes("/tv-shows") ||
     PAGE_NAME.includes("/content") ||
     PAGE_NAME.includes("/player") ||
+    PAGE_NAME.includes("/search") ||
     PAGE_NAME === "/admin" ||
     PAGE_NAME === "/maintenance"
   ) {
@@ -56,6 +57,7 @@ export const config = {
     "/movies/:path*",
     "/tv-shows/:path*",
     "/content/:path*",
+    "/search/:path*",
     "/player/:path*",
     "/admin",
     "/maintenance",
