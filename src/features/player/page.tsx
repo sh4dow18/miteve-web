@@ -19,7 +19,7 @@ export default function PlayerPage({
     return <div className="h-screen w-full bg-black flex items-center justify-center">Cargando...</div>;
   }
 
-  if (player.isTVOrAndroid()) {
+  if (player.isTVOrAndroid() === false) {
     return <PlayerTV content={data.content} tvShow={tvShow} player={player} />;
   }
 

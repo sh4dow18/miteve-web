@@ -125,6 +125,8 @@ export type UsePlayerReturn = {
   qualityMenuRef: RefObject<HTMLDivElement | null>;
   qualityButtonRef: RefObject<HTMLButtonElement | null>;
   playButtonRef: RefObject<HTMLButtonElement | null>;
+  seekbarRef: RefObject<HTMLInputElement | null>;
+  backButtonRef: RefObject<HTMLAnchorElement | null>;
   qualityFocusedIndex: number;
   isAutoQuality: boolean;
   qualityOptions: Array<{
@@ -180,6 +182,7 @@ export type UsePlayerReturn = {
   onSeekBarMouseLeave: () => void;
   onSeekBarTrackClick: (e: ReactMouseEvent<HTMLElement>) => void;
   handleTVNav: (e: ReactKeyboardEvent<HTMLInputElement | HTMLButtonElement>) => void;
+  handleDpadNav: (e: ReactKeyboardEvent<HTMLDivElement>) => void;
   toggleQualityMenu: () => void;
   onToggleQualityMenu: () => void;
   closeQualityMenu: () => void;
@@ -278,6 +281,8 @@ export function usePlayer({
   const qualityMenuRef = useRef<HTMLDivElement | null>(null);
   const qualityButtonRef = useRef<HTMLButtonElement | null>(null);
   const playButtonRef = useRef<HTMLButtonElement | null>(null);
+  const seekbarRef = useRef<HTMLInputElement | null>(null);
+  const backButtonRef = useRef<HTMLAnchorElement | null>(null);
   const [qualityFocusedIndex, setQualityFocusedIndex] = useState(0);
   const [seekPreviewPercent, setSeekPreviewPercent] = useState<number | null>(
     null
@@ -861,6 +866,14 @@ export function usePlayer({
       const isSeekbarFocused =
         activeElement instanceof HTMLInputElement &&
         activeElement.type === "range";
+      const hasTvLayoutRefs =
+        seekbarRef.current !== null &&
+        backButtonRef.current !== null &&
+        playButtonRef.current !== null;
+      const isPlayerFocused =
+        activeElement instanceof Node &&
+        (containerRef.current?.contains(activeElement) ?? false);
+      const useTvDpadNavigation = hasTvLayoutRefs && isPlayerFocused;
 
       switch (e.key) {
         case "f":
@@ -882,13 +895,15 @@ export function usePlayer({
           if (!tv && !isSeekbarFocused) seek(-10);
           break;
         case "ArrowUp":
-          if (!isSeekbarFocused) {
+          if (useTvDpadNavigation) break;
+          if (!tv && !isSeekbarFocused) {
             e.preventDefault();
             adjustVolumeByStep(5);
           }
           break;
         case "ArrowDown":
-          if (!isSeekbarFocused) {
+          if (useTvDpadNavigation) break;
+          if (!tv && !isSeekbarFocused) {
             e.preventDefault();
             adjustVolumeByStep(-5);
           }
@@ -1094,37 +1109,50 @@ export function usePlayer({
     }));
   };
 
-  // ─── Global TV navigation (ArrowUp/ArrowDown between focusable elements) ─────
-  useEffect(() => {
-    const onArrowNav = (e: KeyboardEvent) => {
-      if (!isTVOrAndroid()) return;
+  // ─── TV-like D-pad navigation handler (attached via JSX onKeyDown) ───────────
+  const handleDpadNav = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const activeEl = document.activeElement as HTMLElement | null;
+    if (!activeEl) return;
 
-      const activeEl = document.activeElement;
-      if (!activeEl || !(activeEl as HTMLElement).hasAttribute("data-focusable")) {
+    const hasTvLayoutRefs =
+      seekbarRef.current !== null &&
+      backButtonRef.current !== null &&
+      playButtonRef.current !== null;
+    if (!hasTvLayoutRefs) return;
+
+    const inPlayer = containerRef.current?.contains(activeEl) ?? false;
+    if (!inPlayer) return;
+
+    const isButtonFocused = activeEl.tagName === "BUTTON";
+    const isSeekbarFocused = activeEl === seekbarRef.current;
+    const isBackFocused = activeEl === backButtonRef.current;
+
+    if (e.key === "ArrowUp") {
+      if (isSeekbarFocused) {
+        e.preventDefault();
+        backButtonRef.current?.focus();
         return;
       }
 
-      const els = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-focusable]")
-      );
-      const currentIndex = els.indexOf(activeEl as HTMLElement);
-      if (currentIndex === -1) return;
-
-      if (e.key === "ArrowDown") {
+      if (isButtonFocused) {
         e.preventDefault();
-        const nextIndex = Math.min(currentIndex + 1, els.length - 1);
-        els[nextIndex]?.focus();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        const nextIndex = Math.max(currentIndex - 1, 0);
-        els[nextIndex]?.focus();
+        seekbarRef.current?.focus();
+        return;
       }
-    };
+    }
 
-    const C = containerRef.current;
-    if (C) {
-      C.addEventListener("keydown", onArrowNav);
-      return () => C.removeEventListener("keydown", onArrowNav);
+    if (e.key === "ArrowDown") {
+      if (isBackFocused) {
+        e.preventDefault();
+        seekbarRef.current?.focus();
+        return;
+      }
+
+      if (isSeekbarFocused) {
+        e.preventDefault();
+        playButtonRef.current?.focus();
+        return;
+      }
     }
   }, []);
 
@@ -1132,29 +1160,6 @@ export function usePlayer({
     const v = videoRef.current;
     const input = e.currentTarget as HTMLInputElement | HTMLButtonElement;
     const isSeekbarInput = (input as HTMLInputElement).type === "range";
-
-    // Obtener todos los elementos focusables en orden del DOM
-    const els = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-focusable]")
-    );
-    const currentIndex = els.indexOf(document.activeElement as HTMLElement);
-    if (currentIndex === -1) return;
-
-    // Navegación vertical (ArrowUp/ArrowDown) — Navega entre elementos focusables
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const nextIndex = currentIndex + 1;
-      if (nextIndex < els.length) {
-        els[nextIndex]?.focus();
-      }
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      const prevIndex = currentIndex - 1;
-      if (prevIndex >= 0) {
-        els[prevIndex]?.focus();
-      }
-    }
 
     // Navegación horizontal (ArrowLeft/ArrowRight) — Solo en seekbar
     if (isSeekbarInput) {
@@ -1267,6 +1272,8 @@ export function usePlayer({
     qualityMenuRef,
     qualityButtonRef,
     playButtonRef,
+    seekbarRef,
+    backButtonRef,
     qualityFocusedIndex,
     isAutoQuality,
     qualityOptions,
@@ -1295,6 +1302,7 @@ export function usePlayer({
     onSeekBarMouseLeave,
     onSeekBarTrackClick,
     handleTVNav,
+    handleDpadNav,
     toggleQualityMenu,
     onToggleQualityMenu,
     closeQualityMenu,

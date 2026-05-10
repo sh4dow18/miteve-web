@@ -46,6 +46,8 @@ function PlayerTV({ content, player, tvShow }: Props) {
     qualityMenuRef,
     qualityButtonRef,
     playButtonRef,
+    seekbarRef,
+    backButtonRef,
     qualityFocusedIndex,
     qualityMenuOpen,
     isAutoQuality,
@@ -58,6 +60,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
     onSeekBar,
     onSeekBarTrackClick,
     handleTVNav,
+    handleDpadNav,
     onToggleQualityMenu,
     selectAutoQuality,
     selectQuality,
@@ -88,6 +91,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
     <div
       ref={containerRef}
       id="video-container"
+      onKeyDown={handleDpadNav}
       className={`relative min-h-screen w-full bg-black overflow-hidden select-none ${
         videoStates.controlsHidden ? "cursor-none" : "cursor-default"
       }`}
@@ -125,6 +129,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
         <div className="flex items-start justify-between">
           {/* Back arrow */}
           <Link
+            ref={backButtonRef}
             href={`/content/${content.id}`}
             data-focusable
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors group
@@ -242,6 +247,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
           />
           {/* Hidden range input for remote control */}
           <input
+            ref={seekbarRef}
             type="range"
             min="0"
             max="100"
