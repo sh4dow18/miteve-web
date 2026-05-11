@@ -94,12 +94,6 @@ export function useContentRow({
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
           break;
-
-        case "Enter":
-        case " ":
-          e.preventDefault();
-          e.stopPropagation();
-          break;
       }
     },
     [contentLength, focusCard, focusedIndex, rowIndex, totalRows]

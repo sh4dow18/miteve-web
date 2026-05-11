@@ -13,7 +13,7 @@ function initials(name: string) {
 }
 
 export function Sidebar() {
-  const { menuItems, authItem, mainProfile, isLoggedIn, drawerOpen, isActive, openDrawer, closeDrawer } =
+  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, drawerOpen, isActive, openDrawer, closeDrawer } =
     useSidebar();
   const AuthIcon = authItem.icon;
 
@@ -21,6 +21,18 @@ export function Sidebar() {
     <>
       {/* ── Desktop sidebar (md+) ─────────────────────────────────────────────── */}
       <div className="hidden md:flex fixed left-0 top-0 h-full w-20 bg-black/95 flex-col items-center py-8 z-50">
+        {/* En TV: solo hamburguesa que abre el drawer */}
+        {isTV ? (
+          <button
+            onClick={openDrawer}
+            aria-label="Abrir menú"
+            className="p-2 text-gray-400 hover:text-white transition-colors rounded
+                       focus:outline-none focus:ring-2 focus:ring-white/50"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        ) : (
+          <>
         {/* Logo */}
         <div className="mb-12">
           <Image
@@ -114,6 +126,8 @@ export function Sidebar() {
             <span className="text-[10px] font-medium">{authItem.label}</span>
           </Link>
         </div>
+          </>
+        )}
       </div>
 
       {/* ── Mobile top bar (< md) ─────────────────────────────────────────────── */}
@@ -140,7 +154,7 @@ export function Sidebar() {
       {/* ── Drawer overlay ────────────────────────────────────────────────────── */}
       {drawerOpen && (
         <button
-          className="md:hidden fixed inset-0 bg-black/60 z-50"
+          className="fixed inset-0 bg-black/60 z-50"
           onClick={closeDrawer}
           aria-label="Cerrar menú"
         />
@@ -148,7 +162,7 @@ export function Sidebar() {
 
       {/* ── Drawer panel ──────────────────────────────────────────────────────── */}
       <div
-        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-black/95 z-50
+        className={`fixed top-0 left-0 h-full w-64 bg-black/95 z-60
                     flex flex-col py-8
                     transform transition-transform duration-300 ease-in-out
                     ${drawerOpen ? "translate-x-0" : "-translate-x-full"}`}

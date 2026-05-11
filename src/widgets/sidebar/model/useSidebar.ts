@@ -29,12 +29,24 @@ const adminNavItem = {
   path: routeToHref(ROUTES_MAP.admin.path),
 };
 
+function detectIsTV(): boolean {
+  if (typeof window === "undefined") return false;
+  const w = window as Window & { AndroidApp?: { isAndroidApp: () => boolean } };
+  if (w.AndroidApp?.isAndroidApp()) return true;
+  return navigator.userAgent.toLowerCase().includes("aft");
+}
+
 export function useSidebar() {
   const location = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [mainProfile, setMainProfileState] = useState<MainProfile | null>(null);
+  const [isTV, setIsTV] = useState(false);
+
+  useEffect(() => {
+    setIsTV(detectIsTV());
+  }, []);
 
   useEffect(() => {
     const token = getToken();
@@ -64,6 +76,7 @@ export function useSidebar() {
     authItem,
     mainProfile,
     isLoggedIn,
+    isTV,
     drawerOpen,
     isActive,
     openDrawer,
