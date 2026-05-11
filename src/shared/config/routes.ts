@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   Clapperboard,
   Film,
+  HelpCircle,
   Home,
   LogIn,
   Search,
@@ -88,6 +89,19 @@ export const ROUTES_LIST: Route[] = [
       title: "Buscar",
       description:
         "Encuentra peliculas y series por nombre dentro del catalogo de Miteve.",
+    },
+  },
+  {
+    path: "faq",
+    title: "FAQ",
+    summary: "Preguntas frecuentes sobre cuenta, perfiles, reproduccion y soporte.",
+    Icon: HelpCircle,
+    inSitemap: true,
+    inHome: true,
+    metadata: {
+      title: "Preguntas frecuentes",
+      description:
+        "Encuentra respuestas a las dudas mas comunes sobre el uso de Miteve.",
     },
   },
   {
