@@ -81,16 +81,15 @@ export function ContentRow({
                 index={index}
                 rowIndex={rowIndex}
                 isFocused={focusedIndex === index}
-                onActivate={() =>
-                  handleCardActivate(
-                    (typeof element === "object" &&
+                href={`/content/${
+                  (
+                    typeof element === "object" &&
                     element !== null &&
                     "content" in element
                       ? element.content
                       : element
-                    ).id
-                  )
-                }
+                  ).id
+                }`}
                 onFocus={() => {
                   setFocusedIndex(index);
                   onRowFocus?.(rowIndex);
