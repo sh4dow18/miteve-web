@@ -77,6 +77,56 @@ export function ContinueWatchingRow() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [items, setItems] = useState<ContinueWatchingItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  const focusCWCard = (index: number) => {
+    const card = scrollRef.current?.querySelector(
+      `[data-cw-col="${index}"]`
+    ) as HTMLElement;
+    if (!card) return;
+    card.focus({ preventScroll: true });
+    const container = scrollRef.current!;
+    const containerRect = container.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const offset =
+      cardRect.left -
+      containerRect.left -
+      containerRect.width / 2 +
+      cardRect.width / 2;
+    container.scrollBy({ left: offset, behavior: "smooth" });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    switch (e.key) {
+      case "ArrowRight":
+        e.preventDefault();
+        e.stopPropagation();
+        if (index < items.length - 1) focusCWCard(index + 1);
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        e.stopPropagation();
+        if (index > 0) focusCWCard(index - 1);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        e.stopPropagation();
+        (document.querySelector("[data-hero-btn]") as HTMLElement)?.focus({ preventScroll: false });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        e.stopPropagation();
+        {
+          const firstCard = document.querySelector(
+            "[data-row='0'][data-col='0']"
+          ) as HTMLElement;
+          firstCard?.focus({ preventScroll: false });
+          firstCard?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        break;
+    }
+  };
 
   useEffect(() => {
     const token = getToken();
@@ -133,7 +183,7 @@ export function ContinueWatchingRow() {
                      scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {items.map((item) => {
+          {items.map((item, index) => {
             const href = buildPlayerHref(item);
             const cover = getCover(item);
             const title = getTitle(item);
@@ -143,8 +193,18 @@ export function ContinueWatchingRow() {
               <Link
                 key={item.id}
                 href={href}
-                className="group/card relative shrink-0 cursor-pointer outline-none
-                           w-44 sm:w-52 md:w-60 lg:w-64 xl:w-72"
+                data-cw-card
+                data-cw-col={index}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                onFocus={() => setFocusedIndex(index)}
+                onBlur={() => setFocusedIndex(-1)}
+                className={`group/card relative shrink-0 cursor-pointer outline-none
+                           w-44 sm:w-52 md:w-60 lg:w-64 xl:w-72
+                           ${
+                             focusedIndex === index
+                               ? "ring-4 ring-white rounded"
+                               : ""
+                           }`}
               >
                 {/* Cover */}
                 <div className="relative overflow-hidden rounded aspect-2/3 bg-white/5">

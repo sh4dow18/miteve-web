@@ -89,9 +89,15 @@ export function useContentRow({
             ) as HTMLElement;
             (prevRowCard || fallback)?.focus({ preventScroll: false });
           } else {
-            const heroBtn = document.querySelector("[data-hero-btn]") as HTMLElement;
-            heroBtn?.focus({ preventScroll: false });
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            const cwCard = document.querySelector("[data-cw-col='0']") as HTMLElement;
+            if (cwCard) {
+              cwCard.focus({ preventScroll: false });
+              cwCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else {
+              const heroBtn = document.querySelector("[data-hero-btn]") as HTMLElement;
+              heroBtn?.focus({ preventScroll: false });
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
           }
           break;
       }
