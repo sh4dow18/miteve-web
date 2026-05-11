@@ -4,6 +4,7 @@ import {
   Film,
   HelpCircle,
   Home,
+  Info,
   LogIn,
   Search,
   Shield,
@@ -33,7 +34,8 @@ export const ROUTES_LIST: Route[] = [
     inHome: false,
     metadata: {
       title: "Inicio",
-      description: "Explora Miteve y descubre el catalogo de peliculas y series.",
+      description:
+        "Explora Miteve y descubre el catalogo de peliculas y series.",
     },
   },
   {
@@ -94,7 +96,8 @@ export const ROUTES_LIST: Route[] = [
   {
     path: "faq",
     title: "FAQ",
-    summary: "Preguntas frecuentes sobre cuenta, perfiles, reproduccion y soporte.",
+    summary:
+      "Preguntas frecuentes sobre cuenta, perfiles, reproduccion y soporte.",
     Icon: HelpCircle,
     inSitemap: true,
     inHome: true,
@@ -107,7 +110,8 @@ export const ROUTES_LIST: Route[] = [
   {
     path: "admin",
     title: "Administracion",
-    summary: "Panel para gestionar contenido, contenedores, generos y episodios.",
+    summary:
+      "Panel para gestionar contenido, contenedores, generos y episodios.",
     Icon: Shield,
     inSitemap: false,
     inHome: false,
@@ -181,6 +185,18 @@ export const ROUTES_LIST: Route[] = [
       title: "Registrar usuario",
       description:
         "Crea tu cuenta para guardar favoritos y recomendaciones personalizadas.",
+    },
+  },
+  {
+    path: "appInfo",
+    title: "Info",
+    summary: "Detalles sobre la aplicación Miteve.",
+    Icon: Info,
+    inSitemap: true,
+    inHome: true,
+    metadata: {
+      title: "Información de la aplicación",
+      description: "Detalles sobre la aplicación Miteve.",
     },
   },
 ];
