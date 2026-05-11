@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { GetTmdbImage } from "@/shared/api/tmdb";
 import Image from "next/image";
+import Link from "next/link";
 import type { MiniContent } from "@/entities/content/model/types";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   index: number;
   rowIndex: number;
   isFocused: boolean;
-  onActivate: () => void;
+  href: string;
   onFocus?: () => void;
   onBlur?: () => void;
   onMouseEnter?: () => void;
@@ -22,24 +23,22 @@ export function ContentCard({
   index,
   rowIndex,
   isFocused,
-  onActivate,
+  href,
   onFocus,
   onBlur,
   onMouseEnter,
   onMouseLeave,
 }: Props) {
   return (
-    <div
-      className="group relative shrink-0 cursor-pointer
+    <Link
+      href={href}
+      className="group relative shrink-0 cursor-pointer block
                  w-44 sm:w-52 md:w-60 lg:w-64 xl:w-72
                  outline-none"
-      onClick={onActivate}
       onFocus={onFocus}
       onBlur={onBlur}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      tabIndex={0}
-      role="button"
       aria-label={content.title}
       data-content-card
       data-row={rowIndex}
@@ -75,6 +74,6 @@ export function ContentCard({
           </h3>
         </motion.div>
       </motion.div>
-    </div>
+    </Link>
   );
 }

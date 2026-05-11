@@ -2,6 +2,7 @@
 
 import { usePlayer, usePlayerPageData } from "@/features/player/model/usePlayer";
 import Player from "@/widgets/player/ui/Player";
+import PlayerSkeleton from "@/widgets/player/ui/PlayerSkeleton";
 import PlayerTV from "@/widgets/player/ui/PlayerTV";
 
 export default function PlayerPage({
@@ -9,14 +10,14 @@ export default function PlayerPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ season?: string; episode?: string }>;
+  searchParams: Promise<{ season?: string; episode?: string; time?: string }>;
 }) {
-  const { data, isLoading } = usePlayerPageData({ params, searchParams });
+  const { data, isLoading, startAtTime } = usePlayerPageData({ params, searchParams });
   const tvShow = data?.tvShow ?? undefined;
-  const player = usePlayer({ content: data?.content, tvShow });
+  const player = usePlayer({ content: data?.content, tvShow, startAtTime });
 
   if (isLoading || !data) {
-    return <div className="h-screen w-full bg-black flex items-center justify-center">Cargando...</div>;
+    return <PlayerSkeleton />;
   }
 
   if (player.isTVOrAndroid()) {

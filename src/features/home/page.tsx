@@ -1,5 +1,6 @@
 import { HOME_ROWS } from "@/features/home/config/home.constants";
 import { getHomePageData } from "@/features/home/model/getHomePageData";
+import { ContinueWatchingRow } from "@/features/home/ui/ContinueWatchingRow";
 import { ContentRow } from "@/widgets/content-row";
 import { HeroSection } from "@/widgets/hero-section";
 
@@ -14,6 +15,7 @@ export default async function HomePage() {
       {heroContent && <HeroSection content={heroContent} />}
 
       <div className="-mt-16 relative z-10 space-y-8 pb-12">
+        <ContinueWatchingRow />
         <ContentRow
           title={HOME_ROWS.recent}
           contentsList={recentContents}

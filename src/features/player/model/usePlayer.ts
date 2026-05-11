@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { API_HOST_IP, STREAM_HOST_IP } from "@/shared/config/env";
 import { Content, EpisodeMetadata, NextEpisode } from "@/entities/content/model/types";
 import { getPlayerData } from "@/features/player/model/getPlayerData";
+import { getMainProfile, getToken } from "@/shared/lib/auth";
 
 declare global {
   interface Window {
@@ -30,11 +31,12 @@ interface UsePlayerParams {
     episode: EpisodeMetadata;
     nextEpisode: NextEpisode | null;
   };
+  startAtTime?: number | null;
 }
 
 interface UsePlayerPageDataParams {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ season?: string; episode?: string }>;
+  searchParams: Promise<{ season?: string; episode?: string; time?: string }>;
 }
 
 export type PlayerData = Awaited<globalThis.ReturnType<typeof getPlayerData>>;
@@ -45,6 +47,7 @@ export function usePlayerPageData({
 }: UsePlayerPageDataParams) {
   const [data, setData] = useState<PlayerData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [startAtTime, setStartAtTime] = useState<number | null>(null);
   const requestIdRef = useRef(0);
   const lastRouteKeyRef = useRef<string | null>(null);
 
@@ -62,6 +65,7 @@ export function usePlayerPageData({
         resolvedParams.id,
         resolvedSearchParams.season ?? "",
         resolvedSearchParams.episode ?? "",
+        resolvedSearchParams.time ?? "",
       ].join("|");
 
       if (lastRouteKeyRef.current === routeKey) {
@@ -79,6 +83,9 @@ export function usePlayerPageData({
 
       lastRouteKeyRef.current = routeKey;
       setData(playerData);
+      const rawTime = resolvedSearchParams.time;
+      const parsedTime = rawTime ? parseFloat(rawTime) : null;
+      setStartAtTime(parsedTime && parsedTime > 0 ? parsedTime : null);
       setIsLoading(false);
     };
 
@@ -92,6 +99,7 @@ export function usePlayerPageData({
   return {
     data,
     isLoading,
+    startAtTime,
   };
 }
 
@@ -239,6 +247,7 @@ function formatHms(t: number) {
 export function usePlayer({
   content,
   tvShow,
+  startAtTime,
 }: UsePlayerParams): UsePlayerReturn {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -290,6 +299,18 @@ export function usePlayer({
   const [hasSubtitles, setHasSubtitles] = useState(false);
   const navigatingRef = useRef(false);
   const loadRequestIdRef = useRef(0);
+
+  // ─── Continue-watching tracking ───────────────────────────────────────────────
+  const playedSecondsRef = useRef(0);
+  const continueWatchingIdRef = useRef<string | null>(null);
+  const cwCreatedRef = useRef(false);
+  const lastCwPutRef = useRef(0);
+
+  // Always-fresh refs so the interval closure never reads stale closures
+  const contentRef = useRef(content);
+  contentRef.current = content;
+  const tvShowRef = useRef(tvShow);
+  tvShowRef.current = tvShow;
   const [skips, setSkips] = useState({
     summary: false,
     intro: false,
@@ -355,6 +376,25 @@ export function usePlayer({
     if (navigatingRef.current || !tvShow?.nextEpisode || !content) return;
     navigatingRef.current = true;
     setSkips((p) => ({ ...p, credits: false }));
+
+    // Register the next episode as the new continue-watching entry
+    const profile = getMainProfile();
+    if (profile) {
+      const token = getToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      fetch(`${API_HOST_IP}/continue-watching`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          profileId: Number(profile.id),
+          contentId: content.id,
+          episodeId: tvShow.nextEpisode.id,
+          time: 0,
+        }),
+      }).catch(() => { /* silent */ });
+    }
+
     router.push(
       `/player/${content.id}?season=${tvShow.nextEpisode.seasonNumber}&episode=${tvShow.nextEpisode.episodeNumber}`
     );
@@ -697,8 +737,11 @@ export function usePlayer({
                   }, 3000);
                 }
 
-                // Skip intro/summary al inicio
-                if (tvShow !== undefined) {
+                // Resume from saved position (takes priority over intro skip)
+                if (startAtTime && startAtTime > 0) {
+                  VIDEO.currentTime = startAtTime;
+                } else if (tvShow !== undefined) {
+                  // Skip intro/summary al inicio
                   const { beginSummary, endSummary, beginIntro, endIntro } =
                     tvShow.episode;
                   if (
@@ -1027,10 +1070,24 @@ export function usePlayer({
     }
   };
 
+  const cwPutTime = (time: number) => {
+    if (!cwCreatedRef.current || !continueWatchingIdRef.current) return;
+    const cwId = continueWatchingIdRef.current;
+    const token = getToken();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    fetch(`${API_HOST_IP}/continue-watching/${cwId}/time`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ time: Math.floor(time) }),
+    }).catch(() => { /* silent */ });
+  };
+
   const seek = (secs: number) => {
     const v = videoRef.current;
     if (!v) return;
     v.currentTime = Math.min(Math.max(0, v.currentTime + secs), v.duration);
+    cwPutTime(v.currentTime);
   };
 
   const toggleSubtitles = () => {
@@ -1071,6 +1128,7 @@ export function usePlayer({
     setSeekPreviewPercent(null);
     setRangeStates((p) => ({ ...p, isHovering: false }));
     setVideoStates((p) => ({ ...p, currentTime: fmt(v.currentTime) }));
+    cwPutTime(v.currentTime);
   };
 
   const onSeekBarMouseMove = (e: ReactMouseEvent<HTMLElement>) => {
@@ -1107,6 +1165,7 @@ export function usePlayer({
       progress: pct * 100,
       currentTime: fmt(v.currentTime),
     }));
+    cwPutTime(v.currentTime);
   };
 
   // ─── TV-like D-pad navigation handler (attached via JSX onKeyDown) ───────────
@@ -1215,6 +1274,7 @@ export function usePlayer({
         }));
         setSeekPreviewPercent(null);
         setRangeStates((p) => ({ ...p, isHovering: false }));
+        cwPutTime(nextTime);
       }
     }
 
@@ -1254,6 +1314,80 @@ export function usePlayer({
     };
   }, []);
 
+  // ─── Continue-watching effect ────────────────────────────────────────────────
+  // Reset counters whenever the content or episode changes
+  useEffect(() => {
+    playedSecondsRef.current = 0;
+    continueWatchingIdRef.current = null;
+    cwCreatedRef.current = false;
+    lastCwPutRef.current = 0;
+  }, [content?.id, tvShow?.season, tvShow?.episode.episodeNumber]);
+
+  // Persistent interval — mounts once, reads fresh values via refs
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const VIDEO = videoRef.current;
+      const currentContent = contentRef.current;
+      if (!VIDEO || !currentContent) return;
+      const profile = getMainProfile();
+      if (!profile) return;
+
+      // Only count seconds of actual playback, but allow PUT/POST to fire even while paused
+      if (!VIDEO.paused) playedSecondsRef.current += 1;
+      const played = playedSecondsRef.current;
+      // ── Initial POST after 30s of actual playback ──
+      if (!cwCreatedRef.current && played >= 30) {
+        cwCreatedRef.current = true;
+        const token = getToken();
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const currentTvShow = tvShowRef.current;
+        fetch(`${API_HOST_IP}/continue-watching`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            profileId: Number(profile.id),
+            contentId: currentContent.id,
+            episodeId: currentTvShow?.episode.id ?? null,
+            time: 30,
+          }),
+        })
+          .then((res) => {
+            if (!res.ok) { cwCreatedRef.current = false; return; }
+            return res.json();
+          })
+          .then((data: { id: string | number } | undefined) => {
+            if (data?.id != null) {
+              continueWatchingIdRef.current = String(data.id);
+              lastCwPutRef.current = played;
+            }
+          })
+          .catch(() => { cwCreatedRef.current = false; });
+        return;
+      }
+      // ── PUT every 30s after creation ──
+      if (
+        cwCreatedRef.current &&
+        continueWatchingIdRef.current &&
+        played - lastCwPutRef.current >= 30
+      ) {
+        lastCwPutRef.current = played;
+        const cwId = continueWatchingIdRef.current;
+        const token = getToken();
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        fetch(`${API_HOST_IP}/continue-watching/${cwId}/time`, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ time: Math.floor(VIDEO.currentTime) }),
+        }).catch(() => { /* silent */ });
+      }
+    }, 1000);
+    console.log("7")
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const skip = () => {
     const VIDEO = videoRef.current;
     if (VIDEO === null || tvShow === undefined) return;
@@ -1264,6 +1398,18 @@ export function usePlayer({
     if (skips.intro && tvShow.episode.endIntro !== null) {
       VIDEO.currentTime = tvShow.episode.endIntro;
       setSkips((p) => ({ ...p, intro: false }));
+    }
+    // Update continue-watching time after seek
+    if (cwCreatedRef.current && continueWatchingIdRef.current) {
+      const cwId = continueWatchingIdRef.current;
+      const token = getToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      fetch(`${API_HOST_IP}/continue-watching/${cwId}/time`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ time: Math.floor(VIDEO.currentTime) }),
+      }).catch(() => { /* silent */ });
     }
   };
 
