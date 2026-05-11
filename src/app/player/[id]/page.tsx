@@ -8,7 +8,7 @@ export const metadata = {
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ season?: string; episode?: string }>;
+  searchParams: Promise<{ season?: string; episode?: string; time?: string }>;
 }
 
 export default function PlayerPage({

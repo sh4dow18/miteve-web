@@ -1,9 +1,14 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { API_HOST_IP } from "@/shared/config/env";
 
 export function useRegisterForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -35,9 +40,30 @@ export function useRegisterForm() {
     setAgreed((v) => !v);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Aquí iría la lógica de registro real
+    setError(null);
+    setLoading(true);
+    const name = form.apellido
+      ? `${form.nombre} ${form.apellido}`
+      : form.nombre;
+    try {
+      const res = await fetch(`${API_HOST_IP}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email: form.email, password: form.password }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data?.message ?? "Error al crear la cuenta. Intenta de nuevo.");
+        return;
+      }
+      router.push("/login");
+    } catch {
+      setError("Error de conexión. Verifica tu red e intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return {
@@ -51,5 +77,7 @@ export function useRegisterForm() {
     form,
     handleChange,
     handleSubmit,
+    loading,
+    error,
   };
 }

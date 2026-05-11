@@ -10,6 +10,7 @@ import {
   Shield,
   TriangleAlert,
   Tv,
+  User,
   UserPlus,
   type LucideIcon,
 } from "lucide-react";
@@ -185,6 +186,18 @@ export const ROUTES_LIST: Route[] = [
       title: "Registrar usuario",
       description:
         "Crea tu cuenta para guardar favoritos y recomendaciones personalizadas.",
+    },
+  },
+  {
+    path: "account",
+    title: "Cuenta",
+    summary: "Administra tu cuenta y preferencias de Miteve.",
+    Icon: User,
+    inSitemap: false,
+    inHome: false,
+    metadata: {
+      title: "Mi cuenta",
+      description: "Administra tu cuenta y preferencias de Miteve.",
     },
   },
   {

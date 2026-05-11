@@ -11,6 +11,8 @@ export default function LoginPage() {
     form,
     handleChange,
     handleSubmit,
+    loading,
+    error,
   } = useLoginForm();
 
   return (
@@ -174,10 +176,18 @@ export default function LoginPage() {
               </a>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <p className="rounded-xl border border-[#e50914]/30 bg-[#e50914]/10 px-4 py-2.5 text-xs text-[#e50914]">
+                {error}
+              </p>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
-              className="group relative mt-1 w-full overflow-hidden rounded-xl py-3.5 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(229,9,20,.38)] active:translate-y-0"
+              disabled={loading}
+              className="group relative mt-1 w-full overflow-hidden rounded-xl py-3.5 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(229,9,20,.38)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 background: "linear-gradient(135deg,#e50914 0%,#b5060e 100%)",
               }}
@@ -189,7 +199,7 @@ export default function LoginPage() {
                     "linear-gradient(135deg,rgba(255,255,255,.10) 0%,transparent 60%)",
                 }}
               />
-              <span className="relative">Iniciar sesión</span>
+              <span className="relative">{loading ? "Iniciando sesión…" : "Iniciar sesión"}</span>
             </button>
           </form>
 

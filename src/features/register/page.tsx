@@ -23,6 +23,8 @@ export default function RegisterPage() {
     form,
     handleChange,
     handleSubmit,
+    loading,
+    error,
   } = useRegisterForm();
   const strengthColors = ["bg-white/10", "bg-[#e50914]/60", "bg-orange-400/70", "bg-yellow-400/70", "bg-emerald-400/80"];
   return (
@@ -190,17 +192,25 @@ export default function RegisterPage() {
               </span>
             </button>
 
+            {/* Error message */}
+            {error && (
+              <p className="rounded-xl border border-[#e50914]/30 bg-[#e50914]/10 px-4 py-2.5 text-xs text-[#e50914]">
+                {error}
+              </p>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
-              className="group relative mt-1 w-full overflow-hidden rounded-xl py-3.5 text-sm font-semibold tracking-wide text-gray-400 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(229,9,20,.38)] active:translate-y-0"
+              disabled={loading}
+              className="group relative mt-1 w-full overflow-hidden rounded-xl py-3.5 text-sm font-semibold tracking-wide text-gray-400 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(229,9,20,.38)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{ background: "linear-gradient(135deg,#e50914 0%,#b5060e 100%)" }}
             >
               <span
                 className="absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                 style={{ background: "linear-gradient(135deg,rgba(255,255,255,.10) 0%,transparent 60%)" }}
               />
-              <span className="relative">Crear cuenta gratis</span>
+              <span className="relative">{loading ? "Creando cuenta…" : "Crear cuenta gratis"}</span>
             </button>
           </form>
 
