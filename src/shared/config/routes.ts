@@ -201,7 +201,7 @@ export const ROUTES_LIST: Route[] = [
     },
   },
   {
-    path: "appInfo",
+    path: "app-info",
     title: "Info",
     summary: "Detalles sobre la aplicación Miteve.",
     Icon: Info,
