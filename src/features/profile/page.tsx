@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "lucide-react";
+import { RefreshCw, User } from "lucide-react";
 import { useProfile } from "./model/useProfile";
 
 function initials(name: string) {
@@ -130,6 +130,13 @@ export default function ProfilePage({ id }: { id: string }) {
               >
                 <User className="size-4" />
                 Mi cuenta
+              </Link>
+              <Link
+                href="/profile/switch"
+                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-white/20 hover:text-white"
+              >
+                <RefreshCw className="size-4" />
+                Cambiar perfil
               </Link>
             </div>
           </div>
