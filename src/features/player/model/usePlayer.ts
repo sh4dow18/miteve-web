@@ -1070,24 +1070,55 @@ export function usePlayer({
     }
   };
 
-  const cwPutTime = (time: number) => {
-    if (!cwCreatedRef.current || !continueWatchingIdRef.current) return;
-    const cwId = continueWatchingIdRef.current;
+  const saveCwTime = useCallback((time: number) => {
+    const currentContent = contentRef.current;
+    const profile = getMainProfile();
+    if (!currentContent || !profile) return;
     const token = getToken();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    fetch(`${API_HOST_IP}/continue-watching/${cwId}/time`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({ time: Math.floor(time) }),
-    }).catch(() => { /* silent */ });
-  };
+
+    if (cwCreatedRef.current && continueWatchingIdRef.current) {
+      fetch(`${API_HOST_IP}/continue-watching/${continueWatchingIdRef.current}/time`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ time: Math.floor(time) }),
+      }).catch(() => { /* silent */ });
+      return;
+    }
+
+    if (!cwCreatedRef.current) {
+      cwCreatedRef.current = true;
+      const currentTvShow = tvShowRef.current;
+      fetch(`${API_HOST_IP}/continue-watching`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          profileId: Number(profile.id),
+          contentId: currentContent.id,
+          episodeId: currentTvShow?.episode.id ?? null,
+          time: Math.floor(time),
+        }),
+      })
+        .then((res) => {
+          if (!res.ok) { cwCreatedRef.current = false; return null; }
+          return res.json();
+        })
+        .then((data: { id: string | number } | undefined | null) => {
+          if (data?.id != null) {
+            continueWatchingIdRef.current = String(data.id);
+            lastCwPutRef.current = playedSecondsRef.current;
+          }
+        })
+        .catch(() => { cwCreatedRef.current = false; });
+    }
+  }, []);
 
   const seek = (secs: number) => {
     const v = videoRef.current;
     if (!v) return;
     v.currentTime = Math.min(Math.max(0, v.currentTime + secs), v.duration);
-    cwPutTime(v.currentTime);
+    saveCwTime(v.currentTime);
   };
 
   const toggleSubtitles = () => {
@@ -1128,7 +1159,7 @@ export function usePlayer({
     setSeekPreviewPercent(null);
     setRangeStates((p) => ({ ...p, isHovering: false }));
     setVideoStates((p) => ({ ...p, currentTime: fmt(v.currentTime) }));
-    cwPutTime(v.currentTime);
+    saveCwTime(v.currentTime);
   };
 
   const onSeekBarMouseMove = (e: ReactMouseEvent<HTMLElement>) => {
@@ -1165,7 +1196,7 @@ export function usePlayer({
       progress: pct * 100,
       currentTime: fmt(v.currentTime),
     }));
-    cwPutTime(v.currentTime);
+    saveCwTime(v.currentTime);
   };
 
   // ─── TV-like D-pad navigation handler (attached via JSX onKeyDown) ───────────
@@ -1274,7 +1305,7 @@ export function usePlayer({
         }));
         setSeekPreviewPercent(null);
         setRangeStates((p) => ({ ...p, isHovering: false }));
-        cwPutTime(nextTime);
+        saveCwTime(nextTime);
       }
     }
 
@@ -1399,18 +1430,7 @@ export function usePlayer({
       VIDEO.currentTime = tvShow.episode.endIntro;
       setSkips((p) => ({ ...p, intro: false }));
     }
-    // Update continue-watching time after seek
-    if (cwCreatedRef.current && continueWatchingIdRef.current) {
-      const cwId = continueWatchingIdRef.current;
-      const token = getToken();
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      fetch(`${API_HOST_IP}/continue-watching/${cwId}/time`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify({ time: Math.floor(VIDEO.currentTime) }),
-      }).catch(() => { /* silent */ });
-    }
+    saveCwTime(VIDEO.currentTime);
   };
 
   return {
