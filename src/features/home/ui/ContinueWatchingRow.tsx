@@ -73,11 +73,16 @@ function fmtTime(secs: number): string {
   return `${s}s`;
 }
 
-export function ContinueWatchingRow() {
+export function ContinueWatchingRow({ onLoaded }: { onLoaded?: () => void }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [items, setItems] = useState<ContinueWatchingItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  const markLoaded = () => {
+    setLoaded(true);
+    onLoaded?.();
+  };
 
   const focusCWCard = (index: number) => {
     const card = scrollRef.current?.querySelector(
@@ -132,7 +137,7 @@ export function ContinueWatchingRow() {
     const token = getToken();
     const profile = getMainProfile();
     if (!token || !profile) {
-      setLoaded(true);
+      markLoaded();
       return;
     }
 
@@ -142,7 +147,7 @@ export function ContinueWatchingRow() {
       .then((r) => (r.ok ? r.json() : []))
       .then((data: ContinueWatchingItem[]) => setItems(Array.isArray(data) ? data : []))
       .catch(() => setItems([]))
-      .finally(() => setLoaded(true));
+      .finally(() => markLoaded());
   }, []);
 
   const scroll = (dir: "left" | "right") => {

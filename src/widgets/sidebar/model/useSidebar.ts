@@ -43,12 +43,10 @@ export function useSidebar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [mainProfile, setMainProfileState] = useState<MainProfile | null>(null);
   const [isTV, setIsTV] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setIsTV(detectIsTV());
-  }, []);
-
-  useEffect(() => {
     const token = getToken();
     if (token) {
       setIsLoggedIn(true);
@@ -59,6 +57,7 @@ export function useSidebar() {
       setIsAdmin(false);
       setMainProfileState(null);
     }
+    setMounted(true);
   }, [location]);
 
   const authItem = isLoggedIn ? accountItem : loginItem;
@@ -77,6 +76,7 @@ export function useSidebar() {
     mainProfile,
     isLoggedIn,
     isTV,
+    mounted,
     drawerOpen,
     isActive,
     openDrawer,

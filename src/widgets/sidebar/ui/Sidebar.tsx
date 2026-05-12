@@ -4,6 +4,82 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSidebar } from "@/widgets/sidebar/model/useSidebar";
 
+function Shimmer({ className }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-md bg-white/10 ${className ?? ""}`}
+      style={{
+        backgroundImage:
+          "linear-gradient(90deg,transparent 0%,rgba(255,255,255,.07) 50%,transparent 100%)",
+        backgroundSize: "200% 100%",
+        animation: "shimmer 1.8s ease-in-out infinite",
+      }}
+    />
+  );
+}
+
+function SidebarBottomSkeleton() {
+  return (
+    <div className="pt-6 border-t border-white/10 flex flex-col items-center gap-5">
+      {/* profile avatar placeholder */}
+      <Shimmer className="size-9 rounded-full" />
+      {/* auth icon placeholder */}
+      <div className="flex flex-col items-center gap-1">
+        <Shimmer className="size-6 rounded-md" />
+        <Shimmer className="h-2.5 w-8 rounded-sm" />
+      </div>
+    </div>
+  );
+}
+
+function DrawerBottomSkeleton() {
+  return (
+    <div className="mt-auto px-4 pt-6 border-t border-white/10 flex flex-col gap-1">
+      <div className="flex items-center gap-4 px-4 py-3">
+        <Shimmer className="size-7 rounded-full shrink-0" />
+        <Shimmer className="h-3.5 w-24 rounded-md" />
+      </div>
+      <div className="flex items-center gap-4 px-4 py-3">
+        <Shimmer className="size-5 rounded-md" />
+        <Shimmer className="h-3.5 w-16 rounded-md" />
+      </div>
+    </div>
+  );
+}
+
+function SidebarFullSkeleton() {
+  return (
+    <>
+      <Shimmer className="size-10 rounded-full mb-12" />
+      <div className="flex-1 flex flex-col items-center gap-8">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex flex-col items-center gap-1">
+            <Shimmer className="size-6 rounded-md" />
+            <Shimmer className="h-2 w-8 rounded-sm" />
+          </div>
+        ))}
+      </div>
+      <SidebarBottomSkeleton />
+    </>
+  );
+}
+
+function DrawerFullSkeleton() {
+  return (
+    <>
+      <div className="flex flex-col gap-2 px-4">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-4 py-3">
+            <Shimmer className="size-5 rounded-md shrink-0" />
+            <Shimmer className="h-3.5 w-20 rounded-md" />
+          </div>
+        ))}
+      </div>
+      <DrawerBottomSkeleton />
+    </>
+  );
+}
+
 function initials(name: string) {
   return name
     .split(" ")
@@ -13,7 +89,7 @@ function initials(name: string) {
 }
 
 export function Sidebar() {
-  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, drawerOpen, isActive, openDrawer, closeDrawer } =
+  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, mounted, drawerOpen, isActive, openDrawer, closeDrawer } =
     useSidebar();
   const AuthIcon = authItem.icon;
 
@@ -21,8 +97,9 @@ export function Sidebar() {
     <>
       {/* ── Desktop sidebar (md+) ─────────────────────────────────────────────── */}
       <div className="hidden md:flex fixed left-0 top-0 h-full w-20 bg-black/95 flex-col items-center py-8 z-50">
-        {/* En TV: solo hamburguesa que abre el drawer */}
-        {isTV ? (
+        {!mounted ? (
+          <SidebarFullSkeleton />
+        ) : isTV ? (
           <button
             onClick={openDrawer}
             aria-label="Abrir menú"
@@ -185,95 +262,101 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Nav items — horizontal layout matching sidebar style */}
-        <nav className="flex flex-col gap-2 px-4">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
+        {!mounted ? (
+          <DrawerFullSkeleton />
+        ) : (
+          <>
+            {/* Nav items — horizontal layout matching sidebar style */}
+            <nav className="flex flex-col gap-2 px-4">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={closeDrawer}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg relative
+                                transition-all duration-200 group
+                                ${active
+                                  ? "text-white bg-white/5"
+                                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                                }`}
+                  >
+                    {/* Barra roja igual que en desktop */}
+                    {active && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
+                    )}
+                    <Icon
+                      className={`w-5 h-5 transition-transform group-hover:scale-110 ${
+                        active ? "scale-110" : ""
+                      }`}
+                    />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="mt-auto px-4 pt-6 border-t border-white/10 flex flex-col gap-1">
+              {/* Profile avatar link — shown when logged in */}
+              {isLoggedIn && mainProfile && (
+                <Link
+                  href={`/profile/${mainProfile.id}`}
+                  onClick={closeDrawer}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-lg relative transition-all duration-200 group ${
+                    isActive(`/profile/${mainProfile.id}`)
+                      ? "text-white bg-white/5"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {isActive(`/profile/${mainProfile.id}`) && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
+                  )}
+                  {mainProfile.avatar ? (
+                    <div className="relative size-7 overflow-hidden rounded-full shrink-0">
+                      <Image
+                        src={mainProfile.avatar}
+                        alt={mainProfile.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                      style={{ background: "linear-gradient(135deg,#e50914 0%,#b5060e 100%)" }}
+                    >
+                      {initials(mainProfile.name)}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium">{mainProfile.name}</span>
+                </Link>
+              )}
+
               <Link
-                key={item.path}
-                href={item.path}
+                href={authItem.path}
                 onClick={closeDrawer}
                 className={`flex items-center gap-4 px-4 py-3 rounded-lg relative
                             transition-all duration-200 group
-                            ${active
+                            ${isActive(authItem.path)
                               ? "text-white bg-white/5"
                               : "text-gray-400 hover:text-white hover:bg-white/5"
                             }`}
               >
-                {/* Barra roja igual que en desktop */}
-                {active && (
+                {isActive(authItem.path) && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
                 )}
-                <Icon
+                <AuthIcon
                   className={`w-5 h-5 transition-transform group-hover:scale-110 ${
-                    active ? "scale-110" : ""
+                    isActive(authItem.path) ? "scale-110" : ""
                   }`}
                 />
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-sm font-medium">{authItem.label}</span>
               </Link>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto px-4 pt-6 border-t border-white/10 flex flex-col gap-1">
-          {/* Profile avatar link — shown when logged in */}
-          {isLoggedIn && mainProfile && (
-            <Link
-              href={`/profile/${mainProfile.id}`}
-              onClick={closeDrawer}
-              className={`flex items-center gap-4 px-4 py-3 rounded-lg relative transition-all duration-200 group ${
-                isActive(`/profile/${mainProfile.id}`)
-                  ? "text-white bg-white/5"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              {isActive(`/profile/${mainProfile.id}`) && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
-              )}
-              {mainProfile.avatar ? (
-                <div className="relative size-7 overflow-hidden rounded-full shrink-0">
-                  <Image
-                    src={mainProfile.avatar}
-                    alt={mainProfile.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                  style={{ background: "linear-gradient(135deg,#e50914 0%,#b5060e 100%)" }}
-                >
-                  {initials(mainProfile.name)}
-                </div>
-              )}
-              <span className="text-sm font-medium">{mainProfile.name}</span>
-            </Link>
-          )}
-
-          <Link
-            href={authItem.path}
-            onClick={closeDrawer}
-            className={`flex items-center gap-4 px-4 py-3 rounded-lg relative
-                        transition-all duration-200 group
-                        ${isActive(authItem.path)
-                          ? "text-white bg-white/5"
-                          : "text-gray-400 hover:text-white hover:bg-white/5"
-                        }`}
-          >
-            {isActive(authItem.path) && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#e50914] rounded-r" />
-            )}
-            <AuthIcon
-              className={`w-5 h-5 transition-transform group-hover:scale-110 ${
-                isActive(authItem.path) ? "scale-110" : ""
-              }`}
-            />
-            <span className="text-sm font-medium">{authItem.label}</span>
-          </Link>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
