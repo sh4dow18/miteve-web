@@ -4,6 +4,7 @@ import {
 } from "@/features/content-detail/model/getContentDetailData";
 import { Detail } from "@/widgets/content-detail";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -21,6 +22,6 @@ export default async function ContentDetailPage({
 }: Props) {
   const resolvedParams = await params;
   const content = await getContentDetailData(resolvedParams);
-
+  if (!content) return notFound();
   return <Detail content={content} />;
 }

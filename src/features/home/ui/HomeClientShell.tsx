@@ -23,7 +23,7 @@ export function HomeClientShell({ hero, children }: Props) {
       <div className={ready ? undefined : "invisible absolute"} aria-busy={!ready}>
         <div className="min-h-screen">
           {hero}
-          <div className="-mt-16 relative z-10 space-y-8 pb-12">
+          <div className="sm:-mt-16 relative z-10 space-y-8 pb-12">
             <ContinueWatchingRow onLoaded={onLoaded} />
             {children}
           </div>

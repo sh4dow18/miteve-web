@@ -43,7 +43,25 @@ export function useSidebar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [mainProfile, setMainProfileState] = useState<MainProfile | null>(null);
   const [isTV, setIsTV] = useState(false);
+  const [isShortScreen, setIsShortScreen] = useState(false);
+  const [isVeryShortScreen, setIsVeryShortScreen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-height: 779px)");
+    setIsShortScreen(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsShortScreen(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-height: 614px)");
+    setIsVeryShortScreen(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsVeryShortScreen(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     setIsTV(detectIsTV());
@@ -76,6 +94,8 @@ export function useSidebar() {
     mainProfile,
     isLoggedIn,
     isTV,
+    isShortScreen,
+    isVeryShortScreen,
     mounted,
     drawerOpen,
     isActive,

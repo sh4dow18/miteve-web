@@ -27,6 +27,7 @@ export function useSeasonsModal({
 
     try {
       const fullContent = await FindContentById(content.id);
+      if (!fullContent) throw new Error("Contenido no encontrado");
 
       const body = {
         id: content.id,

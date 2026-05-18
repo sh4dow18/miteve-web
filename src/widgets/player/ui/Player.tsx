@@ -355,7 +355,7 @@ function Player({ content, player, tvShow }: Props) {
             </button>
 
             <button
-              className={`${iconBtn} flex gap-1 items-center`}
+              className={`hidden sm:flex gap-1 items-center ${iconBtn}`}
               onClick={() => seek(-10)}
               tabIndex={0}
               aria-label="Retroceder 10s"
@@ -368,7 +368,7 @@ function Player({ content, player, tvShow }: Props) {
             </button>
 
             <button
-              className={`${iconBtn} flex gap-1 items-center`}
+              className={`hidden sm:flex gap-1 items-center ${iconBtn}`}
               onClick={() => seek(10)}
               tabIndex={0}
               aria-label="Adelantar 10s"
@@ -380,7 +380,7 @@ function Player({ content, player, tvShow }: Props) {
               <span className="text-sm">+10s</span>
             </button>
 
-            <div className="group/volume relative flex items-center">
+            <div className="group/volume hidden sm:flex relative items-center">
               <button
                 className={iconBtn}
                 onClick={toggleMute}
@@ -427,7 +427,7 @@ function Player({ content, player, tvShow }: Props) {
               </div>
             </div>
 
-            <span className="text-white/50 text-xs tabular-nums pl-1 min-[581px]:hidden">
+            <span className="hidden">
               {videoStates.currentTime}
             </span>
           </div>
@@ -441,7 +441,7 @@ function Player({ content, player, tvShow }: Props) {
           <div className="relative flex items-center gap-0.5 min-[425px]:gap-1">
             {tvShow && tvShow.nextEpisode !== null && (
               <button
-                className={iconBtn}
+                className={`hidden sm:inline-flex ${iconBtn}`}
                 onClick={navigateToNextEpisode}
                 tabIndex={0}
                 aria-label="Siguiente Episodio"
@@ -455,7 +455,7 @@ function Player({ content, player, tvShow }: Props) {
 
             <button
               onClick={togglePiP}
-              className={iconBtn}
+              className={`hidden sm:inline-flex ${iconBtn}`}
               tabIndex={0}
               aria-label={isPip ? "Salir de Picture-in-Picture" : "Picture-in-Picture"}
             >
@@ -474,7 +474,7 @@ function Player({ content, player, tvShow }: Props) {
 
             {hasSubtitles && (
               <button
-                className={`${iconBtn} ${
+                className={`hidden sm:inline-flex ${iconBtn} ${
                   videoStates.subtitlesOn ? "text-white" : "text-white/40"
                 }`}
                 onClick={toggleSubtitles}
@@ -500,7 +500,7 @@ function Player({ content, player, tvShow }: Props) {
             )}
 
             {qualityOptions.length > 0 && (
-              <div className="relative">
+              <div className="hidden sm:block relative">
                 <button
                   ref={qualityButtonRef}
                   className={`${iconBtn} ${

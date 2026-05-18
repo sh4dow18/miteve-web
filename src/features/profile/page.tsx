@@ -63,7 +63,7 @@ export default function ProfilePage({ id }: { id: string }) {
         />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl px-6 py-16 sm:px-10">
+      <div className="relative z-10 mx-auto max-w-2xl px-4 pt-20 pb-12 sm:px-10 sm:pt-16">
         {/* Badge */}
         <div
           className="mb-8"
@@ -73,7 +73,7 @@ export default function ProfilePage({ id }: { id: string }) {
             <User className="size-3" />
             Perfil activo
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-white">
             {profile.name}
           </h1>
         </div>
@@ -92,7 +92,7 @@ export default function ProfilePage({ id }: { id: string }) {
             }}
           />
 
-          <div className="px-8 pb-8">
+          <div className="px-4 pb-6 sm:px-8 sm:pb-8">
             {/* Avatar */}
             <div className="-mt-12 mb-5">
               {profile.avatar ? (
@@ -123,17 +123,17 @@ export default function ProfilePage({ id }: { id: string }) {
             </div>
 
             {/* Back link */}
-            <div className="mt-7 flex gap-3">
+            <div className="mt-7 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/account"
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-white/20 hover:text-white"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-white/20 hover:text-white"
               >
                 <User className="size-4" />
                 Mi cuenta
               </Link>
               <Link
                 href="/profile/switch"
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-white/20 hover:text-white"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-white/20 hover:text-white"
               >
                 <RefreshCw className="size-4" />
                 Cambiar perfil

@@ -23,10 +23,10 @@ export async function FindAllTvShows(): Promise<Container[]> {
   );
 }
 
-export async function FindContentById(id: string): Promise<Content> {
-  return await fetch(`${API_HOST_IP}/contents/${id}`).then((response) =>
-    response.json()
-  );
+export async function FindContentById(id: string): Promise<Content | null> {
+  const response = await fetch(`${API_HOST_IP}/contents/${id}`);
+  if (!response.ok) return null;
+  return response.json();
 }
 
 export async function FindRecentContent(): Promise<Content[]> {

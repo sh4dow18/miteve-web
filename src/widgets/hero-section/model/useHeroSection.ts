@@ -13,7 +13,7 @@ export function useHeroSection({ content }: UseHeroSectionParams) {
   const toggleMuted = () => setIsMuted((prev) => !prev);
 
   const focusFirstCard = () => {
-    const cwCard = document.querySelector("[data-cw-col='0']") as HTMLElement;
+    const cwCard = document.querySelector("[data-row='-1'][data-col='0']") as HTMLElement;
     if (cwCard) {
       cwCard.focus({ preventScroll: false });
       cwCard.scrollIntoView({ behavior: "smooth", block: "center" });

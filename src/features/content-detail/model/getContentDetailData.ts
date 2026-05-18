@@ -15,6 +15,7 @@ export async function getContentDetailMetadata(
 ): Promise<Metadata> {
   try {
     const content = await FindContentById(params.id);
+    if (!content) throw new Error();
     return {
       title: content.title,
       description: content.description,

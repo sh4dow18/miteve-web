@@ -11,6 +11,7 @@ interface PlayerQuery {
 
 export async function getPlayerData(id: string, query: PlayerQuery) {
   const content = await FindContentById(id);
+  if (!content) throw new Error("Contenido no encontrado");
 
   if (
     content.type === "tv-show" &&

@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import { useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getToken, getMainProfile } from "@/shared/lib/auth";
 import { API_HOST_IP } from "@/shared/config/env";
-import { GetTmdbImage } from "@/shared/api/tmdb";
+import { ContentCard } from "@/shared/ui/ContentCard";
+import type { MiniContent } from "@/entities/content/model/types";
+import { useContentRow } from "@/widgets/content-row/model/useContentRow";
+
+/** Row index reserved for Continue Watching – used by useContentRow ArrowUp */
+const CW_ROW_INDEX = -1;
 
 type CWContent = {
   id: string;
@@ -38,7 +40,6 @@ type ContinueWatchingItem = {
   episode?: CWEpisode;
 };
 
-// For TV shows, the backend also returns `content` alongside `episode`
 function buildPlayerHref(item: ContinueWatchingItem): string {
   const t = Math.floor(item.time);
   if (item.episode && item.content) {
@@ -49,11 +50,6 @@ function buildPlayerHref(item: ContinueWatchingItem): string {
     return `/player/${item.content.id}?time=${t}`;
   }
   return "/home";
-}
-
-function getCover(item: ContinueWatchingItem): string {
-  const raw = item.content?.cover ?? "";
-  return raw ? GetTmdbImage(raw, 342) : "";
 }
 
 function getTitle(item: ContinueWatchingItem): string {
@@ -74,87 +70,37 @@ function fmtTime(secs: number): string {
 }
 
 export function ContinueWatchingRow({ onLoaded }: { onLoaded?: () => void }) {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [items, setItems] = useState<ContinueWatchingItem[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [focusedIndex, setFocusedIndex] = useState(-1);
 
-  const markLoaded = () => {
-    setLoaded(true);
-    onLoaded?.();
-  };
-
-  const focusCWCard = (index: number) => {
-    const card = scrollRef.current?.querySelector(
-      `[data-cw-col="${index}"]`
-    ) as HTMLElement;
-    if (!card) return;
-    card.focus({ preventScroll: true });
-    const container = scrollRef.current!;
-    const containerRect = container.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const offset =
-      cardRect.left -
-      containerRect.left -
-      containerRect.width / 2 +
-      cardRect.width / 2;
-    container.scrollBy({ left: offset, behavior: "smooth" });
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    switch (e.key) {
-      case "ArrowRight":
-        e.preventDefault();
-        e.stopPropagation();
-        if (index < items.length - 1) focusCWCard(index + 1);
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        e.stopPropagation();
-        if (index > 0) focusCWCard(index - 1);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        e.stopPropagation();
-        (document.querySelector("[data-hero-btn]") as HTMLElement)?.focus({ preventScroll: false });
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        e.stopPropagation();
-        {
-          const firstCard = document.querySelector(
-            "[data-row='0'][data-col='0']"
-          ) as HTMLElement;
-          firstCard?.focus({ preventScroll: false });
-          firstCard?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        break;
-    }
-  };
+  const {
+    scrollContainerRef,
+    focusedIndex,
+    setFocusedIndex,
+    handleCardKeyDown,
+    scroll,
+  } = useContentRow({
+    rowIndex: CW_ROW_INDEX,
+    totalRows: 1,
+    contentLength: items.length,
+  });
 
   useEffect(() => {
     const token = getToken();
     const profile = getMainProfile();
     if (!token || !profile) {
-      markLoaded();
+      setLoaded(true);
+      onLoaded?.();
       return;
     }
-
     fetch(`${API_HOST_IP}/profiles/${profile.id}/continue-watching`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : []))
       .then((data: ContinueWatchingItem[]) => setItems(Array.isArray(data) ? data : []))
       .catch(() => setItems([]))
-      .finally(() => markLoaded());
+      .finally(() => { setLoaded(true); onLoaded?.(); });
   }, []);
-
-  const scroll = (dir: "left" | "right") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" });
-  };
 
   if (!loaded || items.length === 0) return null;
 
@@ -182,76 +128,37 @@ export function ContinueWatchingRow({ onLoaded }: { onLoaded?: () => void }) {
         </button>
 
         <div
-          ref={scrollRef}
-          className="flex gap-3 overflow-x-auto px-4 pb-4
+          ref={scrollContainerRef}
+          className="flex gap-3 overflow-x-auto px-4 pt-2 pb-4
                      sm:gap-4 sm:px-8 md:px-12
                      scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {items.map((item, index) => {
-            const href = buildPlayerHref(item);
-            const cover = getCover(item);
-            const title = getTitle(item);
-            const timeLabel = fmtTime(item.time);
-
+            const content: MiniContent = {
+              id: item.content?.id ?? "",
+              cover: item.content?.cover ?? "",
+              title: getTitle(item),
+            };
             return (
-              <Link
+              <div
                 key={item.id}
-                href={href}
-                data-cw-card
-                data-cw-col={index}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                onFocus={() => setFocusedIndex(index)}
-                onBlur={() => setFocusedIndex(-1)}
-                className={`group/card relative shrink-0 cursor-pointer outline-none
-                           w-44 sm:w-52 md:w-60 lg:w-64 xl:w-72
-                           ${
-                             focusedIndex === index
-                               ? "ring-4 ring-white rounded"
-                               : ""
-                           }`}
+                onKeyDown={(e) => handleCardKeyDown(e, index)}
               >
-                {/* Cover */}
-                <div className="relative overflow-hidden rounded aspect-2/3 bg-white/5">
-                  {cover && (
-                    <Image
-                      src={cover}
-                      alt={title}
-                      fill
-                      sizes="(max-width: 640px) 176px,(max-width: 768px) 208px,288px"
-                      className="object-cover transition-transform duration-300 group-hover/card:scale-105"
-                    />
-                  )}
-
-                  {/* Dark overlay on hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover/card:bg-black/40 transition-colors duration-300" />
-
-                  {/* Play button on hover */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-white/90 shadow-lg">
-                      <Play className="size-5 fill-black text-black ml-0.5" />
-                    </div>
-                  </div>
-
-                  {/* Progress bar overlay at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                    <div
-                      className="h-full bg-[#e50914]"
-                      style={{ width: `${Math.min((item.time / (item.time + 60)) * 100, 95)}%` }}
-                    />
-                  </div>
-
-                  {/* Time badge */}
-                  <div className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
-                    {timeLabel}
-                  </div>
-                </div>
-
-                {/* Title */}
-                <p className="mt-2 text-xs font-medium text-gray-300 line-clamp-2 group-hover/card:text-white transition-colors duration-200">
-                  {title}
-                </p>
-              </Link>
+                <ContentCard
+                  content={content}
+                  index={index}
+                  rowIndex={CW_ROW_INDEX}
+                  isFocused={focusedIndex === index}
+                  href={buildPlayerHref(item)}
+                  onFocus={() => setFocusedIndex(index)}
+                  onBlur={() => setFocusedIndex(-1)}
+                  onMouseEnter={() => setFocusedIndex(index)}
+                  onMouseLeave={() => setFocusedIndex(-1)}
+                  timeLabel={fmtTime(item.time)}
+                  progressPercent={Math.min((item.time / (item.time + 60)) * 100, 95)}
+                />
+              </div>
             );
           })}
         </div>

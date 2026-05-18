@@ -58,7 +58,7 @@ export default function Detail({ content }: Props) {
           )}
         </button>
 
-        <div className="relative z-10 min-h-screen flex items-end p-16">
+        <div className="relative z-10 min-h-screen flex items-end px-4 pt-20 pb-8 sm:p-16">
           <div className="space-y-6 max-w-3xl">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -106,7 +106,7 @@ export default function Detail({ content }: Props) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-base max-w-2xl leading-relaxed md:text-lg xl:text-xl"
+              className="text-base max-w-2xl leading-relaxed line-clamp-4 sm:line-clamp-none md:text-lg xl:text-xl"
             >
               {content.description}
             </motion.p>
@@ -138,7 +138,7 @@ export default function Detail({ content }: Props) {
             >
               <button
                 onClick={playContent}
-                className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded text-xl font-semibold hover:bg-gray-200 transition-colors"
+                className="flex w-full sm:w-auto items-center justify-center gap-3 bg-white text-black px-6 py-3 sm:px-8 sm:py-4 rounded text-base sm:text-xl font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Play className="w-7 h-7" fill="currentColor" />
                 {content.comingSoon ? "Próximamente" : "Reproducir"}
@@ -148,15 +148,14 @@ export default function Detail({ content }: Props) {
         </div>
       </div>
       {content.note !== null && !content.comingSoon && (
-        <div className="bg-gray-900 rounded-xl p-6 border-white/10 border mx-10">
+        <div className="bg-gray-900 rounded-xl p-4 sm:p-6 border-white/10 border mx-4 sm:mx-10">
           <div className="flex items-start gap-4">
             <Image
               src="/logo.png"
               alt="Miteve Note"
-              className="w-12 h-12 rounded-full"
-              width={100}
-              height={100}
-              style={{ width: "auto", height: "auto" }}
+              className="size-12 rounded-full shrink-0"
+              width={48}
+              height={48}
             />
             <div className="flex-1">
               <p className="font-semibold mb-2">Nota de Miteve</p>

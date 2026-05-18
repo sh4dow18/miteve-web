@@ -18,44 +18,14 @@ import { APP_INFO } from "@/features/app-info/config/app-info.constants";
 
 export function AppInfoFeaturePage() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-black via-gray-900 to-black text-white px-8 py-12 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-20 right-20 w-96 h-96 bg-red-600/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{ duration: 10, repeat: Infinity }}
-          className="absolute bottom-20 left-20 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"
-        />
-      </div>
-
+    <div className="min-h-screen bg-linear-to-br from-black via-gray-900 to-black text-white px-4 pt-20 pb-12 sm:px-8 sm:pt-12 relative overflow-hidden">
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-16"
         >
-          <motion.div
-            animate={{
-              rotate: [0, 5, -5, 0],
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="inline-block mb-6 relative"
-          >
-            <div className="absolute inset-0 bg-linear-to-r from-red-600 to-pink-600 rounded-full blur-xl opacity-50" />
-            <Info className="w-20 h-20 text-red-500 relative" />
-          </motion.div>
 
           <motion.div
             className="mb-4"
@@ -75,7 +45,7 @@ export function AppInfoFeaturePage() {
             />
           </motion.div>
 
-          <div className="flex items-center justify-center gap-4 text-gray-300 mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-gray-300 mb-6 sm:mb-8">
             <span className="px-4 py-2 bg-linear-to-r from-red-600/20 to-pink-600/20 rounded-full border border-red-500/30">
               Versión {APP_INFO.version}
             </span>
@@ -89,7 +59,7 @@ export function AppInfoFeaturePage() {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 rounded-xl transition-all shadow-lg shadow-red-500/20 border border-gray-700"
+            className="inline-flex items-center gap-2 px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 rounded-xl transition-all shadow-lg shadow-red-500/20 border border-gray-700"
           >
             <Github className="w-5 h-5" />
             Ver cambios en GitHub
@@ -98,13 +68,13 @@ export function AppInfoFeaturePage() {
         </motion.div>
 
         {/* Main Info Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-8 mb-8 sm:mb-12">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             whileHover={{ scale: 1.02, y: -5 }}
-            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-8 rounded-2xl border border-red-500/20 hover:border-red-500/50 transition-all backdrop-blur-sm overflow-hidden"
+            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-4 sm:p-8 rounded-2xl border border-red-500/20 hover:border-red-500/50 transition-all backdrop-blur-sm overflow-hidden"
           >
             <div className="absolute inset-0 bg-linear-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
@@ -112,7 +82,7 @@ export function AppInfoFeaturePage() {
                 <div className="p-3 bg-red-600/20 rounded-xl group-hover:bg-red-600/30 transition-colors">
                   <Info className="w-6 h-6 text-red-500" />
                 </div>
-                <h2 className="text-2xl">Descripción General</h2>
+                <h2 className="text-lg sm:text-2xl">Descripción General</h2>
               </div>
               <p className="text-gray-300 leading-relaxed">
                 {APP_INFO.description}
@@ -125,7 +95,7 @@ export function AppInfoFeaturePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.02, y: -5 }}
-            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-8 rounded-2xl border border-blue-500/20 hover:border-blue-500/50 transition-all backdrop-blur-sm overflow-hidden"
+            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-4 sm:p-8 rounded-2xl border border-blue-500/20 hover:border-blue-500/50 transition-all backdrop-blur-sm overflow-hidden"
           >
             <div className="absolute inset-0 bg-linear-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
@@ -133,7 +103,7 @@ export function AppInfoFeaturePage() {
                 <div className="p-3 bg-blue-600/20 rounded-xl group-hover:bg-blue-600/30 transition-colors">
                   <Users className="w-6 h-6 text-blue-500" />
                 </div>
-                <h2 className="text-2xl">Público Dirigido</h2>
+                <h2 className="text-lg sm:text-2xl">Público Dirigido</h2>
               </div>
               <p className="text-gray-300 leading-relaxed">
                 {APP_INFO.targetAudience}
@@ -146,7 +116,7 @@ export function AppInfoFeaturePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             whileHover={{ scale: 1.02, y: -5 }}
-            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-8 rounded-2xl border border-yellow-500/20 hover:border-yellow-500/50 transition-all backdrop-blur-sm overflow-hidden"
+            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-4 sm:p-8 rounded-2xl border border-yellow-500/20 hover:border-yellow-500/50 transition-all backdrop-blur-sm overflow-hidden"
           >
             <div className="absolute inset-0 bg-linear-to-br from-yellow-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
@@ -154,7 +124,7 @@ export function AppInfoFeaturePage() {
                 <div className="p-3 bg-yellow-600/20 rounded-xl group-hover:bg-yellow-600/30 transition-colors">
                   <Lightbulb className="w-6 h-6 text-yellow-500" />
                 </div>
-                <h2 className="text-2xl">Problema a Resolver</h2>
+                <h2 className="text-lg sm:text-2xl">Problema a Resolver</h2>
               </div>
               <p className="text-gray-300 leading-relaxed">
                 {APP_INFO.problemSolved}
@@ -167,7 +137,7 @@ export function AppInfoFeaturePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
             whileHover={{ scale: 1.02, y: -5 }}
-            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-8 rounded-2xl border border-green-500/20 hover:border-green-500/50 transition-all backdrop-blur-sm overflow-hidden"
+            className="group relative bg-linear-to-br from-gray-900/80 to-gray-800/80 p-4 sm:p-8 rounded-2xl border border-green-500/20 hover:border-green-500/50 transition-all backdrop-blur-sm overflow-hidden"
           >
             <div className="absolute inset-0 bg-linear-to-br from-green-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
@@ -175,7 +145,7 @@ export function AppInfoFeaturePage() {
                 <div className="p-3 bg-green-600/20 rounded-xl group-hover:bg-green-600/30 transition-colors">
                   <Zap className="w-6 h-6 text-green-500" />
                 </div>
-                <h2 className="text-2xl">Beneficio Principal</h2>
+                <h2 className="text-lg sm:text-2xl">Beneficio Principal</h2>
               </div>
               <p className="text-gray-300 leading-relaxed">
                 {APP_INFO.mainBenefit}
@@ -192,7 +162,7 @@ export function AppInfoFeaturePage() {
           className="mb-12"
         >
           <motion.h2
-            className="text-4xl mb-10 text-center bg-linear-to-r from-white via-gray-200 to-white bg-clip-text text-transparent"
+            className="text-2xl sm:text-4xl mb-6 sm:mb-10 text-center bg-linear-to-r from-white via-gray-200 to-white bg-clip-text text-transparent"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -206,7 +176,7 @@ export function AppInfoFeaturePage() {
               <div className="p-2 bg-cyan-500/20 rounded-lg">
                 <Code className="w-6 h-6 text-cyan-400" />
               </div>
-              <h3 className="text-2xl text-cyan-400">Frontend</h3>
+              <h3 className="text-lg sm:text-2xl text-cyan-400">Frontend</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {APP_INFO.technologies.frontend.map((tech, index) => (
@@ -237,7 +207,7 @@ export function AppInfoFeaturePage() {
               <div className="p-2 bg-purple-500/20 rounded-lg">
                 <Server className="w-6 h-6 text-purple-400" />
               </div>
-              <h3 className="text-2xl text-purple-400">Backend</h3>
+              <h3 className="text-lg sm:text-2xl text-purple-400">Backend</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {APP_INFO.technologies.backend.map((tech, index) => (
@@ -268,7 +238,7 @@ export function AppInfoFeaturePage() {
               <div className="p-2 bg-orange-500/20 rounded-lg">
                 <Cloud className="w-6 h-6 text-orange-400" />
               </div>
-              <h3 className="text-2xl text-orange-400">Despliegue</h3>
+              <h3 className="text-lg sm:text-2xl text-orange-400">Despliegue</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {APP_INFO.technologies.deployment.map((tech, index) => (
@@ -299,7 +269,7 @@ export function AppInfoFeaturePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="relative bg-linear-to-r from-gray-900/80 via-gray-800/80 to-gray-900/80 p-8 rounded-2xl border border-gray-700/50 text-center overflow-hidden backdrop-blur-sm"
+          className="relative bg-linear-to-r from-gray-900/80 via-gray-800/80 to-gray-900/80 p-4 sm:p-8 rounded-2xl border border-gray-700/50 text-center overflow-hidden backdrop-blur-sm"
         >
           <div className="absolute inset-0 bg-linear-to-r from-red-600/5 via-transparent to-blue-600/5" />
 

@@ -71,7 +71,7 @@ export default function AccountPage() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-16 sm:px-10">
+      <div className="relative z-10 mx-auto max-w-4xl px-4 pt-20 pb-12 sm:px-10 sm:pt-16">
         {/* Header */}
         <div
           className="mb-10"
@@ -81,7 +81,7 @@ export default function AccountPage() {
             <User className="size-3" />
             Mi cuenta
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-white">
+          <h1 className="text-xl sm:text-3xl font-semibold tracking-tight text-white break-all">
             {account.email}
           </h1>
           <p className="mt-1.5 text-sm text-gray-400">
@@ -92,7 +92,7 @@ export default function AccountPage() {
         <div className="grid gap-5 lg:grid-cols-5">
           {/* ── Avatar card ── */}
           <div
-            className="flex flex-col items-center gap-5 rounded-2xl border border-white/8 bg-white/3 p-8 backdrop-blur-xl lg:col-span-2"
+            className="flex flex-col items-center gap-5 rounded-2xl border border-white/8 bg-white/3 p-5 sm:p-8 backdrop-blur-xl lg:col-span-2"
             style={{ animation: "slideUp .75s .05s cubic-bezier(.22,1,.36,1) both" }}
           >
             {/* Avatar */}
@@ -146,8 +146,7 @@ export default function AccountPage() {
                     <p className="text-[10px] uppercase tracking-[.08em] text-gray-500">
                       Correo electrónico
                     </p>
-                    <p className="mt-0.5 text-sm font-medium text-white">
-                      {account.email}
+                    <p className="mt-0.5 text-sm font-medium text-white break-all">
                     </p>
                   </div>
                 </div>

@@ -89,7 +89,7 @@ function initials(name: string) {
 }
 
 export function Sidebar() {
-  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, mounted, drawerOpen, isActive, openDrawer, closeDrawer } =
+  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, isShortScreen, isVeryShortScreen, mounted, drawerOpen, isActive, openDrawer, closeDrawer } =
     useSidebar();
   const AuthIcon = authItem.icon;
 
@@ -99,10 +99,11 @@ export function Sidebar() {
       <div className="hidden md:flex fixed left-0 top-0 h-full w-20 bg-black/95 flex-col items-center py-8 z-50">
         {!mounted ? (
           <SidebarFullSkeleton />
-        ) : isTV ? (
+        ) : isTV || isShortScreen ? (
           <button
             onClick={openDrawer}
             aria-label="Abrir menú"
+            data-nav-btn
             className="p-2 text-gray-400 hover:text-white transition-colors rounded
                        focus:outline-none focus:ring-2 focus:ring-white/50"
           >
@@ -209,16 +210,7 @@ export function Sidebar() {
 
       {/* ── Mobile top bar (< md) ─────────────────────────────────────────────── */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-black/95 flex items-center justify-between px-4 z-50">
-        {/* Logo */}
-        <Image
-          src="/logo.png"
-          alt="Miteve"
-          width={32}
-          height={32}
-          style={{ width: "auto", height: "auto" }}
-        />
-
-        {/* Hamburger */}
+        {/* Hamburger — left */}
         <button
           onClick={openDrawer}
           aria-label="Abrir menú"
@@ -226,6 +218,15 @@ export function Sidebar() {
         >
           <Menu className="w-6 h-6" />
         </button>
+
+        {/* Logo — right */}
+        <Image
+          src="/logo.png"
+          alt="Miteve"
+          width={32}
+          height={32}
+          style={{ width: "auto", height: "auto" }}
+        />
       </div>
 
       {/* ── Drawer overlay ────────────────────────────────────────────────────── */}
@@ -268,7 +269,12 @@ export function Sidebar() {
           <>
             {/* Nav items — horizontal layout matching sidebar style */}
             <nav className="flex flex-col gap-2 px-4">
-              {menuItems.map((item) => {
+              {menuItems
+                .filter((item) =>
+                  !isVeryShortScreen ||
+                  !["/faq", "/app-info", "/admin"].includes(item.path)
+                )
+                .map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
                 return (

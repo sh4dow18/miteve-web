@@ -59,7 +59,7 @@ export function ContentRow({
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-3 overflow-x-auto px-4 pb-4
+          className="flex gap-3 overflow-x-auto px-4 pt-2 pb-4
                      sm:gap-4 sm:px-8
                      md:px-12
                      scrollbar-hide"

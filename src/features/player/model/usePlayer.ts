@@ -1060,12 +1060,22 @@ export function usePlayer({
   const toggleFullscreen = () => {
     const c = containerRef.current;
     if (!c) return;
+    type LockableOrientation = ScreenOrientation & {
+      lock?: (type: string) => Promise<void>;
+      unlock?: () => void;
+    };
+    const orientation = screen.orientation as LockableOrientation;
     if (!document.fullscreenElement) {
       if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "-1");
-      c.requestFullscreen();
+      c.requestFullscreen()
+        .then(() => {
+          orientation.lock?.("landscape")?.catch(() => {});
+        })
+        .catch(() => {});
       setVideoStates((p) => ({ ...p, fullscreen: true }));
     } else {
       document.exitFullscreen();
+      orientation.unlock?.();
       setVideoStates((p) => ({ ...p, fullscreen: false }));
     }
   };

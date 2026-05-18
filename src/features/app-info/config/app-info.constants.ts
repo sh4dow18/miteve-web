@@ -13,7 +13,7 @@ export const APP_INFO = {
     "Acceso inmediato a un catálogo de películas y series con reproducción de alta calidad, navegación optimizada y soporte para subtítulos.",
   technologies: {
     frontend: [
-      "Next.js 15",
+      "Next.js 16",
       "React 19",
       "TypeScript",
       "Tailwind CSS v4",

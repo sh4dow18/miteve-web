@@ -14,16 +14,20 @@ export function useContentRow({
 }: UseContentRowParams) {
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [focusedIndex, setFocusedIndex] = useState(0);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const focusCard = useCallback(
     (index: number) => {
       const container = scrollContainerRef.current;
       if (!container) return;
 
-      const card = container.querySelector(
-        `[data-row="${rowIndex}"][data-col="${index}"]`
-      ) as HTMLElement;
+      // Use data-content-card (present on every ContentCard Link) scoped to
+      // this container instead of data-row/data-col to avoid issues with
+      // negative attribute values in CSS selectors (e.g. rowIndex = -1).
+      const cards = container.querySelectorAll(
+        "[data-content-card]"
+      ) as NodeListOf<HTMLElement>;
+      const card = cards[index];
 
       if (!card) return;
 
@@ -39,7 +43,7 @@ export function useContentRow({
 
       container.scrollBy({ left: offset, behavior: "smooth" });
     },
-    [rowIndex]
+    [] // scrollContainerRef is a stable ref object
   );
 
   const handleCardKeyDown = useCallback(
@@ -60,6 +64,10 @@ export function useContentRow({
           if (index > 0) {
             setFocusedIndex(index - 1);
             focusCard(index - 1);
+          } else {
+            // First card → focus the sidebar nav button
+            const navBtn = document.querySelector("[data-nav-btn]") as HTMLElement;
+            navBtn?.focus({ preventScroll: false });
           }
           break;
 
@@ -88,8 +96,8 @@ export function useContentRow({
               `[data-row="${rowIndex - 1}"]`
             ) as HTMLElement;
             (prevRowCard || fallback)?.focus({ preventScroll: false });
-          } else {
-            const cwCard = document.querySelector("[data-cw-col='0']") as HTMLElement;
+          } else if (rowIndex === 0) {
+            const cwCard = document.querySelector("[data-row='-1'][data-col='0']") as HTMLElement;
             if (cwCard) {
               cwCard.focus({ preventScroll: false });
               cwCard.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -98,6 +106,11 @@ export function useContentRow({
               heroBtn?.focus({ preventScroll: false });
               window.scrollTo({ top: 0, behavior: "smooth" });
             }
+          } else {
+            // rowIndex < 0 (ContinueWatching) → go directly to hero
+            const heroBtn = document.querySelector("[data-hero-btn]") as HTMLElement;
+            heroBtn?.focus({ preventScroll: false });
+            window.scrollTo({ top: 0, behavior: "smooth" });
           }
           break;
       }

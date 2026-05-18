@@ -14,10 +14,30 @@ export function getToken(): string | null {
 
 export function setToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
+  // Also write to a cookie so the middleware (Edge Runtime) can read it
+  if (typeof document !== "undefined") {
+    try {
+      const [, payload] = token.split(".");
+      const data = JSON.parse(
+        atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+      ) as { exp?: number };
+      const maxAge =
+        data.exp != null
+          ? data.exp - Math.floor(Date.now() / 1000)
+          : 86400;
+      document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${maxAge}; SameSite=Strict`;
+    } catch {
+      document.cookie = `${TOKEN_KEY}=${token}; path=/; SameSite=Strict`;
+    }
+  }
 }
 
 export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+  // Also clear the cookie
+  if (typeof document !== "undefined") {
+    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; SameSite=Strict`;
+  }
 }
 
 export function getMainProfile(): MainProfile | null {
