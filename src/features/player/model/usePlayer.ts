@@ -691,11 +691,13 @@ export function usePlayer({
                 await player.load(src);
                 if (!isCurrentRequest()) return;
 
-                // Esperar metadatos antes de hacer seek
+                // Esperar a que el video pueda reproducirse antes de hacer seek.
+                // canplay garantiza que Shaka ha terminado su inicialización y que
+                // el seek a cualquier posición será aceptado y no sobreescrito.
                 await new Promise<void>((resolve) => {
-                  if (VIDEO.readyState >= 1) resolve();
+                  if (VIDEO.readyState >= 3) resolve();
                   else
-                    VIDEO.addEventListener("loadedmetadata", () => resolve(), {
+                    VIDEO.addEventListener("canplay", () => resolve(), {
                       once: true,
                     });
                 });
@@ -742,26 +744,34 @@ export function usePlayer({
                   VIDEO.currentTime = startAtTime;
                 } else if (tvShow !== undefined) {
                   // Skip intro/summary al inicio
+                  // Recopila los segmentos definidos y construye la cadena de saltos
+                  // que comienza en el segundo 0, incluyendo segmentos consecutivos
+                  // (con hasta 1 segundo de diferencia entre el fin de uno y el inicio del siguiente).
                   const { beginSummary, endSummary, beginIntro, endIntro } =
                     tvShow.episode;
-                  if (
-                    beginSummary === 0 &&
-                    endSummary !== null &&
-                    beginIntro === endSummary + 1 &&
-                    endIntro != null
-                  ) {
-                    VIDEO.currentTime = endIntro;
-                  } else if (
-                    beginIntro === 0 &&
-                    endIntro !== null &&
-                    beginSummary === endIntro + 1 &&
-                    endSummary != null
-                  ) {
-                    VIDEO.currentTime = endSummary;
-                  } else if (beginSummary === 0 && endSummary != null) {
-                    VIDEO.currentTime = endSummary;
-                  } else if (beginIntro === 0 && endIntro != null) {
-                    VIDEO.currentTime = endIntro;
+                  const segments: Array<{ begin: number; end: number }> = [];
+                  if (beginSummary !== null && endSummary !== null) {
+                    segments.push({ begin: beginSummary, end: endSummary });
+                  }
+                  if (beginIntro !== null && endIntro !== null) {
+                    segments.push({ begin: beginIntro, end: endIntro });
+                  }
+                  const hasZeroStart = segments.some((s) => s.begin === 0);
+                  if (hasZeroStart) {
+                    let chainEnd = 0;
+                    let extended = true;
+                    while (extended) {
+                      extended = false;
+                      for (const seg of segments) {
+                        if (seg.begin <= chainEnd + 1 && seg.end > chainEnd) {
+                          chainEnd = seg.end;
+                          extended = true;
+                        }
+                      }
+                    }
+                    if (chainEnd > 0) {
+                      VIDEO.currentTime = chainEnd;
+                    }
                   }
                 }
 

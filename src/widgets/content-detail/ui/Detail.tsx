@@ -12,9 +12,10 @@ import { useDetail } from "@/widgets/content-detail/model/useDetail";
 
 interface Props {
   content: Content;
+  initialSeason?: number;
 }
 
-export default function Detail({ content }: Props) {
+export default function Detail({ content, initialSeason }: Props) {
   const {
     seasonsList,
     isMuted,
@@ -23,7 +24,7 @@ export default function Detail({ content }: Props) {
     selectSeason,
     currentSeasonData,
     playContent,
-  } = useDetail({ content });
+  } = useDetail({ content, initialSeason });
   return (
     <div className="min-h-screen bg-[#141414] text-white pb-12">
       {/* Hero Section */}

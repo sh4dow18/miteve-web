@@ -4,18 +4,23 @@ import type { Content } from "@/entities/content/model/types";
 
 interface UseDetailParams {
   content: Content;
+  initialSeason?: number;
 }
 
-export function useDetail({ content }: UseDetailParams) {
+export function useDetail({ content, initialSeason }: UseDetailParams) {
   const router = useRouter();
   const seasonsList = Array.isArray(content.seasonsList)
     ? content.seasonsList
     : [];
 
   const [isMuted, setIsMuted] = useState(true);
-  const [selectedSeason, setSelectedSeason] = useState(
-    seasonsList[0] ? seasonsList[0].seasonNumber : undefined
-  );
+  const [selectedSeason, setSelectedSeason] = useState(() => {
+    if (initialSeason !== undefined) {
+      const exists = seasonsList.some((s) => s.seasonNumber === initialSeason);
+      if (exists) return initialSeason;
+    }
+    return seasonsList[0] ? seasonsList[0].seasonNumber : undefined;
+  });
 
   const currentSeasonData = seasonsList.find(
     (s) => s.seasonNumber === selectedSeason

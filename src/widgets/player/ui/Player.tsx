@@ -164,7 +164,7 @@ function Player({ content, player, tvShow }: Props) {
       >
         <div className="flex items-start justify-between">
           <Link
-            href={`/content/${content.id}`}
+            href={`/content/${content.id}${tvShow ? `?season=${tvShow.season}` : ""}`}
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors group"
           >
             <ArrowLeft

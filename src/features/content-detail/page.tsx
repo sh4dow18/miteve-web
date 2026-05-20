@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ season?: string }>;
 }
 
 export async function generateMetadata({
@@ -19,9 +20,12 @@ export async function generateMetadata({
 
 export default async function ContentDetailPage({
   params,
+  searchParams,
 }: Props) {
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   const content = await getContentDetailData(resolvedParams);
   if (!content) return notFound();
-  return <Detail content={content} />;
+  const initialSeason = resolvedSearch.season ? parseInt(resolvedSearch.season, 10) : undefined;
+  return <Detail content={content} initialSeason={initialSeason} />;
 }

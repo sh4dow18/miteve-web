@@ -130,7 +130,7 @@ function PlayerTV({ content, player, tvShow }: Props) {
           {/* Back arrow */}
           <Link
             ref={backButtonRef}
-            href={`/content/${content.id}`}
+            href={`/content/${content.id}${tvShow ? `?season=${tvShow.season}` : ""}`}
             data-focusable
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors group
               focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-lg p-1"
