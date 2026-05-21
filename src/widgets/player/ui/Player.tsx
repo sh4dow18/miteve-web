@@ -205,7 +205,8 @@ function Player({ content, player, tvShow }: Props) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             onClick={skip}
-            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40"
+            autoFocus
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-black/50"
           >
             Omitir Intro
           </motion.button>
@@ -219,7 +220,8 @@ function Player({ content, player, tvShow }: Props) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             onClick={skip}
-            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40"
+            autoFocus
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-6 py-3 rounded font-semibold transition-colors z-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-black/50"
           >
             Omitir Resumen
           </motion.button>
@@ -233,7 +235,8 @@ function Player({ content, player, tvShow }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={navigateToNextEpisode}
-            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-8 py-4 rounded font-semibold transition-colors z-40"
+            autoFocus
+            className="absolute right-12 bottom-32 bg-white/90 hover:bg-white text-black px-8 py-4 rounded font-semibold transition-colors z-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-black/50"
           >
             Siguiente Episodio
           </motion.button>

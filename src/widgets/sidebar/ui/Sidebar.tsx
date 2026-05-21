@@ -118,6 +118,7 @@ export function Sidebar() {
             alt="Miteve"
             width={40}
             height={40}
+            priority
             style={{ width: "auto", height: "auto" }}
           />
         </div>
@@ -225,6 +226,7 @@ export function Sidebar() {
           alt="Miteve"
           width={32}
           height={32}
+          priority
           style={{ width: "auto", height: "auto" }}
         />
       </div>
@@ -252,6 +254,7 @@ export function Sidebar() {
             alt="Miteve"
             width={36}
             height={36}
+            loading="eager"
             style={{ width: "auto", height: "auto" }}
           />
           <button

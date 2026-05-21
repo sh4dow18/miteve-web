@@ -10,6 +10,9 @@ export function useYoutubeVideo({ mute, duration }: UseYoutubeVideoParams) {
   const [ended, setEnded] = useState(false);
 
   useEffect(() => {
+    // Mark the thumbnail img as eager so it is detected as LCP-ready
+    const img = containerRef.current?.querySelector("img");
+    if (img) (img as HTMLImageElement).loading = "eager";
     const btn = containerRef.current?.querySelector("button");
     btn?.click();
   }, []);

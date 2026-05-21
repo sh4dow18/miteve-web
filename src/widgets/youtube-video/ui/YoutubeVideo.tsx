@@ -47,6 +47,7 @@ export function YoutubeVideo({ id, title, thumbnail, mute, duration }: Props) {
         alt={title}
         fill
         unoptimized
+        priority
         sizes="100vw"
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
           ended ? "opacity-100" : "opacity-0"

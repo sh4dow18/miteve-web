@@ -62,6 +62,7 @@ export function ContentCard({
           fill
           unoptimized
           sizes="(max-width: 640px) 176px, (max-width: 768px) 208px, (max-width: 1024px) 240px, (max-width: 1280px) 256px, 288px"
+          priority={rowIndex === 0 && index === 0}
           className={`object-cover transition-transform duration-300 group-hover/card:scale-105 ${
             isFocused ? "scale-105" : ""
           }`}

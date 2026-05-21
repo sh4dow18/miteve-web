@@ -29,7 +29,7 @@ function ProfileAvatar({ name, avatar }: { name: string; avatar?: string }) {
     .join("");
 
   return (
-    <div className="flex size-full items-center justify-center rounded-md bg-linear-to-br from-[#e50914] to-[#8b0000] text-2xl font-bold text-white">
+    <div className="flex size-full items-center justify-center rounded-md bg-linear-to-br from-[#e50914] to-[#8b0000] text-lg sm:text-xl md:text-2xl font-bold text-white">
       {initials}
     </div>
   );
@@ -119,11 +119,11 @@ export default function SwitchProfilesPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black px-6">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-black px-4 sm:px-6 py-10">
       {/* Title */}
       <h1
         id="who-is-watching"
-        className="mb-10 text-4xl font-light tracking-wide text-white sm:text-5xl"
+        className="mb-8 sm:mb-10 text-2xl sm:text-4xl md:text-5xl font-light tracking-wide text-white text-center"
       >
         ¿Quién está viendo?
       </h1>
@@ -132,7 +132,7 @@ export default function SwitchProfilesPage() {
       <div
         role="list"
         aria-labelledby="who-is-watching"
-        className="flex flex-wrap justify-center gap-6"
+        className="flex flex-wrap justify-center gap-4 sm:gap-6"
       >
         {profiles.map((profile, idx) => (
           <div key={profile.id} role="listitem">
@@ -143,12 +143,12 @@ export default function SwitchProfilesPage() {
               aria-label={`Seleccionar perfil ${profile.name}`}
               className={CARD_BTN}
             >
-              <div className={`size-38.75 overflow-hidden ${CARD_BOX_BASE}`}>
+              <div className={`size-24 sm:size-32 md:size-36 overflow-hidden ${CARD_BOX_BASE}`}>
                 <ProfileAvatar name={profile.name} avatar={profile.avatar} />
               </div>
               <span
                 aria-hidden="true"
-                className="text-base text-gray-400 transition-colors group-hover:text-white group-focus:text-white"
+                className="text-xs sm:text-sm md:text-base text-gray-400 transition-colors group-hover:text-white group-focus:text-white"
               >
                 {profile.name}
               </span>
@@ -167,13 +167,13 @@ export default function SwitchProfilesPage() {
               className={CARD_BTN}
             >
               <div
-                className={`flex size-38.75 items-center justify-center bg-[#1a1a24] ${CARD_BOX_BASE}`}
+                className={`flex size-24 sm:size-32 md:size-36 items-center justify-center bg-[#1a1a24] ${CARD_BOX_BASE}`}
               >
-                <Plus className="size-12 text-gray-400 transition-colors group-hover:text-white group-focus:text-white" />
+                <Plus className="size-8 sm:size-10 md:size-12 text-gray-400 transition-colors group-hover:text-white group-focus:text-white" />
               </div>
               <span
                 aria-hidden="true"
-                className="text-base text-gray-400 transition-colors group-hover:text-white group-focus:text-white"
+                className="text-xs sm:text-sm md:text-base text-gray-400 transition-colors group-hover:text-white group-focus:text-white"
               >
                 Agregar Perfil
               </span>
@@ -183,10 +183,10 @@ export default function SwitchProfilesPage() {
       </div>
 
       {/* Manage profiles button */}
-      <div className="mt-12">
+      <div className="mt-10 sm:mt-12 w-full max-w-xs sm:max-w-none sm:w-auto">
         <Link
           href="/account"
-          className="rounded border border-gray-500 px-8 py-3 text-base font-medium tracking-wider text-gray-400 transition-colors hover:border-white hover:text-white focus:border-white focus:text-white focus:outline-none"
+          className="block sm:inline-block text-center rounded border border-gray-500 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-medium tracking-wider text-gray-400 transition-colors hover:border-white hover:text-white focus:border-white focus:text-white focus:outline-none"
         >
           Administrar Perfiles
         </Link>

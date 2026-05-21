@@ -664,8 +664,13 @@ export function usePlayer({
 
                 if (!isCurrentRequest()) return;
 
-                const player = new shaka.default.Player(VIDEO);
+                const player = new shaka.default.Player();
                 shakaPlayerRef.current = player;
+                if (!isCurrentRequest()) {
+                  await player.destroy();
+                  return;
+                }
+                await player.attach(VIDEO);
                 if (!isCurrentRequest()) {
                   await player.destroy();
                   return;

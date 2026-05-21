@@ -13,6 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload logo for LCP — rendered before client-side Sidebar mounts */}
+        <link rel="preload" href="/logo.png" as="image" />
+      </head>
       <body>
         <div className="min-h-screen bg-[#141414] text-white">
           <main>{children}</main>

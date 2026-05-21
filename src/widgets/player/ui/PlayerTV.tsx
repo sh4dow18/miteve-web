@@ -158,6 +158,46 @@ function PlayerTV({ content, player, tvShow }: Props) {
         </div>
       </div>
 
+      {/* ── SKIP BUTTONS — always visible regardless of controls state ── */}
+      <div className="absolute right-10 bottom-44 z-30 flex justify-end">
+        {skips.intro && (
+          <button
+            onClick={skip}
+            tabIndex={0}
+            data-focusable
+            autoFocus
+            className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+          >
+            Omitir Intro
+          </button>
+        )}
+        {skips.summary && (
+          <button
+            onClick={skip}
+            tabIndex={0}
+            data-focusable
+            autoFocus
+            className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+          >
+            Omitir Resumen
+          </button>
+        )}
+        {skips.credits && tvShow?.nextEpisode && (
+          <button
+            onClick={navigateToNextEpisode}
+            tabIndex={0}
+            data-focusable
+            autoFocus
+            className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+          >
+            Siguiente Episodio
+          </button>
+        )}
+      </div>
+
       {/* ══════════════════════════════════════════════════════════════════════
           BOTTOM CONTROLS
       ══════════════════════════════════════════════════════════════════════ */}
@@ -170,43 +210,6 @@ function PlayerTV({ content, player, tvShow }: Props) {
           transition-opacity duration-300
           ${videoStates.controlsHidden ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
-        {/* ── SKIP / NEXT EPISODE BUTTONS — inside controls, focusable via D-pad ── */}
-        {/* Fixed-height row so the seekbar never shifts when they appear/disappear */}
-        <div className="flex justify-end mb-4 h-14">
-          {skips.intro && (
-            <button
-              onClick={skip}
-              tabIndex={0}
-              data-focusable
-              className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
-                focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
-            >
-              Omitir Intro
-            </button>
-          )}
-          {skips.summary && (
-            <button
-              onClick={skip}
-              tabIndex={0}
-              data-focusable
-              className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
-                focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
-            >
-              Omitir Resumen
-            </button>
-          )}
-          {skips.credits && tvShow?.nextEpisode && (
-            <button
-              onClick={navigateToNextEpisode}
-              tabIndex={0}
-              data-focusable
-              className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-lg text-base font-bold tracking-wide transition-colors
-                focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
-            >
-              Siguiente Episodio
-            </button>
-          )}
-        </div>
 
         {/* ── SEEKBAR — fixed-height wrapper so preview bubble never shifts layout ── */}
         <div
