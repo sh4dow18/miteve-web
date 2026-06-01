@@ -1,7 +1,14 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Save, Info, ChevronUp, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import LiteYouTubeEmbed from "react-lite-youtube-embed";
+import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
+import { ImageOff, X, Save, Info, Timer } from "lucide-react";
+import { GetTmdbImage } from "@/shared/api/tmdb";
 import { Genre, ShortContent, ContentRequest, MiniContainer } from "@/entities/content/model/types";
 import { useContentModal } from "@/features/admin/model/modals/useContentModal";
+import { ContainerPositionDnD } from "@/features/admin/ui/ContainerPositionDnD";
+import { TmdbSearch } from "@/features/admin/ui/TmdbSearch";
 
 interface Props {
   item: ShortContent | null;
@@ -26,6 +33,8 @@ export function ContentModal({
     error,
     setTmdbId,
     setTrailerDuration,
+    endTimeStr,
+    setEndTimeStr,
     setField,
     fetchFromTMDB,
     toggleGenre,
@@ -36,12 +45,15 @@ export function ContentModal({
     toggleComingSoon,
   } = useContentModal({ item, onSave, containers, genres });
 
+  const [coverError, setCoverError] = useState(false);
+  const [backgroundError, setBackgroundError] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -49,21 +61,21 @@ export function ContentModal({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-gray-900 rounded-t-2xl sm:rounded-lg max-w-4xl w-full max-h-[95vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-6 flex items-center justify-between z-10">
-          <h2 className="text-2xl font-semibold">
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 px-4 py-4 sm:p-6 flex items-center justify-between z-10">
+          <h2 className="text-lg sm:text-2xl font-semibold">
             {item ? "Editar" : "Agregar"} Contenido
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="p-2 hover:bg-white/10 rounded-full transition-colors shrink-0"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form className="p-6 space-y-6" onSubmit={handleSubmit}>
+        <form className="p-4 sm:p-6 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-600/10 border border-red-600/50 rounded-lg p-4">
               <p className="text-red-400 text-sm">{error}</p>
@@ -73,33 +85,20 @@ export function ContentModal({
           {item === null && (
             <div className="bg-blue-600/10 border border-blue-600/20 rounded-lg p-4">
               <label className="block text-sm text-gray-400 mb-2">
-                ID de TMDB (Opcional - Autocompletar)
+                Buscar en TMDB (Autocompletar)
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  value={tmdbId ?? ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setTmdbId(val ? Number.parseInt(val, 10) : null);
-                  }}
-                  className="flex-1 px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
-                  placeholder="Ej: 550"
-                  min="1"
-                />
-                <button
-                  type="button"
-                  onClick={fetchFromTMDB}
-                  disabled={loadingTMDB || !tmdbId}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingTMDB ? "Cargando..." : "Obtener de TMDB"}
-                </button>
-              </div>
+              <TmdbSearch
+                typeId={formData.typeId}
+                loadingDetail={loadingTMDB}
+                onSelect={(id) => fetchFromTMDB(id)}
+              />
+              {loadingTMDB && (
+                <p className="text-xs text-blue-400 mt-2">Obteniendo datos de TMDB…</p>
+              )}
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-400 mb-2">
                 Título *
@@ -223,9 +222,18 @@ export function ContentModal({
             <p className="text-xs text-gray-500 mt-2">
               Solo el código, no la URL completa
             </p>
+            {formData.trailer && (
+              <div className="mt-3 rounded overflow-hidden border border-gray-700">
+                <LiteYouTubeEmbed
+                  id={formData.trailer}
+                  title="Preview del trailer"
+                  noCookie
+                />
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-400 mb-2">
                 URL del Póster
@@ -233,9 +241,28 @@ export function ContentModal({
               <input
                 type="text"
                 value={formData.cover}
-                onChange={(e) => setField("cover", e.target.value)}
+                onChange={(e) => { setField("cover", e.target.value); setCoverError(false); }}
                 className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
               />
+              {formData.cover && (
+                <div className="mt-2 relative w-full aspect-[2/3] rounded overflow-hidden bg-gray-800 border border-gray-700">
+                  {coverError ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-rose-900/60 to-purple-900/60">
+                      <ImageOff className="w-8 h-8 text-rose-400" />
+                      <span className="text-xs text-rose-300 font-medium">Imagen no encontrada</span>
+                    </div>
+                  ) : (
+                    <Image
+                      src={GetTmdbImage(formData.cover)}
+                      alt="Preview del póster"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={() => setCoverError(true)}
+                    />
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-2">
@@ -244,9 +271,28 @@ export function ContentModal({
               <input
                 type="text"
                 value={formData.background}
-                onChange={(e) => setField("background", e.target.value)}
+                onChange={(e) => { setField("background", e.target.value); setBackgroundError(false); }}
                 className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
               />
+              {formData.background && (
+                <div className="mt-2 relative w-full aspect-video rounded overflow-hidden bg-gray-800 border border-gray-700">
+                  {backgroundError ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-rose-900/60 to-purple-900/60">
+                      <ImageOff className="w-8 h-8 text-rose-400" />
+                      <span className="text-xs text-rose-300 font-medium">Imagen no encontrada</span>
+                    </div>
+                  ) : (
+                    <Image
+                      src={GetTmdbImage(formData.background)}
+                      alt="Preview del backdrop"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={() => setBackgroundError(true)}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -271,30 +317,20 @@ export function ContentModal({
               </select>
 
               {formData.containerId > 0 && (
-                <div className="flex items-center gap-4">
-                  <label className="text-sm text-gray-400">
-                    Posición en contenedor:
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={decrementContainerPosition}
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded"
-                    >
-                      <ChevronUp className="w-4 h-4" />
-                    </button>
-                    <span className="px-4 py-2 bg-gray-800 rounded">
-                      {formData.containerPosition}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={incrementContainerPosition}
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded"
-                    >
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                <>
+                  <p className="text-xs text-gray-500">
+                    Arrastra este elemento a la posición deseada dentro del contenedor.
+                  </p>
+                  <ContainerPositionDnD
+                    containerId={formData.containerId}
+                    typeId={formData.typeId}
+                    currentContentId={item?.id ?? null}
+                    currentTitle={formData.title}
+                    currentCover={formData.cover}
+                    initialPosition={formData.containerPosition}
+                    onPositionChange={(pos) => setField("containerPosition", pos)}
+                  />
+                </>
               )}
             </div>
           </div>
@@ -330,6 +366,24 @@ export function ContentModal({
               onChange={(e) => setField("note", e.target.value)}
               className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none resize-none"
               placeholder="Notas internas sobre este contenido..."
+            />
+          </div>
+
+          <div className="bg-orange-600/10 border border-orange-600/20 rounded-lg p-4">
+            <label className="text-sm text-gray-400 mb-2 flex items-center gap-2">
+              <Timer className="w-4 h-4" />
+              Tiempo final
+            </label>
+            <p className="text-xs text-gray-500 mb-2">
+              Cuando el video llegue a este tiempo se mostrarán recomendaciones de contenido similar.
+              Dejar en blanco para desactivar.
+            </p>
+            <input
+              type="text"
+              value={endTimeStr}
+              onChange={(e) => setEndTimeStr(e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
+              placeholder="Ej: 1:55:00 o 115:00"
             />
           </div>
 

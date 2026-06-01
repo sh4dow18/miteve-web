@@ -39,13 +39,13 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-semibold">Gestión de Episodios</h2>
 
         {selectedSeasonId && (
           <button
             onClick={handleOpenAdd}
-            className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
             Agregar Episodio
@@ -151,10 +151,24 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
           ) : (
             <div className="grid gap-4">
               {episodes.map((episode) => (
-                <div key={episode.id} className="bg-gray-800/50 rounded-lg p-6">
-                  <div className="flex items-start gap-4">
+                <div key={episode.id} className="bg-gray-800/50 rounded-lg overflow-hidden">
+                  {/* Imagen full-width en móvil, oculta en sm+ */}
+                  {episode.cover && (
+                    <div className="w-full h-40 sm:hidden">
+                      <Image
+                        src={GetTmdbImage(episode.cover)}
+                        alt={episode.title}
+                        width={400}
+                        height={160}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-4 p-4 sm:p-6">
+                    {/* Imagen miniatura solo en sm+ */}
                     {episode.cover && (
-                      <div className="w-32 h-20 shrink-0 rounded overflow-hidden bg-gray-700">
+                      <div className="hidden sm:block w-32 h-20 shrink-0 rounded overflow-hidden bg-gray-700">
                         <Image
                           src={GetTmdbImage(episode.cover)}
                           alt={episode.title}
@@ -166,11 +180,11 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
                     )}
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm font-medium shrink-0">
+                      <div className="flex items-start gap-2 mb-1">
+                        <span className="px-2 py-0.5 bg-blue-600/20 text-blue-400 rounded-full text-xs font-medium shrink-0 mt-0.5">
                           E{episode.episodeNumber}
                         </span>
-                        <h4 className="text-lg font-semibold truncate">
+                        <h4 className="text-base sm:text-lg font-semibold leading-tight">
                           {episode.title}
                         </h4>
                       </div>
@@ -183,7 +197,7 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
 
                     <button
                       onClick={() => handleOpenEdit(episode)}
-                      className="p-2 hover:bg-white/10 rounded transition-colors"
+                      className="p-2 hover:bg-white/10 rounded transition-colors shrink-0"
                       aria-label={`Editar episodio ${episode.episodeNumber}`}
                     >
                       <Edit2 className="w-4 h-4" />

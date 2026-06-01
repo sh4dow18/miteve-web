@@ -17,7 +17,6 @@ export function AddProfileModal({ name, error, adding, onNameChange, onSubmit, o
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Focus the first input when the modal opens
     containerRef.current?.querySelector<HTMLElement>("input")?.focus();
 
     function onKeyDown(e: KeyboardEvent) {
@@ -139,4 +138,3 @@ export function AddProfileModal({ name, error, adding, onNameChange, onSubmit, o
     </motion.div>
   );
 }
-

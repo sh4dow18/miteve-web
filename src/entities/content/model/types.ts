@@ -18,6 +18,8 @@ export interface MiniContent {
   id: string;
   cover: string;
   title: string;
+  trailer: string;
+  age: number;
 }
 
 export interface Content {
@@ -41,6 +43,7 @@ export interface Content {
   seasonsList: Season[];
   container: MiniContainer;
   position: number;
+  endTime: number | null;
 }
 
 export interface ShortContent {
@@ -72,11 +75,21 @@ export interface ContentRequest {
   genresList: number[];
   containerId: number;
   containerPosition: number;
+  endTime: number | null;
 }
 
 export interface Genre {
   id: number;
   name: string;
+}
+
+export interface GenrePageItem {
+  id: string;
+  title: string;
+  cover: string;
+  year: number;
+  rating: number;
+  type: string;
 }
 
 export interface GenreRequest {
@@ -155,9 +168,69 @@ export interface NextEpisode {
   episodeNumber: number;
 }
 
+export interface Privilege {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+export interface PrivilegeRequest {
+  slug: string;
+  name: string;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  privilegesList: Privilege[];
+}
+
+export interface RoleRequest {
+  name: string;
+  privilegeIds: number[];
+}
+
+export interface MiniRole {
+  id: number;
+  name: string;
+}
+
+export interface AppUser {
+  id: number;
+  email: string;
+  profilesList: unknown[];
+  role: MiniRole;
+}
+
 export type TabType =
   | "content"
   | "containers"
   | "genres"
   | "seasons"
-  | "episodes";
+  | "episodes"
+  | "bug-reports"
+  | "suggested-content"
+  | "privileges"
+  | "roles"
+  | "users";
+
+export interface BugReportResponse {
+  id: number;
+  message: string;
+  reportedAt: string;
+  userId: number;
+  userEmail: string;
+  statusId: number;
+  statusName: string;
+}
+
+export interface SuggestedContentReportResponse {
+  id: number;
+  message: string;
+  reportedAt: string;
+  userId: number;
+  userEmail: string;
+  statusId: number;
+  statusName: string;
+  rejectionReason: string | null;
+}

@@ -1,8 +1,10 @@
 "use client";
+import { useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ContentCard } from "@/shared/ui/ContentCard";
 import type { ContainerElement, Content } from "@/entities/content/model/types";
 import { useContentRow } from "@/widgets/content-row/model/useContentRow";
+import { useAdultProfile } from "@/shared/lib/AdultProfileContext";
 
 interface Props {
   title: string;
@@ -19,6 +21,15 @@ export function ContentRow({
   onRowFocus,
   totalRows = 1,
 }: Props) {
+  const adultProfile = useAdultProfile();
+  const visibleList = useMemo(() => {
+    if (adultProfile) return contentsList;
+    return contentsList.filter((element) => {
+      const age = "content" in element ? element.content.age : (element as Content).age;
+      return age <= 15;
+    });
+  }, [contentsList, adultProfile]);
+
   const {
     scrollContainerRef,
     focusedIndex,
@@ -29,10 +40,10 @@ export function ContentRow({
   } = useContentRow({
     rowIndex,
     totalRows,
-    contentLength: contentsList.length,
+    contentLength: visibleList.length,
   });
 
-  if (!contentsList || contentsList.length === 0) return null;
+  if (!visibleList || visibleList.length === 0) return null;
 
   return (
     <div className="mb-8 md:mb-12 group/row">
@@ -65,7 +76,7 @@ export function ContentRow({
                      scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {contentsList.map((element, index) => (
+          {visibleList.map((element, index) => (
             <div
               key={element.id}
               onKeyDown={(e) => handleCardKeyDown(e, index)}

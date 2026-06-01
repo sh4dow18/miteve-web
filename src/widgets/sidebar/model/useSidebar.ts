@@ -29,6 +29,12 @@ const adminNavItem = {
   path: routeToHref(ROUTES_MAP.admin.path),
 };
 
+const downloadsNavItem = {
+  icon: ROUTES_MAP.downloads.Icon,
+  label: ROUTES_MAP.downloads.title,
+  path: routeToHref(ROUTES_MAP.downloads.path),
+};
+
 function detectIsTV(): boolean {
   if (typeof window === "undefined") return false;
   const w = window as Window & { AndroidApp?: { isAndroidApp: () => boolean } };
@@ -79,9 +85,11 @@ export function useSidebar() {
   }, [location]);
 
   const authItem = isLoggedIn ? accountItem : loginItem;
-  const dynamicMenuItems = isAdmin
-    ? [...menuItems, adminNavItem]
-    : menuItems;
+  const dynamicMenuItems = [
+    ...menuItems,
+    downloadsNavItem,
+    ...(isAdmin ? [adminNavItem] : []),
+  ];
 
   const isActive = (path: string) =>
     location === path || location.startsWith(`${path}/`);

@@ -8,6 +8,11 @@ import {
   EpisodesTab,
   GenresTab,
   SeasonsTab,
+  BugReportsTab,
+  SuggestedContentTab,
+  PrivilegesTab,
+  RolesTab,
+  UsersTab,
 } from "@/features/admin/ui/tabs";
 import { TabButton } from "@/shared/ui/TabButton";
 
@@ -40,7 +45,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen px-3 py-16 md:px-4 md:py-4 lg:px-6">
-      <div className="w-full space-y-6 p-5">
+      <div className="w-full space-y-6 p-3 sm:p-5">
         <header className="space-y-2">
           <h1 className="text-3xl font-bold">Panel de Administración</h1>
           <p className="text-gray-400">
@@ -102,6 +107,16 @@ export default function AdminPage() {
             onEdit={(id, data) => editEpisode(id, data)}
           />
         )}
+
+        {activeTab === "bug-reports" && <BugReportsTab />}
+
+        {activeTab === "suggested-content" && <SuggestedContentTab />}
+
+        {activeTab === "privileges" && <PrivilegesTab />}
+
+        {activeTab === "roles" && <RolesTab />}
+
+        {activeTab === "users" && <UsersTab />}
       </div>
     </div>
   );

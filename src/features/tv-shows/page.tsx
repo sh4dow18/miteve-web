@@ -1,22 +1,37 @@
-import { getTvShowsPageData } from "@/features/tv-shows/model/getTvShowsPageData";
-import { ContentRow } from "@/widgets/content-row";
-import { HeroSection } from "@/widgets/hero-section";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { ContentRow } from "@/widgets/content-row/ui/ContentRow";
+import { ContentRowTV } from "@/widgets/content-row/ui/ContentRowTV";
+import { HeroSection } from "@/widgets/hero-section/ui/HeroSection";
+import { HeroSectionTV } from "@/widgets/hero-section/ui/HeroSectionTV";
+import { useTV } from "@/shared/lib/hooks/useTV";
+import type { Container, Content } from "@/entities/content/model/types";
 
-export default async function TvShowsPage() {
-  const { containers, heroContent } = await getTvShowsPageData();
+interface TvShowsPageData {
+  containers: Container[];
+  heroContent: Content | null;
+}
+
+export default function TvShowsFeaturePage({ data }: { data: TvShowsPageData }) {
+  const isTV = useTV();
+  const { containers, heroContent } = data;
 
   if (containers.length === 0) {
     return <div className="min-h-screen" />;
   }
 
+  const Row = isTV ? ContentRowTV : ContentRow;
+
   return (
     <div className="min-h-screen">
-      {heroContent && <HeroSection content={heroContent} />}
+      {heroContent && (
+        isTV
+          ? <HeroSectionTV content={heroContent} />
+          : <HeroSection content={heroContent} />
+      )}
       <div className="-mt-16 relative z-10 space-y-8 pb-12">
         {containers.map((container, index) => (
-          <ContentRow
+          <Row
             key={container.id}
             title={container.name}
             contentsList={container.elementsList}

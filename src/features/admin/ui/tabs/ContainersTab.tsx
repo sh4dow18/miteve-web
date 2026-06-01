@@ -28,11 +28,11 @@ export function ContainersTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-semibold">Gestión de Contenedores</h2>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
           tabIndex={0}
         >
           <Plus className="w-5 h-5" />

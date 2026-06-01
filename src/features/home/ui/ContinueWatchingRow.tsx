@@ -15,6 +15,7 @@ type CWContent = {
   id: string;
   title: string;
   cover: string;
+  age: number;
 };
 
 type CWEpisode = {
@@ -139,6 +140,8 @@ export function ContinueWatchingRow({ onLoaded }: { onLoaded?: () => void }) {
               id: item.content?.id ?? "",
               cover: item.content?.cover ?? "",
               title: getTitle(item),
+              trailer: "",
+              age: item.content?.age ?? 0,
             };
             return (
               <div

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
@@ -8,7 +7,6 @@ import { Plus } from "lucide-react";
 import { useSwitchProfiles } from "./model/useSwitchProfiles";
 import { AddProfileModal } from "./ui/AddProfileModal";
 
-// Shared card focus/hover classes — visible enough for TV remote D-pad navigation
 const CARD_BTN = "group flex flex-col items-center gap-3 focus:outline-none";
 const CARD_BOX_BASE =
   "rounded-md border-4 border-transparent transition-all duration-150 group-hover:border-white group-focus:border-white group-hover:scale-105 group-focus:scale-105";
@@ -45,51 +43,15 @@ export default function SwitchProfilesPage() {
     newName,
     addError,
     adding,
+    profileRefs,
+    addButtonRef,
     selectProfile,
     openModal,
     closeModal,
     handleNameChange,
     handleAddProfile,
+    handleCardKeyDown,
   } = useSwitchProfiles();
-
-  // Refs for D-pad / arrow-key navigation (TV remote support)
-  const profileRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const addButtonRef = useRef<HTMLButtonElement | null>(null);
-
-  // Auto-focus the first card once the page is ready
-  useEffect(() => {
-    if (!loading && !error) {
-      profileRefs.current[0]?.focus();
-    }
-  }, [loading, error]);
-
-  // Return focus to the "Add profile" button after the modal closes
-  const prevModalOpen = useRef(false);
-  useEffect(() => {
-    if (prevModalOpen.current && !modalOpen) {
-      addButtonRef.current?.focus();
-    }
-    prevModalOpen.current = modalOpen;
-  }, [modalOpen]);
-
-  function getAllCards(): HTMLButtonElement[] {
-    const cards: (HTMLButtonElement | null)[] = [
-      ...profileRefs.current.slice(0, profiles.length),
-    ];
-    if (canAddProfile) cards.push(addButtonRef.current);
-    return cards.filter((c): c is HTMLButtonElement => c !== null);
-  }
-
-  function handleCardKeyDown(e: React.KeyboardEvent, idx: number) {
-    const cards = getAllCards();
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      cards[(idx + 1) % cards.length]?.focus();
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      e.preventDefault();
-      cards[(idx - 1 + cards.length) % cards.length]?.focus();
-    }
-  }
 
   if (loading) {
     return (
@@ -120,7 +82,6 @@ export default function SwitchProfilesPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-black px-4 sm:px-6 py-10">
-      {/* Title */}
       <h1
         id="who-is-watching"
         className="mb-8 sm:mb-10 text-2xl sm:text-4xl md:text-5xl font-light tracking-wide text-white text-center"
@@ -128,7 +89,6 @@ export default function SwitchProfilesPage() {
         ¿Quién está viendo?
       </h1>
 
-      {/* Profile grid */}
       <div
         role="list"
         aria-labelledby="who-is-watching"
@@ -156,7 +116,6 @@ export default function SwitchProfilesPage() {
           </div>
         ))}
 
-        {/* Add profile card — hidden when the 5-profile limit is reached */}
         {canAddProfile && (
           <div role="listitem">
             <button
@@ -182,7 +141,6 @@ export default function SwitchProfilesPage() {
         )}
       </div>
 
-      {/* Manage profiles button */}
       <div className="mt-10 sm:mt-12 w-full max-w-xs sm:max-w-none sm:w-auto">
         <Link
           href="/account"
@@ -192,7 +150,6 @@ export default function SwitchProfilesPage() {
         </Link>
       </div>
 
-      {/* Add profile modal */}
       <AnimatePresence>
         {modalOpen && (
           <AddProfileModal

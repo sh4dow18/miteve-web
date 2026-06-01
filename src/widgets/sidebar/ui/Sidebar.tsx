@@ -112,7 +112,7 @@ export function Sidebar() {
         ) : (
           <>
         {/* Logo */}
-        <div className="mb-12">
+        <div className="mb-6 shrink-0">
           <Image
             src="/logo.png"
             alt="Miteve"
@@ -123,8 +123,8 @@ export function Sidebar() {
           />
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 flex flex-col gap-8">
+        {/* Nav — scrollable */}
+        <nav className="flex-1 flex flex-col gap-6 overflow-y-auto min-h-0 w-full items-center scrollbar-hide py-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -150,7 +150,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="pt-6 border-t border-white/10 flex flex-col items-center gap-5">
+        <div className="shrink-0 pt-4 border-t border-white/10 flex flex-col items-center gap-5">
           {/* Profile avatar — shown when logged in */}
           {isLoggedIn && mainProfile && (
             <Link
@@ -271,7 +271,7 @@ export function Sidebar() {
         ) : (
           <>
             {/* Nav items — horizontal layout matching sidebar style */}
-            <nav className="flex flex-col gap-2 px-4">
+            <nav className={`flex flex-col gap-2 px-4${isShortScreen || isTV ? " flex-1 min-h-0 overflow-y-auto scrollbar-hide" : ""}`}>
               {menuItems
                 .filter((item) =>
                   !isVeryShortScreen ||
@@ -285,6 +285,7 @@ export function Sidebar() {
                     key={item.path}
                     href={item.path}
                     onClick={closeDrawer}
+                    onFocus={(e) => e.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" })}
                     className={`flex items-center gap-4 px-4 py-3 rounded-lg relative
                                 transition-all duration-200 group
                                 ${active

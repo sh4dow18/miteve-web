@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { Content, EpisodeMetadata, NextEpisode } from "@/entities/content/model/types";
 import { type UsePlayerReturn } from "@/features/player/model/usePlayer";
+import { EndTimeOverlayTV } from "@/widgets/player/ui/EndTimeOverlayTV";
 
 interface Props {
   content: Content;
@@ -67,6 +68,8 @@ function PlayerTV({ content, player, tvShow }: Props) {
     navigateToNextEpisode,
     skip,
     fmt,
+    endTimeOverlay,
+    dismissEndTimeOverlay,
   } = player;
 
   // ── Derived values ──────────────────────────────────────────────────────────
@@ -96,6 +99,13 @@ function PlayerTV({ content, player, tvShow }: Props) {
         videoStates.controlsHidden ? "cursor-none" : "cursor-default"
       }`}
     >
+      {/* ── END-TIME OVERLAY ── */}
+      <EndTimeOverlayTV
+        contentId={content.id}
+        visible={endTimeOverlay}
+        onDismiss={dismissEndTimeOverlay}
+      />
+
       {/* ── VIDEO ── */}
       <video
         ref={videoRef}

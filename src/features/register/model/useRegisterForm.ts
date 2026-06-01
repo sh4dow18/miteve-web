@@ -51,7 +51,7 @@ export function useRegisterForm() {
       const res = await fetch(`${API_HOST_IP}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email: form.email, password: form.password }),
+        body: JSON.stringify({ roleId: 2, name, email: form.email, password: form.password }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

@@ -24,6 +24,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Content, EpisodeMetadata, NextEpisode } from "@/entities/content/model/types";
 import { type UsePlayerReturn } from "@/features/player/model/usePlayer";
+import { EndTimeOverlay } from "@/widgets/player/ui/EndTimeOverlay";
 
 interface Props {
   content: Content;
@@ -71,6 +72,8 @@ function Player({ content, player, tvShow }: Props) {
     navigateToNextEpisode,
     skip,
     fmt,
+    endTimeOverlay,
+    dismissEndTimeOverlay,
   } = player;
 
   const iconBtn =
@@ -114,6 +117,13 @@ function Player({ content, player, tvShow }: Props) {
         playsInline
         data-focusable
         onClick={togglePlay}
+      />
+
+      {/* END-TIME OVERLAY */}
+      <EndTimeOverlay
+        contentId={content.id}
+        visible={endTimeOverlay}
+        onDismiss={dismissEndTimeOverlay}
       />
 
       {/* LOADING */}

@@ -23,6 +23,7 @@ export function useContentModal({
 }: UseContentModalParams) {
   const [tmdbId, setTmdbId] = useState<number | null>(null);
   const [trailerDuration, setTrailerDuration] = useState<string>("");
+  const [endTimeStr, setEndTimeStr] = useState<string>("");
   const [formData, setFormData] = useState<ContentRequest>({
     tmdbId: 0,
     title: "",
@@ -41,22 +42,25 @@ export function useContentModal({
     typeId: 1,
     containerId: 0,
     containerPosition: 0,
+    endTime: null,
   });
   const [loadingTMDB, setLoadingTMDB] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFromTMDB = async () => {
-    if (!tmdbId || tmdbId <= 0) {
+  const fetchFromTMDB = async (overrideId?: number) => {
+    const idToUse = overrideId ?? tmdbId;
+    if (!idToUse || idToUse <= 0) {
       setError("Por favor ingresa un ID de TMDB valido");
       return;
     }
 
+    if (overrideId) setTmdbId(overrideId);
     setLoadingTMDB(true);
     setError(null);
 
     try {
       const detailsRes = await fetch(
-        `/api/tmdb?id=${tmdbId}&type=${formData.typeId === 1 ? "movie" : "tv"}`
+        `/api/tmdb?id=${idToUse}&type=${formData.typeId === 1 ? "movie" : "tv"}`
       );
 
       if (!detailsRes.ok) {
@@ -115,6 +119,7 @@ export function useContentModal({
         }
 
         setTrailerDuration(secondsToTime(existingContent.trailerDuration || 0));
+        setEndTimeStr(existingContent.endTime != null ? secondsToTime(existingContent.endTime) : "");
         setFormData({
           tmdbId: existingContent.tmdbId || 0,
           title: existingContent.title || "",
@@ -135,6 +140,7 @@ export function useContentModal({
           typeId: existingContent.type === "movie" ? 1 : 2,
           containerId: existingContent.container?.id || 0,
           containerPosition: existingContent.position || 0,
+          endTime: existingContent.endTime ?? null,
         });
       } catch {
         setError("Error al cargar el contenido");
@@ -163,6 +169,7 @@ export function useContentModal({
     }
 
     const trailerSeconds = timeToSeconds(trailerDuration);
+    const endTimeSecs = endTimeStr.trim() ? timeToSeconds(endTimeStr) : null;
 
     setError(null);
     onSave({
@@ -171,6 +178,7 @@ export function useContentModal({
       note: formData.note !== "" ? formData.note : null,
       trailerDuration: trailerSeconds !== null ? trailerSeconds : 0,
       tmdbId: tmdbId !== null ? tmdbId : 0,
+      endTime: endTimeSecs ?? null,
     });
   };
 
@@ -225,6 +233,8 @@ export function useContentModal({
     genres,
     setTmdbId,
     setTrailerDuration,
+    endTimeStr,
+    setEndTimeStr,
     setField,
     fetchFromTMDB,
     toggleGenre,

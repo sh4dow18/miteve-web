@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import {
+  Bug,
   Clapperboard,
+  Download,
   Film,
   HelpCircle,
   Home,
   Info,
+  Lightbulb,
   LogIn,
   Search,
   Shield,
@@ -110,7 +113,7 @@ export const ROUTES_LIST: Route[] = [
   },
   {
     path: "admin",
-    title: "Administracion",
+    title: "Administración",
     summary:
       "Panel para gestionar contenido, contenedores, generos y episodios.",
     Icon: Shield,
@@ -210,6 +213,43 @@ export const ROUTES_LIST: Route[] = [
     metadata: {
       title: "Información de la aplicación",
       description: "Detalles sobre la aplicación Miteve.",
+    },
+  },
+  {
+    path: "bug-report",
+    title: "Reportar Bug",
+    summary: "Reporta problemas o errores que encuentres en la aplicación.",
+    Icon: Bug,
+    inSitemap: false,
+    inHome: true,
+    metadata: {
+      title: "Reportar un Bug",
+      description: "Reporta problemas o errores que encuentres en la aplicación.",
+    },
+  },
+  {
+    path: "suggest-content",
+    title: "Sugerir",
+    summary: "Sugiere películas o series que te gustaría ver en Miteve.",
+    Icon: Lightbulb,
+    inSitemap: false,
+    inHome: true,
+    metadata: {
+      title: "Sugerir Contenido",
+      description: "Sugiere películas o series que te gustaría ver en Miteve.",
+    },
+  },
+  {
+    path: "downloads",
+    title: "Descargas",
+    summary: "Contenido descargado para ver sin conexión a internet.",
+    Icon: Download,
+    inSitemap: false,
+    // inHome: false — shown dynamically only when isPWA, not via ROUTES_LIST
+    inHome: false,
+    metadata: {
+      title: "Descargas offline",
+      description: "Contenido descargado para ver sin conexión a internet.",
     },
   },
 ];

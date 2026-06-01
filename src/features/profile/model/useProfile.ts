@@ -6,6 +6,11 @@ export type ProfileInfo = {
   id: string;
   name: string;
   avatar?: string;
+  autoSkip: boolean;
+  lowQuality: boolean;
+  disableSubtitles: boolean;
+  adultProfile: boolean;
+  allowPersonalizedRecommendations: boolean;
 };
 
 export function useProfile(id: string) {
@@ -32,5 +37,5 @@ export function useProfile(id: string) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  return { profile, loading, error };
+  return { profile, setProfile, loading, error };
 }

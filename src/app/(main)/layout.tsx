@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import { Sidebar } from "@/widgets/sidebar";
+import { AdultProfileProvider } from "@/shared/lib/AdultProfileContext";
 
 export const metadata: Metadata = {
   title: "Miteve",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Sidebar />
-      <main className="md:ml-20">{children}</main>
+      <main className="md:ml-20">
+        <AdultProfileProvider>{children}</AdultProfileProvider>
+      </main>
     </div>
   );
 }

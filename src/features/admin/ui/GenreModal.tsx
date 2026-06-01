@@ -18,7 +18,7 @@ export function GenreModal({ item, onSave, onClose }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -26,10 +26,10 @@ export function GenreModal({ item, onSave, onClose }: Props) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gray-900 rounded-lg max-w-2xl w-full p-8"
+        className="bg-gray-900 rounded-t-2xl sm:rounded-lg max-w-2xl w-full p-4 sm:p-8"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-2xl font-semibold">
             {item ? "Editar" : "Agregar"} Género
           </h2>
           <button

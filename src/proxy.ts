@@ -36,6 +36,18 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/404", request.url));
     }
   }
+  // Downloads page: always accessible offline (PWA) — skip API check
+  if (PAGE_NAME === "/downloads") {
+    return NextResponse.next();
+  }
+  // Player page in offline mode via PWA: skip API check
+  if (
+    PAGE_NAME.startsWith("/player/") &&
+    request.nextUrl.searchParams.get("offline") === "true" &&
+    request.cookies.get("miteve_pwa")?.value === "1"
+  ) {
+    return NextResponse.next();
+  }
   // Check backend connection for all pages
   let apiOk = true;
   // Set Controller to allow to check fast the API Health

@@ -1,4 +1,5 @@
 import HomeFeaturePage from "@/features/home/page";
+import { getHomePageData } from "@/features/home/model/getHomePageData";
 import { ROUTES_MAP } from "@/shared/config/routes";
 
 export const metadata = {
@@ -7,6 +8,7 @@ export const metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-	return <HomeFeaturePage />;
+export default async function HomePage() {
+	const data = await getHomePageData();
+	return <HomeFeaturePage data={data} />;
 }

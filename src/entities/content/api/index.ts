@@ -5,7 +5,9 @@ import type {
   EpisodeMetadata,
   FullEpisode,
   Genre,
+  GenrePageItem,
   MiniContainer,
+  MiniContent,
   MiniSeason,
   NextEpisode,
   ShortContent,
@@ -71,6 +73,13 @@ export async function FindAllContainers(): Promise<MiniContainer[]> {
   );
 }
 
+export async function FindContainerById(id: number, typeId: number): Promise<Container | null> {
+  const response = await fetch(`${API_HOST_IP}/containers/type/${typeId}`);
+  if (!response.ok) return null;
+  const containers: Container[] = await response.json();
+  return containers.find((c) => c.id === id) ?? null;
+}
+
 export async function FindAllGenres(): Promise<Genre[]> {
   return await fetch(`${API_HOST_IP}/genres`).then((response) =>
     response.json()
@@ -103,4 +112,28 @@ export async function FindContentsByNameLike(name: string): Promise<Content[]> {
   }
 
   return await response.json();
+}
+
+export async function FindSimilarContent(id: string, size = 5): Promise<MiniContent[]> {
+  const response = await fetch(`${API_HOST_IP}/contents/${id}/similar?page=0&size=${size}`);
+  if (!response.ok) return [];
+  const data = await response.json();
+  // Spring Boot returns a Page object: { content: [...], ... }
+  return Array.isArray(data) ? data : (data.content ?? []);
+}
+
+export async function FindContentsByGenre(
+  genreId: number,
+  page = 0,
+  size = 20
+): Promise<{ items: GenrePageItem[]; totalPages: number }> {
+  const response = await fetch(
+    `${API_HOST_IP}/contents/genre/${genreId}?page=${page}&size=${size}`
+  );
+  if (!response.ok) return { items: [], totalPages: 0 };
+  const data = await response.json();
+  const items: GenrePageItem[] = Array.isArray(data) ? data : (data.content ?? []);
+  const totalPages: number =
+    typeof data.totalPages === "number" ? data.totalPages : 1;
+  return { items, totalPages };
 }

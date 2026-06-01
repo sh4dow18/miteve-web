@@ -21,6 +21,20 @@ export default function RootLayout({
         <div className="min-h-screen bg-[#141414] text-white">
           <main>{children}</main>
         </div>
+        {/* Service Worker registration for PWA offline support */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                    console.warn('[SW] Registration failed:', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

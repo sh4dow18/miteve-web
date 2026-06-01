@@ -74,14 +74,20 @@ export function useContentRow({
         case "ArrowDown":
           e.preventDefault();
           e.stopPropagation();
-          if (rowIndex < totalRows - 1) {
-            const nextRowCard = document.querySelector(
-              `[data-row="${rowIndex + 1}"][data-col="${focusedIndex}"]`
-            ) as HTMLElement;
-            const fallback = document.querySelector(
-              `[data-row="${rowIndex + 1}"]`
-            ) as HTMLElement;
-            (nextRowCard || fallback)?.focus({ preventScroll: false });
+          {
+            // Scan forward through rows until we find one that is rendered
+            let target: HTMLElement | null = null;
+            for (let r = rowIndex + 1; r < totalRows; r++) {
+              const exact = document.querySelector(
+                `[data-row="${r}"][data-col="${focusedIndex}"]`
+              ) as HTMLElement | null;
+              const fallback = document.querySelector(
+                `[data-row="${r}"]`
+              ) as HTMLElement | null;
+              target = exact ?? fallback;
+              if (target) break;
+            }
+            target?.focus({ preventScroll: false });
           }
           break;
 
@@ -89,13 +95,32 @@ export function useContentRow({
           e.preventDefault();
           e.stopPropagation();
           if (rowIndex > 0) {
-            const prevRowCard = document.querySelector(
-              `[data-row="${rowIndex - 1}"][data-col="${focusedIndex}"]`
-            ) as HTMLElement;
-            const fallback = document.querySelector(
-              `[data-row="${rowIndex - 1}"]`
-            ) as HTMLElement;
-            (prevRowCard || fallback)?.focus({ preventScroll: false });
+            // Scan backward through rows until we find one that is rendered
+            let target: HTMLElement | null = null;
+            for (let r = rowIndex - 1; r >= 0; r--) {
+              const exact = document.querySelector(
+                `[data-row="${r}"][data-col="${focusedIndex}"]`
+              ) as HTMLElement | null;
+              const fallback = document.querySelector(
+                `[data-row="${r}"]`
+              ) as HTMLElement | null;
+              target = exact ?? fallback;
+              if (target) break;
+            }
+            if (target) {
+              target.focus({ preventScroll: false });
+            } else {
+              // No row above found → go to Continue Watching or hero
+              const cwCard = document.querySelector("[data-row='-1'][data-col='0']") as HTMLElement;
+              if (cwCard) {
+                cwCard.focus({ preventScroll: false });
+                cwCard.scrollIntoView({ behavior: "smooth", block: "center" });
+              } else {
+                const heroBtn = document.querySelector("[data-hero-btn]") as HTMLElement;
+                heroBtn?.focus({ preventScroll: false });
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }
           } else if (rowIndex === 0) {
             const cwCard = document.querySelector("[data-row='-1'][data-col='0']") as HTMLElement;
             if (cwCard) {

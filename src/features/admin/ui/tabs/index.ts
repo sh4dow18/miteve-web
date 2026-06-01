@@ -3,3 +3,8 @@ export { ContainersTab } from "@/features/admin/ui/tabs/ContainersTab";
 export { GenresTab } from "@/features/admin/ui/tabs/GenresTab";
 export { default as SeasonsTab } from "@/features/admin/ui/tabs/SeasonsTab";
 export { default as EpisodesTab } from "@/features/admin/ui/tabs/EpisodesTab";
+export { BugReportsTab } from "@/features/admin/ui/tabs/BugReportsTab";
+export { SuggestedContentTab } from "@/features/admin/ui/tabs/SuggestedContentTab";
+export { PrivilegesTab } from "@/features/admin/ui/tabs/PrivilegesTab";
+export { RolesTab } from "@/features/admin/ui/tabs/RolesTab";
+export { UsersTab } from "@/features/admin/ui/tabs/UsersTab";

@@ -15,6 +15,7 @@ import { API_HOST_IP, STREAM_HOST_IP } from "@/shared/config/env";
 import { Content, EpisodeMetadata, NextEpisode } from "@/entities/content/model/types";
 import { getPlayerData } from "@/features/player/model/getPlayerData";
 import { getMainProfile, getToken } from "@/shared/lib/auth";
+import type { ProfileInfo } from "@/features/profile/model/useProfile";
 
 declare global {
   interface Window {
@@ -32,6 +33,8 @@ interface UsePlayerParams {
     nextEpisode: NextEpisode | null;
   };
   startAtTime?: number | null;
+  /** If provided, Shaka loads this offline URI instead of the stream URL */
+  offlineUri?: string;
 }
 
 interface UsePlayerPageDataParams {
@@ -124,7 +127,7 @@ function enableSubtitles(video: HTMLVideoElement) {
 
 function disableSubtitles(video: HTMLVideoElement) {
   for (let i = 0; i < video.textTracks.length; i++) {
-    video.textTracks[i].mode = "hidden";
+    video.textTracks[i].mode = "disabled";
   }
 }
 
@@ -200,6 +203,8 @@ export type UsePlayerReturn = {
   skip: () => void;
   fmt: (t: number) => string;
   isTVOrAndroid: () => boolean;
+  endTimeOverlay: boolean;
+  dismissEndTimeOverlay: () => void;
 };
 
 type ShakaPlayer = {
@@ -248,12 +253,35 @@ export function usePlayer({
   content,
   tvShow,
   startAtTime,
+  offlineUri,
 }: UsePlayerParams): UsePlayerReturn {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const shakaPlayerRef = useRef<ShakaPlayer | null>(null);
+  const profileSettingsRef = useRef<Pick<ProfileInfo, "autoSkip" | "lowQuality" | "disableSubtitles"> | null>(null);
+
+  // Load profile settings once on mount
+  useEffect(() => {
+    const mainProfile = getMainProfile();
+    if (!mainProfile) return;
+    const token = getToken();
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+    fetch(`${API_HOST_IP}/profiles/${mainProfile.id}`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data: ProfileInfo | null) => {
+        if (data) {
+          profileSettingsRef.current = {
+            autoSkip: data.autoSkip,
+            lowQuality: data.lowQuality,
+            disableSubtitles: data.disableSubtitles,
+          };
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [videoStates, setVideoStates] = useState({
     paused: true,
@@ -316,6 +344,8 @@ export function usePlayer({
     intro: false,
     credits: false,
   });
+  const [endTimeOverlay, setEndTimeOverlay] = useState(false);
+  const endTimeTriggeredRef = useRef(false);
 
   const syncQualityState = useCallback((tracks: VariantTrack[]) => {
     const variantTracks = tracks.filter((track) => track.type === "variant");
@@ -511,17 +541,29 @@ export function usePlayer({
       const CURRENT_TIME = VIDEO.currentTime;
       const { beginSummary, endSummary, beginIntro, endIntro, beginCredits } =
         tvShow.episode;
-      setSkips({
-        summary:
-          beginSummary !== null && endSummary !== null
-            ? CURRENT_TIME > beginSummary && CURRENT_TIME < endSummary
-            : false,
-        intro:
-          beginIntro !== null && endIntro !== null
-            ? CURRENT_TIME > beginIntro && CURRENT_TIME < endIntro
-            : false,
-        credits: beginCredits !== null ? CURRENT_TIME > beginCredits : false,
-      });
+      const nextSummary =
+        beginSummary !== null && endSummary !== null
+          ? CURRENT_TIME > beginSummary && CURRENT_TIME < endSummary
+          : false;
+      const nextIntro =
+        beginIntro !== null && endIntro !== null
+          ? CURRENT_TIME > beginIntro && CURRENT_TIME < endIntro
+          : false;
+      const nextCredits = beginCredits !== null ? CURRENT_TIME > beginCredits : false;
+
+      // autoSkip: jump automatically without showing the button
+      if (profileSettingsRef.current?.autoSkip) {
+        if (nextSummary && endSummary !== null) {
+          VIDEO.currentTime = endSummary;
+          return;
+        }
+        if (nextIntro && endIntro !== null) {
+          VIDEO.currentTime = endIntro;
+          return;
+        }
+      }
+
+      setSkips({ summary: nextSummary, intro: nextIntro, credits: nextCredits });
     };
     VIDEO.addEventListener("timeupdate", manageSkips);
     VIDEO.addEventListener("seeked", manageSkips);
@@ -530,6 +572,27 @@ export function usePlayer({
       VIDEO.removeEventListener("seeked", manageSkips);
     };
   }, [tvShow]);
+
+  // ─── EndTime overlay ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const VIDEO = videoRef.current;
+    const endTime = content?.endTime;
+    if (!VIDEO || !endTime) return;
+
+    endTimeTriggeredRef.current = false;
+
+    const checkEndTime = () => {
+      if (endTimeTriggeredRef.current) return;
+      if (VIDEO.currentTime >= endTime) {
+        endTimeTriggeredRef.current = true;
+        setEndTimeOverlay(true);
+        VIDEO.pause();
+      }
+    };
+
+    VIDEO.addEventListener("timeupdate", checkEndTime);
+    return () => VIDEO.removeEventListener("timeupdate", checkEndTime);
+  }, [content?.id, content?.endTime]);
 
   useEffect(() => {
     if (!qualityMenuOpen) return;
@@ -608,11 +671,73 @@ export function usePlayer({
       if (!videoRef.current || !content) return;
       const VIDEO = videoRef.current;
 
+      // ── Offline mode: skip speed test and use stored offlineUri ─────────────
+      if (offlineUri) {
+        setIsAutoQuality(true);
+        setQualityMenuOpen(false);
+        setQualityOptions([]);
+
+        const loadOffline = async (attempts = 3, delay = 1500) => {
+          for (let i = 0; i < attempts; i++) {
+            if (!isCurrentRequest()) return;
+            try {
+              const shaka = await import("shaka-player/dist/shaka-player.compiled");
+              if (!isCurrentRequest()) return;
+              shaka.default.polyfill.installAll();
+
+              if (shakaPlayerRef.current) await shakaPlayerRef.current.destroy();
+              if (!isCurrentRequest()) return;
+
+              const player = new shaka.default.Player();
+              shakaPlayerRef.current = player;
+              if (!isCurrentRequest()) { await player.destroy(); return; }
+
+              await player.attach(VIDEO);
+              if (!isCurrentRequest()) { await player.destroy(); return; }
+
+              player.addEventListener("error", (e: unknown) => {
+                console.warn("Shaka offline error", e);
+              });
+
+              await player.load(offlineUri);
+              if (!isCurrentRequest()) return;
+
+              await new Promise<void>((resolve) => {
+                if (VIDEO.readyState >= 3) resolve();
+                else VIDEO.addEventListener("canplay", () => resolve(), { once: true });
+              });
+
+              if (startAtTime && startAtTime > 0) {
+                VIDEO.currentTime = startAtTime;
+              }
+
+              VIDEO.play()
+                .then(() => isCurrentRequest() && setVideoStates((p) => ({ ...p, paused: false, waiting: false })))
+                .catch(() => isCurrentRequest() && setVideoStates((p) => ({ ...p, paused: true, waiting: false })));
+
+              return;
+            } catch (e) {
+              if (!isCurrentRequest()) return;
+              console.warn(`Shaka offline intento ${i + 1} fallido`, e);
+              if (i < attempts - 1) {
+                await new Promise((r) => setTimeout(r, delay));
+              }
+            }
+          }
+          if (isCurrentRequest()) {
+            setVideoStates((p) => ({ ...p, paused: true, waiting: false }));
+          }
+        };
+
+        void loadOffline();
+        return;
+      }
+
       const speed = await speedTest();
       if (!isCurrentRequest()) return;
 
       const slow = speed < 4;
-      const lowQ = videoStates.resolution === "SD" || slow;
+      const lowQ = profileSettingsRef.current?.lowQuality || videoStates.resolution === "SD" || slow;
 
       const API = `${
         tvShow
@@ -710,19 +835,32 @@ export function usePlayer({
                 // ── Auto-activar subtítulos ─────────────────────────────────
                 // Intentar activar inmediatamente
                 const subtitleTrack = getSubtitleTrack(VIDEO);
+                const subsDisabled = profileSettingsRef.current?.disableSubtitles ?? false;
                 if (subtitleTrack) {
-                  enableSubtitles(VIDEO);
-                  setHasSubtitles(true);
-                  setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                  if (subsDisabled) {
+                    disableSubtitles(VIDEO);
+                    setHasSubtitles(true);
+                    setVideoStates((p) => ({ ...p, subtitlesOn: false }));
+                  } else {
+                    enableSubtitles(VIDEO);
+                    setHasSubtitles(true);
+                    setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                  }
                 } else {
                   // Shaka puede tardar un tick en añadir los tracks
                   const trackTimeoutRef = { current: null as NodeJS.Timeout | null };
                   const onTrackAdded = () => {
                     const t = getSubtitleTrack(VIDEO);
                     if (t) {
-                      enableSubtitles(VIDEO);
-                      setHasSubtitles(true);
-                      setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                      if (subsDisabled) {
+                        disableSubtitles(VIDEO);
+                        setHasSubtitles(true);
+                        setVideoStates((p) => ({ ...p, subtitlesOn: false }));
+                      } else {
+                        enableSubtitles(VIDEO);
+                        setHasSubtitles(true);
+                        setVideoStates((p) => ({ ...p, subtitlesOn: true }));
+                      }
                       VIDEO.textTracks.removeEventListener(
                         "addtrack",
                         onTrackAdded
@@ -784,15 +922,31 @@ export function usePlayer({
                 const tracks = player.getVariantTracks();
                 syncQualityState(tracks);
 
-                const track = tracks.find((t) => t.active);
-                if (track?.height) {
-                  setVideoStates((p) => ({
-                    ...p,
-                    resolution:
-                      track.height !== null && track.height > 720
-                        ? "FHD"
-                        : "SD",
-                  }));
+                if (profileSettingsRef.current?.lowQuality) {
+                  // Force lowest-resolution variant and disable ABR
+                  const variantTracks = tracks.filter((t) => t.type === "variant");
+                  const sdTrack = variantTracks.sort(
+                    (a, b) => (a.height ?? 0) - (b.height ?? 0)
+                  )[0];
+                  if (sdTrack) {
+                    player.configure({ abr: { enabled: false } });
+                    player.selectVariantTrack(sdTrack, true);
+                    setIsAutoQuality(false);
+                    setVideoStates((p) => ({ ...p, resolution: "SD" }));
+                    // Re-sync so the quality menu shows the forced track as selected
+                    syncQualityState(player.getVariantTracks());
+                  }
+                } else {
+                  const track = tracks.find((t) => t.active);
+                  if (track?.height) {
+                    setVideoStates((p) => ({
+                      ...p,
+                      resolution:
+                        track.height !== null && track.height > 720
+                          ? "FHD"
+                          : "SD",
+                    }));
+                  }
                 }
 
                 VIDEO.play()
@@ -843,7 +997,7 @@ export function usePlayer({
       shakaPlayerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content]);
+  }, [content, offlineUri]);
 
   useEffect(() => {
     const VIDEO = videoRef.current;
@@ -1503,5 +1657,10 @@ export function usePlayer({
     skip,
     fmt,
     isTVOrAndroid,
+    endTimeOverlay,
+    dismissEndTimeOverlay: () => {
+      setEndTimeOverlay(false);
+      videoRef.current?.play();
+    },
   };
 }

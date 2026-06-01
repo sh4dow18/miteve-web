@@ -1,4 +1,5 @@
 import TvShowsFeaturePage from "@/features/tv-shows/page";
+import { getTvShowsPageData } from "@/features/tv-shows/model/getTvShowsPageData";
 import { ROUTES_MAP } from "@/shared/config/routes";
 
 export const metadata = {
@@ -7,6 +8,7 @@ export const metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default function TvShowsPage() {
-	return <TvShowsFeaturePage />;
+export default async function TvShowsPage() {
+	const data = await getTvShowsPageData();
+	return <TvShowsFeaturePage data={data} />;
 }

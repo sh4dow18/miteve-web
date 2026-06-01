@@ -1,4 +1,11 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import { API_HOST_IP } from "@/shared/config/env";
 import { getToken, getUserId, setMainProfile } from "@/shared/lib/auth";
@@ -17,12 +24,17 @@ export function useSwitchProfiles() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [addError, setAddError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
+  // Refs for D-pad / arrow-key navigation (TV remote support)
+  const profileRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const addButtonRef = useRef<HTMLButtonElement | null>(null);
+  const prevModalOpen = useRef(false);
+
+  // ── Fetch profiles ────────────────────────────────────────────────────────
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -51,6 +63,44 @@ export function useSwitchProfiles() {
       .finally(() => setLoading(false));
   }, [router]);
 
+  // ── Auto-focus first card when page is ready ─────────────────────────────
+  useEffect(() => {
+    if (!loading && !error) {
+      profileRefs.current[0]?.focus();
+    }
+  }, [loading, error]);
+
+  // ── Return focus to "Add profile" button after modal closes ──────────────
+  useEffect(() => {
+    if (prevModalOpen.current && !modalOpen) {
+      addButtonRef.current?.focus();
+    }
+    prevModalOpen.current = modalOpen;
+  }, [modalOpen]);
+
+  // ── Navigation helpers ────────────────────────────────────────────────────
+  const canAddProfile = profiles.length < MAX_PROFILES;
+
+  function getAllCards(): HTMLButtonElement[] {
+    const cards: (HTMLButtonElement | null)[] = [
+      ...profileRefs.current.slice(0, profiles.length),
+    ];
+    if (canAddProfile) cards.push(addButtonRef.current);
+    return cards.filter((c): c is HTMLButtonElement => c !== null);
+  }
+
+  function handleCardKeyDown(e: ReactKeyboardEvent, idx: number) {
+    const cards = getAllCards();
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      cards[(idx + 1) % cards.length]?.focus();
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      cards[(idx - 1 + cards.length) % cards.length]?.focus();
+    }
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
   function selectProfile(profile: ProfileItem) {
     setMainProfile({ id: profile.id, name: profile.name, avatar: profile.avatar });
     router.push("/home");
@@ -81,7 +131,6 @@ export function useSwitchProfiles() {
       setAddError(`Solo se permiten ${MAX_PROFILES} perfiles por cuenta.`);
       return;
     }
-
     if (!trimmed) {
       setAddError("El nombre del perfil es requerido.");
       return;
@@ -117,7 +166,9 @@ export function useSwitchProfiles() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error((body as { message?: string }).message ?? "No se pudo crear el perfil.");
+        throw new Error(
+          (body as { message?: string }).message ?? "No se pudo crear el perfil."
+        );
       }
 
       const created = (await res.json()) as ProfileItem;
@@ -130,8 +181,6 @@ export function useSwitchProfiles() {
     }
   }
 
-  const canAddProfile = profiles.length < MAX_PROFILES;
-
   return {
     profiles,
     loading,
@@ -141,10 +190,13 @@ export function useSwitchProfiles() {
     newName,
     addError,
     adding,
+    profileRefs,
+    addButtonRef,
     selectProfile,
     openModal,
     closeModal,
     handleNameChange,
     handleAddProfile,
+    handleCardKeyDown,
   };
 }

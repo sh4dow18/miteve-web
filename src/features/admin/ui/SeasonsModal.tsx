@@ -30,7 +30,7 @@ export default function SeasonsModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -38,10 +38,10 @@ export default function SeasonsModal({
         animate={{ scale: 1 }}
         exit={{ scale: 0.9 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gray-900 rounded-lg max-w-2xl w-full p-8"
+        className="bg-gray-900 rounded-t-2xl sm:rounded-lg max-w-2xl w-full p-4 sm:p-8"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-2xl font-semibold leading-tight pr-4">
             Agregar Temporadas desde TMDB
           </h2>
           <button
@@ -68,7 +68,7 @@ export default function SeasonsModal({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm text-gray-400 mb-2">
                 Temporada Inicial
