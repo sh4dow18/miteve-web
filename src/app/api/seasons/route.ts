@@ -69,6 +69,7 @@ export async function POST(request: Request) {
       // Return the season object with filtered episodes in the desired format
       return {
         seasonNumber,
+        comingSoon: false,
         episodesList: FILTERED_EPISODES_LIST.map((episode: TMDB_EPISODE) => ({
           episodeNumber: episode.episode_number,
           title: episode.name,
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(FILTERES_SEASON_DATA_LIST),
-  });
+  })
   // Return the response from the internal API as the final result
   return new Response(JSON.stringify(await SEASONS.json()), {
     headers: { "Content-Type": "application/json" },
