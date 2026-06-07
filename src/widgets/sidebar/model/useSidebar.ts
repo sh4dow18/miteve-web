@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ROUTES_LIST, ROUTES_MAP, routeToHref } from "@/shared/config/routes";
 import { getToken, hasAuthority, getMainProfile, type MainProfile } from "@/shared/lib/auth";
@@ -53,6 +53,11 @@ export function useSidebar() {
   const [isVeryShortScreen, setIsVeryShortScreen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const navLinkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const profileLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const authLinkRef = useRef<HTMLAnchorElement | null>(null);
+
   useEffect(() => {
     const mq = window.matchMedia("(max-height: 779px)");
     setIsShortScreen(mq.matches);
@@ -91,13 +96,55 @@ export function useSidebar() {
     ...(isAdmin ? [adminNavItem] : []),
   ];
 
+  const visibleMenuItems = dynamicMenuItems.filter(
+    (item) =>
+      !isVeryShortScreen ||
+      !["/faq", "/app-info", "/admin"].includes(item.path)
+  );
+
   const isActive = (path: string) =>
     location === path || location.startsWith(`${path}/`);
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
 
+  useEffect(() => {
+    if (drawerOpen && mounted) {
+      navLinkRefs.current[0]?.focus();
+    }
+  }, [drawerOpen, mounted]);
+
+  const handleDrawerKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      const focusable: HTMLElement[] = [];
+      if (closeBtnRef.current) focusable.push(closeBtnRef.current);
+      navLinkRefs.current.forEach((el) => {
+        if (el) focusable.push(el);
+      });
+      if (isLoggedIn && mainProfile && profileLinkRef.current) {
+        focusable.push(profileLinkRef.current);
+      }
+      if (authLinkRef.current) focusable.push(authLinkRef.current);
+
+      const currentIndex = focusable.indexOf(
+        document.activeElement as HTMLElement
+      );
+      if (currentIndex === -1) return;
+
+      e.preventDefault();
+      const len = focusable.length;
+      const nextIndex =
+        e.key === "ArrowDown"
+          ? (currentIndex + 1) % len
+          : (currentIndex - 1 + len) % len;
+      focusable[nextIndex]?.focus();
+    },
+    [isLoggedIn, mainProfile]
+  );
+
   return {
     menuItems: dynamicMenuItems,
+    visibleMenuItems,
     authItem,
     mainProfile,
     isLoggedIn,
@@ -109,5 +156,10 @@ export function useSidebar() {
     isActive,
     openDrawer,
     closeDrawer,
+    closeBtnRef,
+    navLinkRefs,
+    profileLinkRef,
+    authLinkRef,
+    handleDrawerKeyDown,
   };
 }

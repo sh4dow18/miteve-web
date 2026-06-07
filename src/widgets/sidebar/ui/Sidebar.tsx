@@ -89,8 +89,25 @@ function initials(name: string) {
 }
 
 export function Sidebar() {
-  const { menuItems, authItem, mainProfile, isLoggedIn, isTV, isShortScreen, isVeryShortScreen, mounted, drawerOpen, isActive, openDrawer, closeDrawer } =
-    useSidebar();
+  const {
+    menuItems,
+    visibleMenuItems,
+    authItem,
+    mainProfile,
+    isLoggedIn,
+    isTV,
+    isShortScreen,
+    mounted,
+    drawerOpen,
+    isActive,
+    openDrawer,
+    closeDrawer,
+    closeBtnRef,
+    navLinkRefs,
+    profileLinkRef,
+    authLinkRef,
+    handleDrawerKeyDown,
+  } = useSidebar();
   const AuthIcon = authItem.icon;
 
   return (
@@ -242,6 +259,7 @@ export function Sidebar() {
 
       {/* ── Drawer panel ──────────────────────────────────────────────────────── */}
       <div
+        onKeyDown={handleDrawerKeyDown}
         className={`fixed top-0 left-0 h-full w-64 bg-black/95 z-60
                     flex flex-col py-8
                     transform transition-transform duration-300 ease-in-out
@@ -258,6 +276,7 @@ export function Sidebar() {
             style={{ width: "auto", height: "auto" }}
           />
           <button
+            ref={closeBtnRef}
             onClick={closeDrawer}
             aria-label="Cerrar menú"
             className="text-gray-400 hover:text-white transition-colors p-1"
@@ -272,17 +291,15 @@ export function Sidebar() {
           <>
             {/* Nav items — horizontal layout matching sidebar style */}
             <nav className={`flex flex-col gap-2 px-4${isShortScreen || isTV ? " flex-1 min-h-0 overflow-y-auto scrollbar-hide" : ""}`}>
-              {menuItems
-                .filter((item) =>
-                  !isVeryShortScreen ||
-                  !["/faq", "/app-info", "/admin"].includes(item.path)
-                )
-                .map((item) => {
+              {visibleMenuItems.map((item, index) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
                 return (
                   <Link
                     key={item.path}
+                    ref={(el) => {
+                      navLinkRefs.current[index] = el;
+                    }}
                     href={item.path}
                     onClick={closeDrawer}
                     onFocus={(e) => e.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" })}
@@ -312,6 +329,7 @@ export function Sidebar() {
               {/* Profile avatar link — shown when logged in */}
               {isLoggedIn && mainProfile && (
                 <Link
+                  ref={profileLinkRef}
                   href={`/profile/${mainProfile.id}`}
                   onClick={closeDrawer}
                   className={`flex items-center gap-4 px-4 py-3 rounded-lg relative transition-all duration-200 group ${
@@ -345,6 +363,7 @@ export function Sidebar() {
               )}
 
               <Link
+                ref={authLinkRef}
                 href={authItem.path}
                 onClick={closeDrawer}
                 className={`flex items-center gap-4 px-4 py-3 rounded-lg relative

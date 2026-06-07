@@ -14,6 +14,7 @@ import { FavoriteButton } from "@/shared/ui/FavoriteButton";
 import { ContentCardTV } from "@/shared/ui/ContentCardTV";
 import { useContentRow } from "@/widgets/content-row/model/useContentRow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CommentsSection } from "@/widgets/content-detail/ui/CommentsSection";
 
 interface Props {
   content: Content;
@@ -304,6 +305,9 @@ export default function DetailTV({ content, initialSeason }: Props) {
           </div>
         </div>
       )}
+
+      {/* Comments (read-only on TV) */}
+      <CommentsSection contentId={content.id} readOnly />
     </div>
   );
 }

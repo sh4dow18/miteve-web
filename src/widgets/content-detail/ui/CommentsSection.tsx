@@ -8,6 +8,7 @@ import { useComments } from "@/widgets/content-detail/model/useComments";
 
 interface Props {
   contentId: string;
+  readOnly?: boolean;
 }
 
 function Avatar({ name, avatar }: { name: string; avatar: string | null }) {
@@ -59,7 +60,7 @@ function RatingStars({
   );
 }
 
-export function CommentsSection({ contentId }: Props) {
+export function CommentsSection({ contentId, readOnly = false }: Props) {
   const {
     comments,
     loading,
@@ -91,7 +92,7 @@ export function CommentsSection({ contentId }: Props) {
       </h2>
 
       {/* Write / Edit own comment */}
-      {profile && (
+      {profile && !readOnly && (
         <div className="mb-10 bg-[#161b22] rounded-xl p-5 border border-white/5">
           <div className="flex items-center gap-3 mb-4">
             <Avatar name={profile.name} avatar={profile.avatar ?? null} />
@@ -195,7 +196,7 @@ export function CommentsSection({ contentId }: Props) {
       ) : (
         <div className="space-y-4">
           {comments
-            .filter((c) => !profile || String(c.profileId) !== String(profile.id))
+            .filter((c) => readOnly || !profile || String(c.profileId) !== String(profile.id))
             .map((comment) => (
               <div
                 key={comment.id}
