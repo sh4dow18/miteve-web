@@ -23,6 +23,29 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Cache a navigation URL so it works offline (e.g. player routes for downloaded content)
+async function cacheUrl(url) {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    // Use include credentials to match typical navigation requests
+    const request = new Request(url, { credentials: "include" });
+    const existing = await cache.match(request);
+    if (existing) return;
+    const response = await fetch(request);
+    if (response && response.ok) {
+      await cache.put(request, response.clone());
+    }
+  } catch {
+    // Ignore cache errors
+  }
+}
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "CACHE_URLS" && Array.isArray(event.data.urls)) {
+    event.waitUntil(Promise.all(event.data.urls.map(cacheUrl)));
+  }
+});
+
 // Network-first for navigation, fallback to cache or /offline.html
 self.addEventListener("fetch", (event) => {
   const { request } = event;

@@ -3,6 +3,17 @@
 import { useState, useEffect } from "react";
 import { getDownloads, removeDownload, type OfflineDownload } from "@/shared/lib/offline-db";
 
+function cachePlayerUrls(downloads: OfflineDownload[]) {
+  if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) return;
+  const urls = downloads.map((d) =>
+    d.type === "tv-show" && d.seasonNumber !== undefined && d.episodeNumber !== undefined
+      ? `/player/${d.contentId}?season=${d.seasonNumber}&episode=${d.episodeNumber}&offline=true`
+      : `/player/${d.contentId}?offline=true`
+  );
+  if (urls.length === 0) return;
+  navigator.serviceWorker.controller.postMessage({ type: "CACHE_URLS", urls });
+}
+
 export function useDownloads() {
   const [downloads, setDownloads] = useState<OfflineDownload[]>([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +21,9 @@ export function useDownloads() {
   useEffect(() => {
     getDownloads()
       .then((all) => {
-        setDownloads(all.sort((a, b) => b.downloadedAt - a.downloadedAt));
+        const sorted = all.sort((a, b) => b.downloadedAt - a.downloadedAt);
+        setDownloads(sorted);
+        cachePlayerUrls(sorted);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

@@ -49,6 +49,7 @@ export async function proxy(request: NextRequest) {
   }
   // Check backend connection for all pages
   let apiOk = true;
+  let apiReachable = false;
   // Set Controller to allow to check fast the API Health
   const CONTROLLER = new AbortController();
   const TIMEOUT = setTimeout(() => CONTROLLER.abort(), 5000);
@@ -59,8 +60,10 @@ export async function proxy(request: NextRequest) {
       signal: CONTROLLER.signal,
     });
     apiOk = RESPONSE.ok;
+    apiReachable = true;
   } catch {
     apiOk = false;
+    apiReachable = false;
   } finally {
     clearTimeout(TIMEOUT);
   }
@@ -68,9 +71,34 @@ export async function proxy(request: NextRequest) {
   if (apiOk === true && PAGE_NAME === "/maintenance") {
     return NextResponse.redirect(new URL("/home", request.url));
   }
-  // If API is down and the current page is not "Maintenance", redirect to Maintenance page
-  if (apiOk === false && PAGE_NAME !== "/maintenance") {
+  // If API responds with an error, the backend is in maintenance/unhealthy.
+  if (apiOk === false && apiReachable === true && PAGE_NAME !== "/maintenance") {
     return NextResponse.redirect(new URL("/maintenance", request.url));
+  }
+  // If API is unreachable, distinguish between "no internet" and "API server down"
+  // by probing a reliable external host. No internet -> downloads; API down -> maintenance.
+  if (apiOk === false && apiReachable === false) {
+    let hasInternet = false;
+    const NET_CONTROLLER = new AbortController();
+    const NET_TIMEOUT = setTimeout(() => NET_CONTROLLER.abort(), 3000);
+    try {
+      const NET_RESPONSE = await fetch("https://www.google.com/generate_204", {
+        method: "HEAD",
+        signal: NET_CONTROLLER.signal,
+      });
+      hasInternet = NET_RESPONSE.status === 204 || NET_RESPONSE.ok;
+    } catch {
+      hasInternet = false;
+    } finally {
+      clearTimeout(NET_TIMEOUT);
+    }
+
+    if (hasInternet && PAGE_NAME !== "/maintenance") {
+      return NextResponse.redirect(new URL("/maintenance", request.url));
+    }
+    if (!hasInternet && PAGE_NAME !== "/downloads" && PAGE_NAME !== "/maintenance") {
+      return NextResponse.redirect(new URL("/downloads", request.url));
+    }
   }
 }
 // Proxy Config — matches all page routes, excludes Next.js internals and static assets

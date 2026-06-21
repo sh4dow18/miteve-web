@@ -151,6 +151,18 @@ export function useOfflineDownload(params: UseOfflineDownloadParams) {
       setExistingDownload(download);
       setState("done");
       setProgress(100);
+
+      // Cache the corresponding offline player URL for PWA offline navigation
+      const playerUrl =
+        seasonNumber !== undefined && episodeNumber !== undefined
+          ? `/player/${contentId}?season=${seasonNumber}&episode=${episodeNumber}&offline=true`
+          : `/player/${contentId}?offline=true`;
+      if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: "CACHE_URLS",
+          urls: [playerUrl],
+        });
+      }
     } catch (err) {
       console.error("[OfflineDownload] Error:", err);
       setState("error");
