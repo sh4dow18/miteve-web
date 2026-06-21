@@ -1,5 +1,6 @@
-import { Settings } from "lucide-react";
+import { Download, Settings } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function MaintenanceFeaturePage() {
   return (
@@ -27,11 +28,21 @@ export default function MaintenanceFeaturePage() {
           En mantenimiento
         </h1>
         <div className="mx-auto mb-6 h-px w-12 bg-primary opacity-70" />
-        <p className="mx-auto mb-10 max-w-sm leading-relaxed text-[#a3a3a3]">
+        <p className="mx-auto mb-8 max-w-sm leading-relaxed text-[#a3a3a3]">
           Estamos mejorando tu experiencia. Volveremos pronto con novedades.
         </p>
+        <Link
+          href="/downloads"
+          className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(45,156,219,.35)] transition-all duration-200 hover:-translate-y-px hover:scale-105 hover:shadow-[0_12px_32px_rgba(45,156,219,.45)] focus:outline-none focus:ring-2 focus:ring-primary/50"
+          style={{
+            background: "linear-gradient(135deg, #2d9cdb 0%, #1a7ab8 100%)",
+          }}
+        >
+          <Download className="w-4 h-4 transition-transform duration-200 group-hover:-translate-y-px" />
+          Descargas offline
+        </Link>
         <div
-          className="mx-auto mb-10 h-px w-48 overflow-hidden rounded-full bg-[#2a2a2a]"
+          className="mx-auto mt-8 mb-10 h-px w-48 overflow-hidden rounded-full bg-[#2a2a2a]"
           aria-hidden="true"
         >
           <div className="h-full rounded-full bg-primary animate-[progressPulse_2.5s_ease-in-out_infinite] w-[60%]" />

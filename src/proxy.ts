@@ -40,11 +40,10 @@ export async function proxy(request: NextRequest) {
   if (PAGE_NAME === "/downloads") {
     return NextResponse.next();
   }
-  // Player page in offline mode via PWA: skip API check
+  // Player page in offline mode: skip API check only when offline param is present
   if (
     PAGE_NAME.startsWith("/player/") &&
-    request.nextUrl.searchParams.get("offline") === "true" &&
-    request.cookies.get("miteve_pwa")?.value === "1"
+    request.nextUrl.searchParams.get("offline") === "true"
   ) {
     return NextResponse.next();
   }
