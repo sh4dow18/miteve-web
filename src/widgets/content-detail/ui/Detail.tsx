@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Content } from "@/entities/content/model/types";
 import { useDetail } from "@/widgets/content-detail/model/useDetail";
 import { useContinueWatchingEntry } from "@/widgets/content-detail/model/useContinueWatchingEntry";
-import { DownloadButton } from "@/shared/ui/DownloadButton";
+import { DownloadButton } from "@/widgets/download";
 import { FavoriteButton } from "@/shared/ui/FavoriteButton";
 import { useRecommendations } from "@/widgets/content-detail/model/useRecommendations";
 import { ContentCard } from "@/shared/ui/ContentCard";

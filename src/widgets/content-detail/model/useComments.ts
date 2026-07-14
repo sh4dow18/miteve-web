@@ -24,7 +24,11 @@ export function useComments(contentId: string) {
   const [editRating, setEditRating] = useState(0);
   const [editMessage, setEditMessage] = useState("");
 
-  const profile = typeof window !== "undefined" ? getMainProfile() : null;
+  const [profile, setProfile] = useState<ReturnType<typeof getMainProfile>>(null);
+
+  useEffect(() => {
+    setProfile(getMainProfile());
+  }, []);
 
   const loadComments = useCallback(async () => {
     setLoading(true);

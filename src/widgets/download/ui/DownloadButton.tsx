@@ -1,7 +1,8 @@
 "use client";
 
 import { Download, Check, Trash2, Loader2 } from "lucide-react";
-import { useOfflineDownload } from "@/shared/lib/hooks/useOfflineDownload";
+import { useDownloadButton } from "@/widgets/download/model/useDownloadButton";
+import { QualityModal } from "@/widgets/download/ui/QualityModal";
 
 interface DownloadButtonProps {
   contentId: string;
@@ -28,15 +29,16 @@ export function DownloadButton({
   className = "",
   compact = false,
 }: DownloadButtonProps) {
-  const { state, progress, download, remove } = useOfflineDownload({
-    contentId,
-    contentTitle,
-    cover,
-    type,
-    seasonNumber,
-    episodeNumber,
-    episodeTitle,
-  });
+  const { state, progress, onRemove, onDownloadClick, modal } =
+    useDownloadButton({
+      contentId,
+      contentTitle,
+      cover,
+      type,
+      seasonNumber,
+      episodeNumber,
+      episodeTitle,
+    });
 
   if (state === "downloading") {
     return (
@@ -54,7 +56,7 @@ export function DownloadButton({
   if (state === "done") {
     return (
       <button
-        onClick={remove}
+        onClick={onRemove}
         title="Eliminar descarga"
         className={`flex items-center justify-center gap-2 bg-green-700/80 hover:bg-red-700/80 text-white rounded transition-colors group ${className}`}
       >
@@ -83,15 +85,28 @@ export function DownloadButton({
     );
   }
 
-  // idle or error
   return (
-    <button
-      onClick={download}
-      title="Descargar para ver offline"
-      className={`flex items-center justify-center gap-2 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded transition-colors ${className}`}
-    >
-      <Download className="w-5 h-5 shrink-0" />
-      {!compact && <span className="text-sm font-medium">{state === "error" ? "Reintentar descarga" : "Descargar"}</span>}
-    </button>
+    <>
+      <button
+        onClick={onDownloadClick}
+        title="Descargar para ver offline"
+        className={`flex items-center justify-center gap-2 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded transition-colors ${className}`}
+      >
+        <Download className="w-5 h-5 shrink-0" />
+        {!compact && (
+          <span className="text-sm font-medium">
+            {state === "error" ? "Reintentar descarga" : "Descargar"}
+          </span>
+        )}
+      </button>
+
+      <QualityModal
+        isOpen={modal.isOpen}
+        containerRef={modal.containerRef}
+        contentTitle={modal.contentTitle}
+        onSelect={modal.handleSelect}
+        onClose={modal.handleClose}
+      />
+    </>
   );
 }

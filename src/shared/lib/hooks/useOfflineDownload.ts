@@ -10,6 +10,8 @@ import {
   type OfflineDownload,
 } from "@/shared/lib/offline-db";
 
+export type DownloadQuality = "fhd" | "sd";
+
 export type DownloadState =
   | "idle"
   | "downloading"
@@ -27,11 +29,18 @@ interface UseOfflineDownloadParams {
   episodeTitle?: string;
 }
 
+interface ShakaTrack {
+  type: string;
+  bandwidth: number;
+  height?: number;
+  label?: string;
+}
+
 interface ShakaOfflineStorage {
   configure: (config: {
     offline?: {
       progressCallback?: (content: unknown, progress: number) => void;
-      trackSelectionCallback?: (tracks: Array<{ type: string; bandwidth: number }>) => Array<{ type: string; bandwidth: number }>;
+      trackSelectionCallback?: (tracks: ShakaTrack[]) => ShakaTrack[];
     };
   }) => void;
   store: (uri: string, metadata?: Record<string, unknown>) => { promise: Promise<{ offlineUri: string; size?: number }> } | Promise<{ offlineUri: string; size?: number }>;
@@ -84,7 +93,7 @@ export function useOfflineDownload(params: UseOfflineDownloadParams) {
     return `${STREAM_HOST_IP}/${path}`;
   };
 
-  const download = useCallback(async () => {
+  const download = useCallback(async (quality: DownloadQuality = "fhd") => {
     if (state === "downloading") return;
     setState("downloading");
     setProgress(0);
@@ -103,18 +112,30 @@ export function useOfflineDownload(params: UseOfflineDownloadParams) {
           progressCallback: (_content: unknown, pct: number) => {
             setProgress(Math.round(pct * 100));
           },
-          // Select only the single highest-bandwidth video+audio track for download
-          trackSelectionCallback: (allTracks: Array<{ type: string; bandwidth: number }>) => {
+          // Select track based on desired quality
+          trackSelectionCallback: (allTracks: ShakaTrack[]) => {
             const videoTracks = allTracks.filter((t) => t.type === "variant");
             if (videoTracks.length > 0) {
-              const best = videoTracks.reduce((a, b) =>
-                b.bandwidth > a.bandwidth ? b : a
-              );
+              let selected: ShakaTrack;
+              if (quality === "sd") {
+                // Prefer a track <= 720p, or the lowest bandwidth
+                const target = videoTracks.find(
+                  (t) => (t.height != null && t.height <= 720)
+                );
+                selected = target ?? videoTracks.reduce((a, b) =>
+                  b.bandwidth < a.bandwidth ? b : a
+                );
+              } else {
+                // Full HD: pick the highest bandwidth track
+                selected = videoTracks.reduce((a, b) =>
+                  b.bandwidth > a.bandwidth ? b : a
+                );
+              }
               // Also include all text/image tracks (subtitles, thumbnails)
               const extras = allTracks.filter(
                 (t) => t.type === "text" || t.type === "image"
               );
-              return [best, ...extras];
+              return [selected, ...extras];
             }
             return allTracks;
           },
