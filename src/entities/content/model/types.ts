@@ -155,6 +155,19 @@ export interface EpisodeRequest {
   beginCredits: number | null;
 }
 
+export interface BatchUpdateEpisodesRequest {
+  seriesId: string;
+  startSeason: number;
+  startEpisode: number;
+  endSeason: number;
+  endEpisode: number;
+  beginSummary: number | null;
+  endSummary: number | null;
+  beginIntro: number | null;
+  endIntro: number | null;
+  endingDuration: number | null;
+}
+
 export type TMDB_EPISODE = {
   episode_number: string;
   name: string;

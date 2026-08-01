@@ -1,4 +1,8 @@
-import { Plus, Edit2 } from "lucide-react";
+import { useState } from "react";
+import { Plus, Edit2, Layers } from "lucide-react";
+import {
+  FindEpisodesBySeasonId,
+} from "@/entities/content/api";
 import {
   ShortContent,
   EpisodeRequest,
@@ -7,6 +11,7 @@ import { GetTmdbImage } from "@/shared/api/tmdb";
 import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
 import EpisodeModal from "@/features/admin/ui/EpisodeModal";
+import BatchUpdateModal from "@/features/admin/ui/BatchUpdateModal";
 import { useEpisodesTab } from "@/features/admin/model/tabs/useEpisodesTab";
 
 interface Props {
@@ -15,6 +20,8 @@ interface Props {
 }
 
 export default function EpisodesTab({ contents, onEdit }: Props) {
+  const [showBatchModal, setShowBatchModal] = useState(false);
+
   const {
     selectedContentId,
     selectedSeasonId,
@@ -43,13 +50,22 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
         <h2 className="text-2xl font-semibold">Gestión de Episodios</h2>
 
         {selectedSeasonId && (
-          <button
-            onClick={handleOpenAdd}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
-          >
-            <Plus className="w-5 h-5" />
-            Agregar Episodio
-          </button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleOpenAdd}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
+            >
+              <Plus className="w-5 h-5" />
+              Agregar Episodio
+            </button>
+            <button
+              onClick={() => setShowBatchModal(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded transition-colors w-full sm:w-auto"
+            >
+              <Layers className="w-5 h-5" />
+              Actualizar en Lote
+            </button>
+          </div>
         )}
       </div>
 
@@ -218,6 +234,24 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
             contents={contents}
             onSave={handleSave}
             onClose={handleClose}
+            reloadEpisodes={setEpisodes}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showBatchModal && selectedContentId && (
+          <BatchUpdateModal
+            seriesId={selectedContentId}
+            seriesName={selectedContent?.title || ""}
+            seasons={seasons}
+            onClose={async () => {
+              setShowBatchModal(false);
+              if (selectedSeasonId) {
+                const refreshed = await FindEpisodesBySeasonId(selectedSeasonId);
+                setEpisodes(refreshed || []);
+              }
+            }}
             reloadEpisodes={setEpisodes}
           />
         )}

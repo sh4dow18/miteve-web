@@ -1,5 +1,6 @@
 import { API_HOST_IP } from "@/shared/config/env";
 import type {
+  BatchUpdateEpisodesRequest,
   Container,
   Content,
   EpisodeMetadata,
@@ -136,4 +137,17 @@ export async function FindContentsByGenre(
   const totalPages: number =
     typeof data.totalPages === "number" ? data.totalPages : 1;
   return { items, totalPages };
+}
+
+export async function BatchUpdateEpisodes(
+  data: BatchUpdateEpisodesRequest
+): Promise<void> {
+  const response = await fetch(`${API_HOST_IP}/episodes/batch-update`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Error al actualizar episodios en lote");
+  }
 }
