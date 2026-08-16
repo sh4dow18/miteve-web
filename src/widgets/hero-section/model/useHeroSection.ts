@@ -1,5 +1,6 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
+import { HOME_TOTAL_ROWS } from "@/features/home/config/home.constants";
 import type { Content } from "@/entities/content/model/types";
 
 interface UseHeroSectionParams {
@@ -29,11 +30,16 @@ export function useHeroSection({ content }: UseHeroSectionParams) {
       cwCard.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    const firstCard = document.querySelector(
-      "[data-row='0'][data-col='0']"
-    ) as HTMLElement;
-    firstCard?.focus({ preventScroll: false });
-    firstCard?.scrollIntoView({ behavior: "smooth", block: "center" });
+    for (let r = 0; r < HOME_TOTAL_ROWS; r++) {
+      const card = document.querySelector(
+        `[data-row="${r}"][data-col="0"]`
+      ) as HTMLElement | null;
+      if (card) {
+        card.focus({ preventScroll: false });
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
   };
 
   const handleHeroBtnKeyDown = (e: KeyboardEvent) => {

@@ -7,6 +7,7 @@ import { API_HOST_IP } from "@/shared/config/env";
 import { ContentCardTV } from "@/shared/ui/ContentCardTV";
 import type { MiniContent } from "@/entities/content/model/types";
 import { useContentRow } from "@/widgets/content-row/model/useContentRow";
+import { HOME_TOTAL_ROWS } from "@/features/home/config/home.constants";
 
 /** Row index reserved for Continue Watching – used by useContentRow ArrowUp */
 const CW_ROW_INDEX = -1;
@@ -82,7 +83,7 @@ export function ContinueWatchingRowTV({ onLoaded }: { onLoaded?: () => void }) {
     scroll,
   } = useContentRow({
     rowIndex: CW_ROW_INDEX,
-    totalRows: 1,
+    totalRows: HOME_TOTAL_ROWS,
     contentLength: items.length,
   });
 
