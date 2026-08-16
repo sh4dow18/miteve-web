@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { Content } from "@/entities/content/model/types";
 
@@ -9,6 +9,16 @@ interface UseHeroSectionParams {
 export function useHeroSection({ content }: UseHeroSectionParams) {
   const [isMuted, setIsMuted] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const playBtn = document.querySelector(
+        "[data-hero-btn]"
+      ) as HTMLElement;
+      playBtn?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleMuted = () => setIsMuted((prev) => !prev);
 
