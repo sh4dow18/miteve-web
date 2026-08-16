@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, type KeyboardEvent } from "react";
+import { useRef, useCallback, useState, useEffect, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 
 interface UseContentRowParams {
@@ -15,6 +15,26 @@ export function useContentRow({
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  // Sync focusedIndex with actual DOM focus on TV devices where
+  // the native focus event may not trigger the React onFocus callback
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target?.matches?.("[data-content-card]")) {
+        const col = target.getAttribute("data-col");
+        if (col !== null) {
+          setFocusedIndex(Number(col));
+        }
+      }
+    };
+
+    container.addEventListener("focusin", handleFocusIn);
+    return () => container.removeEventListener("focusin", handleFocusIn);
+  }, []);
 
   const focusCard = useCallback(
     (index: number) => {
