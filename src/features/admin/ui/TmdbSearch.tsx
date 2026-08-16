@@ -42,12 +42,30 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
       setSearching(true);
       try {
         const type = typeId === 1 ? "movie" : "tv";
-        const res = await fetch(
-          `/api/tmdb?query=${encodeURIComponent(query.trim())}&type=${type}`
-        );
+        const trimmed = query.trim();
+        const isNumericId = /^\d+$/.test(trimmed);
+
+        let res: Response;
+        if (isNumericId) {
+          res = await fetch(`/api/tmdb?id=${trimmed}&type=${type}`);
+        } else {
+          res = await fetch(
+            `/api/tmdb?query=${encodeURIComponent(trimmed)}&type=${type}`
+          );
+        }
+
         if (!res.ok) throw new Error();
         const data = await res.json();
-        setResults((data.results ?? []).slice(0, 8));
+
+        if (isNumericId) {
+          if (data.success === false) {
+            setResults([]);
+          } else {
+            setResults([data].slice(0, 1));
+          }
+        } else {
+          setResults((data.results ?? []).slice(0, 8));
+        }
         setOpen(true);
       } catch {
         setResults([]);
@@ -94,7 +112,7 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={`Buscar ${typeId === 1 ? "película" : "serie"} en TMDB…`}
+          placeholder={`Buscar ${typeId === 1 ? "película" : "serie"} por nombre o ID de TMDB…`}
           className="w-full pl-9 pr-10 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
           autoComplete="off"
         />
