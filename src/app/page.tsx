@@ -1,6 +1,7 @@
 "use client";
-import { redirect } from "next/navigation";
+import { useLandingRedirect } from "@/features/landing/model/useLandingRedirect";
 
 export default function Home() {
-  redirect("/home");
+  useLandingRedirect();
+  return null;
 }

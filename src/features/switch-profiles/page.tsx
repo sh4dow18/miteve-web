@@ -141,15 +141,6 @@ export default function SwitchProfilesPage() {
         )}
       </div>
 
-      <div className="mt-10 sm:mt-12 w-full max-w-xs sm:max-w-none sm:w-auto">
-        <Link
-          href="/account"
-          className="block sm:inline-block text-center rounded border border-gray-500 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-medium tracking-wider text-gray-400 transition-colors hover:border-white hover:text-white focus:border-white focus:text-white focus:outline-none"
-        >
-          Administrar Perfiles
-        </Link>
-      </div>
-
       <AnimatePresence>
         {modalOpen && (
           <AddProfileModal
