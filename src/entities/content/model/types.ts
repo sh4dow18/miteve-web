@@ -219,7 +219,6 @@ export type TabType =
   | "content"
   | "containers"
   | "genres"
-  | "seasons"
   | "episodes"
   | "bug-reports"
   | "suggested-content"

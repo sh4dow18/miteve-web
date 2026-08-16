@@ -7,7 +7,6 @@ import {
   ContainersTab,
   EpisodesTab,
   GenresTab,
-  SeasonsTab,
   BugReportsTab,
   SuggestedContentTab,
   PrivilegesTab,
@@ -98,8 +97,6 @@ export default function AdminPage() {
             onEdit={(id, data) => void editGenre(id, data)}
           />
         )}
-
-        {activeTab === "seasons" && <SeasonsTab contents={contents} />}
 
         {activeTab === "episodes" && (
           <EpisodesTab

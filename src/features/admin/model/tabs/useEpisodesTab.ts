@@ -27,6 +27,7 @@ export function useEpisodesTab({ contents, onEdit }: UseEpisodesTabParams) {
   const [error, setError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<FullEpisode | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showSeasonsModal, setShowSeasonsModal] = useState(false);
 
   const seriesContents = useMemo(
     () => contents.filter((c) => c.type === "tv-show"),
@@ -101,6 +102,9 @@ export function useEpisodesTab({ contents, onEdit }: UseEpisodesTabParams) {
     handleClose();
   };
 
+  const openSeasonsModal = () => setShowSeasonsModal(true);
+  const closeSeasonsModal = () => setShowSeasonsModal(false);
+
   return {
     selectedContentId,
     selectedSeasonId,
@@ -115,11 +119,15 @@ export function useEpisodesTab({ contents, onEdit }: UseEpisodesTabParams) {
     selectedContent,
     selectedSeason,
     setEpisodes,
+    setSeasons,
     handleContentSelection,
     handleSeasonSelection,
     handleOpenAdd,
     handleOpenEdit,
     handleClose,
     handleSave,
+    showSeasonsModal,
+    openSeasonsModal,
+    closeSeasonsModal,
   };
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Layers } from "lucide-react";
+import { Plus, Edit2, Layers, Download } from "lucide-react";
 import {
   FindEpisodesBySeasonId,
 } from "@/entities/content/api";
@@ -12,6 +12,7 @@ import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
 import EpisodeModal from "@/features/admin/ui/EpisodeModal";
 import BatchUpdateModal from "@/features/admin/ui/BatchUpdateModal";
+import SeasonsModal from "@/features/admin/ui/SeasonsModal";
 import { useEpisodesTab } from "@/features/admin/model/tabs/useEpisodesTab";
 
 interface Props {
@@ -36,12 +37,16 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
     selectedContent,
     selectedSeason,
     setEpisodes,
+    setSeasons,
     handleContentSelection,
     handleSeasonSelection,
     handleOpenAdd,
     handleOpenEdit,
     handleClose,
     handleSave,
+    showSeasonsModal,
+    openSeasonsModal,
+    closeSeasonsModal,
   } = useEpisodesTab({ contents, onEdit });
 
   return (
@@ -49,22 +54,33 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-semibold">Gestión de Episodios</h2>
 
-        {selectedSeasonId && (
+        {selectedContentId && (
           <div className="flex gap-2 w-full sm:w-auto">
             <button
-              onClick={handleOpenAdd}
+              onClick={openSeasonsModal}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
             >
-              <Plus className="w-5 h-5" />
-              Agregar Episodio
+              <Download className="w-5 h-5" />
+              Agregar Temporadas
             </button>
-            <button
-              onClick={() => setShowBatchModal(true)}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded transition-colors w-full sm:w-auto"
-            >
-              <Layers className="w-5 h-5" />
-              Actualizar en Lote
-            </button>
+            {selectedSeasonId && (
+              <>
+                <button
+                  onClick={handleOpenAdd}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded transition-colors w-full sm:w-auto"
+                >
+                  <Plus className="w-5 h-5" />
+                  Agregar Episodio
+                </button>
+                <button
+                  onClick={() => setShowBatchModal(true)}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded transition-colors w-full sm:w-auto"
+                >
+                  <Layers className="w-5 h-5" />
+                  Actualizar en Lote
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -253,6 +269,16 @@ export default function EpisodesTab({ contents, onEdit }: Props) {
               }
             }}
             reloadEpisodes={setEpisodes}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSeasonsModal && selectedContent && (
+          <SeasonsModal
+            content={selectedContent}
+            onClose={closeSeasonsModal}
+            reloadSeasons={setSeasons}
           />
         )}
       </AnimatePresence>
