@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Loader2, Search, X } from "lucide-react";
+import { Loader2, Search, X, ExternalLink } from "lucide-react";
 import { GetTmdbImage } from "@/shared/api/tmdb";
 
 interface TmdbResult {
@@ -25,6 +25,7 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
   const [results, setResults] = useState<TmdbResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -93,6 +94,7 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
   const handleSelect = (result: TmdbResult) => {
     setOpen(false);
     setQuery(result.title ?? result.name ?? "");
+    setSelectedId(result.id);
     onSelect(result.id);
   };
 
@@ -100,6 +102,7 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
     setQuery("");
     setResults([]);
     setOpen(false);
+    setSelectedId(null);
   };
 
   return (
@@ -116,14 +119,28 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
           className="w-full pl-9 pr-10 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
           autoComplete="off"
         />
-        <div className="absolute right-3 flex items-center">
+        <div className="absolute right-3 flex items-center gap-1">
           {(searching || loadingDetail) ? (
             <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-          ) : query ? (
-            <button type="button" onClick={handleClear}>
-              <X className="w-4 h-4 text-gray-400 hover:text-white transition-colors" />
-            </button>
-          ) : null}
+          ) : (
+            <>
+              {selectedId && (
+                <a
+                  href={`https://www.themoviedb.org/${typeId === 1 ? "movie" : "tv"}/${selectedId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
+              {query && (
+                <button type="button" onClick={handleClear}>
+                  <X className="w-4 h-4 text-gray-400 hover:text-white transition-colors" />
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
