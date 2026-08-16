@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ContentRequest,
   Genre,
@@ -7,8 +7,6 @@ import {
 } from "@/entities/content/model/types";
 
 interface UseContentTabParams {
-  contents: ShortContent[];
-  searchTerm: string;
   onAdd: (data: ContentRequest) => void;
   onEdit: (id: string, data: ContentRequest) => void;
   containers: MiniContainer[];
@@ -16,8 +14,6 @@ interface UseContentTabParams {
 }
 
 export function useContentTab({
-  contents,
-  searchTerm,
   onAdd,
   onEdit,
   containers,
@@ -25,14 +21,6 @@ export function useContentTab({
 }: UseContentTabParams) {
   const [editingItem, setEditingItem] = useState<ShortContent | null>(null);
   const [showModal, setShowModal] = useState(false);
-
-  const filtered = useMemo(
-    () =>
-      contents.filter((c) =>
-        c.title.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [contents, searchTerm]
-  );
 
   const handleOpenAdd = () => {
     setEditingItem(null);
@@ -59,7 +47,6 @@ export function useContentTab({
   };
 
   return {
-    filtered,
     editingItem,
     showModal,
     containers,

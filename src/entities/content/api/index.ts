@@ -11,6 +11,7 @@ import type {
   MiniContent,
   MiniSeason,
   NextEpisode,
+  PageResponse,
   ShortContent,
 } from "@/entities/content/model/types";
 
@@ -63,9 +64,38 @@ export async function FindNextEpisodeById(
 }
 
 export async function FindAllContents(): Promise<ShortContent[]> {
-  return await fetch(`${API_HOST_IP}/contents`).then((response) =>
-    response.json()
+  const data = await fetch(`${API_HOST_IP}/contents?page=0&size=9999`).then(
+    (response) => response.json()
   );
+  return Array.isArray(data) ? data : (data.content ?? []);
+}
+
+export async function FindContentsPage(
+  page = 0,
+  size = 20
+): Promise<PageResponse<ShortContent>> {
+  const response = await fetch(
+    `${API_HOST_IP}/contents?page=${page}&size=${size}`
+  );
+  if (!response.ok) {
+    throw new Error("Error al obtener contenidos paginados");
+  }
+  return response.json();
+}
+
+export async function SearchContentsPage(
+  title: string,
+  page = 0,
+  size = 20
+): Promise<PageResponse<ShortContent>> {
+  const encodedTitle = encodeURIComponent(title);
+  const response = await fetch(
+    `${API_HOST_IP}/contents/search?title=${encodedTitle}&page=${page}&size=${size}`
+  );
+  if (!response.ok) {
+    throw new Error("Error al buscar contenidos");
+  }
+  return response.json();
 }
 
 export async function FindAllContainers(): Promise<MiniContainer[]> {

@@ -2,6 +2,8 @@ import {
   FindAllContainers,
   FindAllContents,
   FindAllGenres,
+  FindContentsPage,
+  SearchContentsPage,
 } from "@/entities/content/api";
 import type {
   ContainerRequest,
@@ -14,7 +16,7 @@ import type {
   TabType,
 } from "@/entities/content/model/types";
 import { API_HOST_IP } from "@/shared/config/env";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useAdmin() {
   const [activeTab, setActiveTab] = useState<TabType>("content");
@@ -24,18 +26,56 @@ export function useAdmin() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [contentPage, setContentPage] = useState<ShortContent[]>([]);
+  const [contentPageNumber, setContentPageNumber] = useState(0);
+  const [contentTotalPages, setContentTotalPages] = useState(1);
+  const [contentLoading, setContentLoading] = useState(true);
+
+  const searchContentTitleRef = useRef("");
+  const [contentSearchTerm, setContentSearchTerm] = useState("");
+
+  const loadContentPage = useCallback(async (page: number, size = 20) => {
+    setContentLoading(true);
+    try {
+      const title = searchContentTitleRef.current;
+      const data = title
+        ? await SearchContentsPage(title, page, size)
+        : await FindContentsPage(page, size);
+      setContentPage(data.content);
+      setContentPageNumber(data.number);
+      setContentTotalPages(data.totalPages);
+    } finally {
+      setContentLoading(false);
+    }
+  }, []);
+
+  const searchContent = useCallback(
+    (term: string) => {
+      searchContentTitleRef.current = term;
+      setContentSearchTerm(term);
+      void loadContentPage(0);
+    },
+    [loadContentPage]
+  );
+
   const loadData = async () => {
     try {
-      const [contentsData, containersData, genresData] = await Promise.all([
-        FindAllContents(),
-        FindAllContainers(),
-        FindAllGenres(),
-      ]);
+      const [contentsData, containersData, genresData, contentPageData] =
+        await Promise.all([
+          FindAllContents(),
+          FindAllContainers(),
+          FindAllGenres(),
+          FindContentsPage(0),
+        ]);
       setContents(contentsData);
       setContainers(containersData);
       setGenres(genresData);
+      setContentPage(contentPageData.content);
+      setContentPageNumber(contentPageData.number);
+      setContentTotalPages(contentPageData.totalPages);
     } finally {
       setLoading(false);
+      setContentLoading(false);
     }
   };
 
@@ -98,8 +138,15 @@ export function useAdmin() {
     containers,
     genres,
     loading,
+    contentPage,
+    contentPageNumber,
+    contentTotalPages,
+    contentLoading,
+    contentSearchTerm,
     setActiveTab,
     setSearchTerm,
+    loadContentPage,
+    searchContent,
     addContent,
     editContent,
     addContainer,

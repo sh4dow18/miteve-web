@@ -23,8 +23,15 @@ export default function AdminPage() {
     containers,
     genres,
     loading,
+    contentPage,
+    contentPageNumber,
+    contentTotalPages,
+    contentLoading,
+    contentSearchTerm,
     setActiveTab,
     setSearchTerm,
+    loadContentPage,
+    searchContent,
     addContent,
     editContent,
     addContainer,
@@ -68,11 +75,15 @@ export default function AdminPage() {
 
         {activeTab === "content" && (
           <ContentTab
-            contents={contents}
+            contentPage={contentPage}
+            contentPageNumber={contentPageNumber}
+            contentTotalPages={contentTotalPages}
+            contentLoading={contentLoading}
+            contentSearchTerm={contentSearchTerm}
+            onPageChange={(page) => void loadContentPage(page)}
+            onSearch={(term) => searchContent(term)}
             containers={containers}
             genres={genres}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
             onAdd={(data) => void addContent(data)}
             onEdit={(id, data) => void editContent(id, data)}
           />
