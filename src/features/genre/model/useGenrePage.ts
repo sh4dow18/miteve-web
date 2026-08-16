@@ -21,7 +21,6 @@ export function useGenrePage(genreId: number) {
 
   const loadPage = useCallback(
     async (p: number) => {
-      setLoading(true);
       try {
         const { items: newItems, totalPages: tp } = await FindContentsByGenre(
           genreId,
@@ -41,8 +40,22 @@ export function useGenrePage(genreId: number) {
   );
 
   useEffect(() => {
-    void loadPage(0);
-  }, [loadPage]);
+    let cancelled = false;
+    FindContentsByGenre(genreId, 0, PAGE_SIZE)
+      .then(({ items: newItems, totalPages: tp }) => {
+        if (cancelled) return;
+        setItems(newItems);
+        setTotalPages(tp);
+        setPage(0);
+      })
+      .catch(() => {
+        if (cancelled) setItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [genreId]);
 
   return { genre, items, page, totalPages, loading, loadPage };
 }

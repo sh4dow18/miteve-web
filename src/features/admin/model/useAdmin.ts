@@ -25,7 +25,6 @@ export function useAdmin() {
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
-    setLoading(true);
     try {
       const [contentsData, containersData, genresData] = await Promise.all([
         FindAllContents(),

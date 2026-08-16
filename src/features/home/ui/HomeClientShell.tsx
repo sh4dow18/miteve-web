@@ -50,7 +50,6 @@ export function HomeClientShell({ hero, children, isTV = false }: Props) {
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const Row = isTV ? ProfileContentRowTV : ProfileContentRow;

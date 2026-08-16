@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, ArrowLeft, Volume2, VolumeX, Trash2, Film } from "lucide-react";
+import { Play, ArrowLeft, Volume2, VolumeX, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { GetTmdbImage } from "@/shared/api/tmdb";
 import { Stars } from "@/shared/ui/Stars";

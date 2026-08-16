@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { ROUTES_LIST, ROUTES_MAP, routeToHref } from "@/shared/config/routes";
-import { getToken, hasAuthority, getMainProfile, type MainProfile } from "@/shared/lib/auth";
+import { getToken, hasAuthority, getMainProfile } from "@/shared/lib/auth";
 
 export const menuItems = ROUTES_LIST.filter((route) => route.inHome).map(
   (route) => ({
@@ -42,52 +42,45 @@ function detectIsTV(): boolean {
   return navigator.userAgent.toLowerCase().includes("aft");
 }
 
+function subscribeNothing() {
+  return () => {};
+}
+
+function getShortScreenSnapshot() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-height: 779px)").matches;
+}
+
+function getVeryShortScreenSnapshot() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-height: 614px)").matches;
+}
+
+function getMountedSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function useSidebar() {
   const location = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [mainProfile, setMainProfileState] = useState<MainProfile | null>(null);
-  const [isTV, setIsTV] = useState(false);
-  const [isShortScreen, setIsShortScreen] = useState(false);
-  const [isVeryShortScreen, setIsVeryShortScreen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isTV] = useState(() => detectIsTV());
+  const isShortScreen = useSyncExternalStore(subscribeNothing, getShortScreenSnapshot, getServerSnapshot);
+  const isVeryShortScreen = useSyncExternalStore(subscribeNothing, getVeryShortScreenSnapshot, getServerSnapshot);
+  const mounted = useSyncExternalStore(subscribeNothing, getMountedSnapshot, getServerSnapshot);
+
+  const token = getToken();
+  const isLoggedIn = !!token;
+  const isAdmin = token ? hasAuthority(token, "read-admin-page") : false;
+  const mainProfile = token ? getMainProfile() : null;
 
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const navLinkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const profileLinkRef = useRef<HTMLAnchorElement | null>(null);
   const authLinkRef = useRef<HTMLAnchorElement | null>(null);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-height: 779px)");
-    setIsShortScreen(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setIsShortScreen(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-height: 614px)");
-    setIsVeryShortScreen(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setIsVeryShortScreen(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    setIsTV(detectIsTV());
-    const token = getToken();
-    if (token) {
-      setIsLoggedIn(true);
-      setIsAdmin(hasAuthority(token, "read-admin-page"));
-      setMainProfileState(getMainProfile());
-    } else {
-      setIsLoggedIn(false);
-      setIsAdmin(false);
-      setMainProfileState(null);
-    }
-    setMounted(true);
-  }, [location]);
 
   const authItem = isLoggedIn ? accountItem : loginItem;
   const dynamicMenuItems = [

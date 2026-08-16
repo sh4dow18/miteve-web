@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Save, X } from "lucide-react";
 import type { AppUser, MiniRole } from "@/entities/content/model/types";
@@ -30,21 +30,12 @@ export function UserModal({ item, roles, onSaveAdd, onSaveEdit, onClose }: Props
   const isEdit = item !== null;
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => item?.email ?? "");
   const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState<number>(roles[0]?.id ?? 2);
+  const [roleId, setRoleId] = useState<number>(() => item?.role.id ?? roles[0]?.id ?? 2);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setName("");
-    setEmail(item?.email ?? "");
-    setPassword("");
-    setRoleId(item?.role.id ?? roles[0]?.id ?? 2);
-    setError(null);
-    setShowPassword(false);
-  }, [item, roles]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

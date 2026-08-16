@@ -10,7 +10,6 @@ import { useUpdateProfile } from "../model/useUpdateProfile";
 import { useProfileHistory } from "../model/useProfileHistory";
 import { ContentCard } from "@/shared/ui/ContentCard";
 import { useContentRow } from "@/widgets/content-row/model/useContentRow";
-import { GetTmdbImage } from "@/shared/api/tmdb";
 
 function initials(name: string) {
   return name

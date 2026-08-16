@@ -103,7 +103,6 @@ export function useOfflineDownload(params: UseOfflineDownloadParams) {
       const shaka = await import("shaka-player/dist/shaka-player.compiled");
       shaka.default.polyfill.installAll();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const storage = new shaka.default.offline.Storage() as unknown as ShakaOfflineStorage;
       storageRef.current = storage;
 
@@ -204,7 +203,6 @@ export function useOfflineDownload(params: UseOfflineDownloadParams) {
       const shaka = await import("shaka-player/dist/shaka-player.compiled");
       shaka.default.polyfill.installAll();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const storage = new shaka.default.offline.Storage() as unknown as ShakaOfflineStorage;
       await storage.remove(existingDownload.offlineUri);
       await storage.destroy().catch(() => {});

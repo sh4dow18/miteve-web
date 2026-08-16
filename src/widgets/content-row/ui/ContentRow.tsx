@@ -35,7 +35,6 @@ export function ContentRow({
     focusedIndex,
     setFocusedIndex,
     handleCardKeyDown,
-    handleCardActivate,
     scroll,
   } = useContentRow({
     rowIndex,

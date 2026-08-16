@@ -26,21 +26,19 @@ export function BugReportsTab() {
   const [updating, setUpdating] = useState<number | null>(null);
 
   useEffect(() => {
+    const loadReports = async () => {
+      try {
+        const token = getToken();
+        const res = await fetch(`${API_HOST_IP}/bug-reports`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.ok) setReports((await res.json()) as BugReportResponse[]);
+      } finally {
+        setLoading(false);
+      }
+    };
     void loadReports();
   }, []);
-
-  async function loadReports() {
-    setLoading(true);
-    try {
-      const token = getToken();
-      const res = await fetch(`${API_HOST_IP}/bug-reports`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) setReports((await res.json()) as BugReportResponse[]);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleUpdateStatus(id: number, statusId: number) {
     setUpdating(id);

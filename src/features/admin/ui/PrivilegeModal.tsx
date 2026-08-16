@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { X, Save } from "lucide-react";
 import type { Privilege, PrivilegeRequest } from "@/entities/content/model/types";
@@ -12,16 +12,10 @@ interface Props {
 }
 
 export function PrivilegeModal({ item, onSave, onClose }: Props) {
-  const [slug, setSlug] = useState("");
-  const [name, setName] = useState("");
+  const [slug, setSlug] = useState(() => item?.slug ?? "");
+  const [name, setName] = useState(() => item?.name ?? "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setSlug(item?.slug ?? "");
-    setName(item?.name ?? "");
-    setError(null);
-  }, [item]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

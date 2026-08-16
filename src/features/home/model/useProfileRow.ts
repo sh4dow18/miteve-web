@@ -32,7 +32,7 @@ export function useProfileRow(endpoint: EndpointBuilder, requiresProfile = false
 
   useEffect(() => {
     if (requiresProfile && !getMainProfile()) {
-      setReady(true);
+      setTimeout(() => setReady(true), 0);
       return;
     }
     fetchItems(endpoint)

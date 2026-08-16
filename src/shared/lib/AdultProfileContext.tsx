@@ -28,7 +28,6 @@ export function AdultProfileProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

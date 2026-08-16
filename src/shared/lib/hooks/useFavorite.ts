@@ -5,14 +5,12 @@ import { API_HOST_IP } from "@/shared/config/env";
 export function useFavorite(contentId: string) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [hasProfile, setHasProfile] = useState(false);
+  const hasProfile = !!(getMainProfile() && getToken());
 
   useEffect(() => {
     const profile = getMainProfile();
     const token = getToken();
     if (!profile || !token) return;
-
-    setHasProfile(true);
 
     fetch(`${API_HOST_IP}/profiles/${profile.id}/favorites`, {
       headers: { Authorization: `Bearer ${token}` },

@@ -19,24 +19,21 @@ export function usePrivilegesTab() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_HOST_IP}/privileges`, {
+          headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error("Error al cargar privilegios.");
+        setItems(await res.json());
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Error de conexión.");
+      } finally {
+        setLoading(false);
+      }
+    };
     void load();
   }, []);
-
-  async function load() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${API_HOST_IP}/privileges`, {
-        headers: authHeaders(),
-      });
-      if (!res.ok) throw new Error("Error al cargar privilegios.");
-      setItems(await res.json());
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error de conexión.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function add(data: PrivilegeRequest) {
     const res = await fetch(`${API_HOST_IP}/privileges`, {

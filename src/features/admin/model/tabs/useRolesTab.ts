@@ -20,31 +20,28 @@ export function useRolesTab() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    const load = async () => {
+      try {
+        const [rolesRes, privRes] = await Promise.all([
+          fetch(`${API_HOST_IP}/roles`, { headers: authHeaders() }),
+          fetch(`${API_HOST_IP}/privileges`, { headers: authHeaders() }),
+        ]);
+        if (!rolesRes.ok) throw new Error("Error al cargar roles.");
+        if (!privRes.ok) throw new Error("Error al cargar privilegios.");
+        const [roles, privs]: [Role[], Privilege[]] = await Promise.all([
+          rolesRes.json(),
+          privRes.json(),
+        ]);
+        setItems(roles);
+        setPrivileges(privs);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Error de conexión.");
+      } finally {
+        setLoading(false);
+      }
+    };
     void load();
   }, []);
-
-  async function load() {
-    setLoading(true);
-    setError(null);
-    try {
-      const [rolesRes, privRes] = await Promise.all([
-        fetch(`${API_HOST_IP}/roles`, { headers: authHeaders() }),
-        fetch(`${API_HOST_IP}/privileges`, { headers: authHeaders() }),
-      ]);
-      if (!rolesRes.ok) throw new Error("Error al cargar roles.");
-      if (!privRes.ok) throw new Error("Error al cargar privilegios.");
-      const [roles, privs]: [Role[], Privilege[]] = await Promise.all([
-        rolesRes.json(),
-        privRes.json(),
-      ]);
-      setItems(roles);
-      setPrivileges(privs);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error de conexión.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function add(data: RoleRequest) {
     const res = await fetch(`${API_HOST_IP}/roles`, {

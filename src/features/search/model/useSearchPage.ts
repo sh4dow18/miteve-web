@@ -34,7 +34,7 @@ export function useSearchPage() {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    setInputValue(queryFromUrl);
+    setTimeout(() => setInputValue(queryFromUrl), 0);
   }, [queryFromUrl]);
 
   useEffect(() => {

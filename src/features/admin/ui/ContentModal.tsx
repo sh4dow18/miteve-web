@@ -25,7 +25,6 @@ export function ContentModal({
   onClose,
 }: Props) {
   const {
-    tmdbId,
     trailerDuration,
     formData,
     loadingTMDB,
@@ -35,8 +34,9 @@ export function ContentModal({
     previewRetries,
     coverError,
     backgroundError,
+    setCoverError,
+    setBackgroundError,
     videoRef,
-    setTmdbId,
     setTrailerDuration,
     endTimeStr,
     setEndTimeStr,
@@ -47,8 +47,6 @@ export function ContentModal({
     toggleGenre,
     handleSubmit,
     handleNumberInput,
-    decrementContainerPosition,
-    incrementContainerPosition,
     toggleComingSoon,
     handlePreview,
     resetPreview,

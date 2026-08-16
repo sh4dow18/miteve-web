@@ -34,9 +34,13 @@ export function TmdbSearch({ typeId, loadingDetail, onSelect }: Props) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (!query.trim()) {
-      setResults([]);
-      setOpen(false);
-      return;
+      debounceRef.current = setTimeout(() => {
+        setResults([]);
+        setOpen(false);
+      }, 0);
+      return () => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+      };
     }
 
     debounceRef.current = setTimeout(async () => {

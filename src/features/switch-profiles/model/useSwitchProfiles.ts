@@ -44,8 +44,10 @@ export function useSwitchProfiles() {
 
     const userId = getUserId(token);
     if (!userId) {
-      setError("Token inválido. Por favor inicia sesión de nuevo.");
-      setLoading(false);
+      setTimeout(() => {
+        setError("Token inválido. Por favor inicia sesión de nuevo.");
+        setLoading(false);
+      }, 0);
       return;
     }
 

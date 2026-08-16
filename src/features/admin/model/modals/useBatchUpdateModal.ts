@@ -32,7 +32,6 @@ export function useBatchUpdateModal({
   seriesId,
   seasons,
   onClose,
-  reloadEpisodes,
 }: UseBatchUpdateModalParams) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

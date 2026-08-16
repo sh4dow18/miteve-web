@@ -31,7 +31,7 @@ export function GenrePageTV({ genreId }: Props) {
   // Focus first card whenever items change
   useEffect(() => {
     if (!loading && items.length > 0) {
-      setFocusedIndex(0);
+      setTimeout(() => setFocusedIndex(0), 0);
       setTimeout(() => cardRefs.current[0]?.focus(), 80);
     }
   }, [loading, items]);

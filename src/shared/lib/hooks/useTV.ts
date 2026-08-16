@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function isTVDevice(): boolean {
   if (typeof window === "undefined") return false;
@@ -9,11 +9,6 @@ function isTVDevice(): boolean {
 }
 
 export function useTV(): boolean {
-  const [isTV, setIsTV] = useState(false);
-
-  useEffect(() => {
-    setIsTV(isTVDevice());
-  }, []);
-
+  const [isTV] = useState(() => isTVDevice());
   return isTV;
 }

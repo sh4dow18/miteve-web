@@ -35,7 +35,6 @@ export function ContentRowTV({
     focusedIndex,
     setFocusedIndex,
     handleCardKeyDown,
-    handleCardActivate,
     scroll,
   } = useContentRow({
     rowIndex,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { X, Save } from "lucide-react";
 import type { Privilege, Role, RoleRequest } from "@/entities/content/model/types";
@@ -13,16 +13,10 @@ interface Props {
 }
 
 export function RoleModal({ item, privileges, onSave, onClose }: Props) {
-  const [name, setName] = useState("");
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [name, setName] = useState(() => item?.name ?? "");
+  const [selectedIds, setSelectedIds] = useState<number[]>(() => item?.privilegesList.map((p) => p.id) ?? []);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setName(item?.name ?? "");
-    setSelectedIds(item?.privilegesList.map((p) => p.id) ?? []);
-    setError(null);
-  }, [item]);
 
   function togglePrivilege(id: number) {
     setSelectedIds((prev) =>

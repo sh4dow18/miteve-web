@@ -280,7 +280,6 @@ export function usePlayer({
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [videoStates, setVideoStates] = useState({
@@ -336,9 +335,13 @@ export function usePlayer({
 
   // Always-fresh refs so the interval closure never reads stale closures
   const contentRef = useRef(content);
-  contentRef.current = content;
   const tvShowRef = useRef(tvShow);
-  tvShowRef.current = tvShow;
+  useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
+  useEffect(() => {
+    tvShowRef.current = tvShow;
+  }, [tvShow]);
   const [skips, setSkips] = useState({
     summary: false,
     intro: false,
@@ -1064,6 +1067,120 @@ export function usePlayer({
     return navigator.userAgent.toLowerCase().includes("aft");
   }
 
+  // ─── Actions ─────────────────────────────────────────────────────────────────
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play();
+      setVideoStates((p) => ({ ...p, paused: false }));
+    } else {
+      v.pause();
+      setVideoStates((p) => ({ ...p, paused: true, controlsHidden: false }));
+    }
+  };
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.muted || v.volume === 0) {
+      v.muted = false;
+      const restoredVolume = Math.max(lastVolumeRef.current, 0.05);
+      v.volume = restoredVolume;
+    } else {
+      if (v.volume > 0) {
+        lastVolumeRef.current = v.volume;
+      }
+      v.muted = true;
+    }
+  };
+
+  const toggleFullscreen = () => {
+    const c = containerRef.current;
+    if (!c) return;
+    type LockableOrientation = ScreenOrientation & {
+      lock?: (type: string) => Promise<void>;
+      unlock?: () => void;
+    };
+    const orientation = screen.orientation as LockableOrientation;
+    if (!document.fullscreenElement) {
+      if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "-1");
+      c.requestFullscreen()
+        .then(() => {
+          orientation.lock?.("landscape")?.catch(() => {});
+        })
+        .catch(() => {});
+      setVideoStates((p) => ({ ...p, fullscreen: true }));
+    } else {
+      document.exitFullscreen();
+      orientation.unlock?.();
+      setVideoStates((p) => ({ ...p, fullscreen: false }));
+    }
+  };
+
+  const saveCwTime = useCallback((time: number) => {
+    const currentContent = contentRef.current;
+    const profile = getMainProfile();
+    if (!currentContent || !profile) return;
+    const token = getToken();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    if (cwCreatedRef.current && continueWatchingIdRef.current) {
+      fetch(`${API_HOST_IP}/continue-watching/${continueWatchingIdRef.current}/time`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ time: Math.floor(time) }),
+      }).catch(() => { /* silent */ });
+      return;
+    }
+
+    if (!cwCreatedRef.current) {
+      cwCreatedRef.current = true;
+      const currentTvShow = tvShowRef.current;
+      fetch(`${API_HOST_IP}/continue-watching`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          profileId: Number(profile.id),
+          contentId: currentContent.id,
+          episodeId: currentTvShow?.episode.id ?? null,
+          time: Math.floor(time),
+        }),
+      })
+        .then((res) => {
+          if (!res.ok) { cwCreatedRef.current = false; return null; }
+          return res.json();
+        })
+        .then((data: { id: string | number } | undefined | null) => {
+          if (data?.id != null) {
+            continueWatchingIdRef.current = String(data.id);
+            lastCwPutRef.current = playedSecondsRef.current;
+          }
+        })
+        .catch(() => { cwCreatedRef.current = false; });
+    }
+  }, []);
+
+  const seek = (secs: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = Math.min(Math.max(0, v.currentTime + secs), v.duration);
+    saveCwTime(v.currentTime);
+  };
+
+  const toggleSubtitles = () => {
+    const VIDEO = videoRef.current;
+    if (!VIDEO) return;
+    const newState = !videoStates.subtitlesOn;
+    if (newState) {
+      enableSubtitles(VIDEO);
+    } else {
+      disableSubtitles(VIDEO);
+    }
+    setVideoStates((p) => ({ ...p, subtitlesOn: newState }));
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (qualityMenuOpen) {
@@ -1197,120 +1314,6 @@ export function usePlayer({
     VIDEO.addEventListener("progress", update);
     return () => VIDEO.removeEventListener("progress", update);
   }, []);
-
-  // ─── Actions ─────────────────────────────────────────────────────────────────
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play();
-      setVideoStates((p) => ({ ...p, paused: false }));
-    } else {
-      v.pause();
-      setVideoStates((p) => ({ ...p, paused: true, controlsHidden: false }));
-    }
-  };
-
-  const toggleMute = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.muted || v.volume === 0) {
-      v.muted = false;
-      const restoredVolume = Math.max(lastVolumeRef.current, 0.05);
-      v.volume = restoredVolume;
-    } else {
-      if (v.volume > 0) {
-        lastVolumeRef.current = v.volume;
-      }
-      v.muted = true;
-    }
-  };
-
-  const toggleFullscreen = () => {
-    const c = containerRef.current;
-    if (!c) return;
-    type LockableOrientation = ScreenOrientation & {
-      lock?: (type: string) => Promise<void>;
-      unlock?: () => void;
-    };
-    const orientation = screen.orientation as LockableOrientation;
-    if (!document.fullscreenElement) {
-      if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "-1");
-      c.requestFullscreen()
-        .then(() => {
-          orientation.lock?.("landscape")?.catch(() => {});
-        })
-        .catch(() => {});
-      setVideoStates((p) => ({ ...p, fullscreen: true }));
-    } else {
-      document.exitFullscreen();
-      orientation.unlock?.();
-      setVideoStates((p) => ({ ...p, fullscreen: false }));
-    }
-  };
-
-  const saveCwTime = useCallback((time: number) => {
-    const currentContent = contentRef.current;
-    const profile = getMainProfile();
-    if (!currentContent || !profile) return;
-    const token = getToken();
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    if (cwCreatedRef.current && continueWatchingIdRef.current) {
-      fetch(`${API_HOST_IP}/continue-watching/${continueWatchingIdRef.current}/time`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify({ time: Math.floor(time) }),
-      }).catch(() => { /* silent */ });
-      return;
-    }
-
-    if (!cwCreatedRef.current) {
-      cwCreatedRef.current = true;
-      const currentTvShow = tvShowRef.current;
-      fetch(`${API_HOST_IP}/continue-watching`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          profileId: Number(profile.id),
-          contentId: currentContent.id,
-          episodeId: currentTvShow?.episode.id ?? null,
-          time: Math.floor(time),
-        }),
-      })
-        .then((res) => {
-          if (!res.ok) { cwCreatedRef.current = false; return null; }
-          return res.json();
-        })
-        .then((data: { id: string | number } | undefined | null) => {
-          if (data?.id != null) {
-            continueWatchingIdRef.current = String(data.id);
-            lastCwPutRef.current = playedSecondsRef.current;
-          }
-        })
-        .catch(() => { cwCreatedRef.current = false; });
-    }
-  }, []);
-
-  const seek = (secs: number) => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.currentTime = Math.min(Math.max(0, v.currentTime + secs), v.duration);
-    saveCwTime(v.currentTime);
-  };
-
-  const toggleSubtitles = () => {
-    const VIDEO = videoRef.current;
-    if (!VIDEO) return;
-    const newState = !videoStates.subtitlesOn;
-    if (newState) {
-      enableSubtitles(VIDEO);
-    } else {
-      disableSubtitles(VIDEO);
-    }
-    setVideoStates((p) => ({ ...p, subtitlesOn: newState }));
-  };
 
   const fmt = (t: number) => {
     return formatHms(t);
@@ -1593,9 +1596,7 @@ export function usePlayer({
         }).catch(() => { /* silent */ });
       }
     }, 1000);
-    console.log("7")
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const skip = () => {

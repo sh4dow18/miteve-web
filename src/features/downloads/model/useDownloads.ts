@@ -33,7 +33,6 @@ export function useDownloads() {
     try {
       const shaka = await import("shaka-player/dist/shaka-player.compiled");
       shaka.default.polyfill.installAll();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const storage = new shaka.default.offline.Storage();
       await (storage as { remove: (uri: string) => Promise<void> }).remove(download.offlineUri);
       await (storage as { destroy: () => Promise<void> }).destroy();

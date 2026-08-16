@@ -25,7 +25,10 @@ export type AccountInfo = {
 export function useAccount() {
   const router = useRouter();
   const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [authorities, setAuthorities] = useState<string[]>([]);
+  const [authorities] = useState<string[]>(() => {
+    const t = getToken();
+    return t ? getAuthorities(t) : [];
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,11 +40,11 @@ export function useAccount() {
     }
 
     const userId = getUserId(token);
-    setAuthorities(getAuthorities(token));
-
     if (!userId) {
-      setError("Token inválido. Por favor inicia sesión de nuevo.");
-      setLoading(false);
+      setTimeout(() => {
+        setError("Token inválido. Por favor inicia sesión de nuevo.");
+        setLoading(false);
+      }, 0);
       return;
     }
 

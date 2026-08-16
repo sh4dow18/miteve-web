@@ -17,8 +17,6 @@ export default function RegisterPage() {
     toggleShowPassword,
     agreed,
     toggleAgreed,
-    password,
-    setPassword,
     strength,
     form,
     handleChange,

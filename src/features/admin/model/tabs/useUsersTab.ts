@@ -26,31 +26,28 @@ export function useUsersTab() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    const load = async () => {
+      try {
+        const [usersRes, rolesRes] = await Promise.all([
+          fetch(`${API_HOST_IP}/users`, { headers: authHeaders() }),
+          fetch(`${API_HOST_IP}/roles`, { headers: authHeaders() }),
+        ]);
+        if (!usersRes.ok) throw new Error("Error al cargar usuarios.");
+        if (!rolesRes.ok) throw new Error("Error al cargar roles.");
+        const [users, rolesData]: [AppUser[], MiniRole[]] = await Promise.all([
+          usersRes.json(),
+          rolesRes.json(),
+        ]);
+        setItems(users);
+        setRoles(rolesData);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Error de conexión.");
+      } finally {
+        setLoading(false);
+      }
+    };
     void load();
   }, []);
-
-  async function load() {
-    setLoading(true);
-    setError(null);
-    try {
-      const [usersRes, rolesRes] = await Promise.all([
-        fetch(`${API_HOST_IP}/users`, { headers: authHeaders() }),
-        fetch(`${API_HOST_IP}/roles`, { headers: authHeaders() }),
-      ]);
-      if (!usersRes.ok) throw new Error("Error al cargar usuarios.");
-      if (!rolesRes.ok) throw new Error("Error al cargar roles.");
-      const [users, rolesData]: [AppUser[], MiniRole[]] = await Promise.all([
-        usersRes.json(),
-        rolesRes.json(),
-      ]);
-      setItems(users);
-      setRoles(rolesData);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error de conexión.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function add(data: { name: string; email: string; password: string; roleId: number }) {
     const res = await fetch(`${API_HOST_IP}/users`, {

@@ -374,6 +374,8 @@ export function useContentModal({
     previewRetries,
     coverError,
     backgroundError,
+    setCoverError,
+    setBackgroundError,
     videoRef,
     shakaPlayerRef,
     setTmdbId,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getToken, getMainProfile } from "@/shared/lib/auth";
 import { API_HOST_IP } from "@/shared/config/env";
@@ -74,6 +74,8 @@ function fmtTime(secs: number): string {
 export function ContinueWatchingRowTV({ onLoaded }: { onLoaded?: () => void }) {
   const [items, setItems] = useState<ContinueWatchingItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const onLoadedRef = useRef(onLoaded);
+  useEffect(() => { onLoadedRef.current = onLoaded; });
 
   const {
     scrollContainerRef,
@@ -91,8 +93,7 @@ export function ContinueWatchingRowTV({ onLoaded }: { onLoaded?: () => void }) {
     const token = getToken();
     const profile = getMainProfile();
     if (!token || !profile) {
-      setLoaded(true);
-      onLoaded?.();
+      onLoadedRef.current?.();
       return;
     }
     fetch(`${API_HOST_IP}/profiles/${profile.id}/continue-watching`, {
@@ -101,7 +102,7 @@ export function ContinueWatchingRowTV({ onLoaded }: { onLoaded?: () => void }) {
       .then((r) => (r.ok ? r.json() : []))
       .then((data: ContinueWatchingItem[]) => setItems(Array.isArray(data) ? data : []))
       .catch(() => setItems([]))
-      .finally(() => { setLoaded(true); onLoaded?.(); });
+      .finally(() => { setLoaded(true); onLoadedRef.current?.(); });
   }, []);
 
   if (!loaded || items.length === 0) return null;

@@ -1,27 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+
+function subscribePWA() {
+  return () => {};
+}
+
+function getSnapshot() {
+  const mq = window.matchMedia("(display-mode: standalone)");
+  const nav = navigator as Navigator & { standalone?: boolean };
+  return mq.matches || nav.standalone === true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function getMountedSnapshot() {
+  return true;
+}
 
 /**
  * Returns true when the app is running as an installed PWA
  * (standalone / fullscreen display mode).
  */
 export function usePWA(): { isPWA: boolean; mounted: boolean } {
-  const [isPWA, setIsPWA] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const isPWA = useSyncExternalStore(subscribePWA, getSnapshot, getServerSnapshot);
+  const mounted = useSyncExternalStore(subscribePWA, getMountedSnapshot, () => false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(display-mode: standalone)");
-    // Also handle iOS Safari which uses navigator.standalone
-    const nav = navigator as Navigator & { standalone?: boolean };
-    const standalone = mq.matches || nav.standalone === true;
-    setIsPWA(standalone);
-    // Set cookie so Edge Runtime proxy can detect PWA mode
+    const standalone = getSnapshot();
     document.cookie = `miteve_pwa=${standalone ? "1" : "0"}; path=/; SameSite=Strict`;
-    setMounted(true);
 
+    const mq = window.matchMedia("(display-mode: standalone)");
     const onChange = (e: MediaQueryListEvent) => {
-      setIsPWA(e.matches);
       document.cookie = `miteve_pwa=${e.matches ? "1" : "0"}; path=/; SameSite=Strict`;
     };
     mq.addEventListener("change", onChange);

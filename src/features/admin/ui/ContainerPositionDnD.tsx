@@ -45,8 +45,6 @@ export function ContainerPositionDnD({
   // Build the item list from the container data, injecting the current item
   useEffect(() => {
     if (!containerId) return;
-    setLoading(true);
-
     FindContainerById(containerId, typeId)
       .then((container) => {
         if (!container) { setLoading(false); return; }
