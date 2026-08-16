@@ -22,6 +22,17 @@ export function timeToSeconds(time: string): number | null {
   return undefined as unknown as number;
 }
 
+export function toSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function secondsToTime(totalSeconds: number): string {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds));
   const hours = Math.floor(safeSeconds / 3600);

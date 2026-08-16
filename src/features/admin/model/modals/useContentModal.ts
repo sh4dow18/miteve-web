@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { FindContentById } from "@/entities/content/api";
 import {
   ContentRequest,
@@ -6,7 +6,8 @@ import {
   MiniContainer,
   ShortContent,
 } from "@/entities/content/model/types";
-import { secondsToTime, timeToSeconds } from "@/shared/lib/utils";
+import { secondsToTime, timeToSeconds, toSlug } from "@/shared/lib/utils";
+import { API_HOST_IP, STREAM_HOST_IP } from "@/shared/config/env";
 import {
   getAgeFromReleaseDates,
   getAgeFromContentRatings,
@@ -50,6 +51,66 @@ export function useContentModal({
   });
   const [loadingTMDB, setLoadingTMDB] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewStatus, setPreviewStatus] = useState<"idle" | "loading" | "success" | "failed">("idle");
+  const [previewRetries, setPreviewRetries] = useState(0);
+  const [coverError, setCoverError] = useState(false);
+  const [backgroundError, setBackgroundError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const shakaPlayerRef = useRef<unknown>(null);
+
+  const contentSlug = toSlug(formData.title);
+
+  const loadShakaPlayer = useCallback(async () => {
+    if (!videoRef.current || !contentSlug) return false;
+
+    const apiPath = `${contentSlug}/manifest.mpd`;
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+
+      let ip = API_HOST_IP;
+      try {
+        const res = await fetch(`${ip}/${apiPath}`, { method: "HEAD", signal: controller.signal });
+        if (!res.ok) throw new Error();
+      } catch {
+        ip = API_HOST_IP;
+      }
+      clearTimeout(timeout);
+
+      const shaka = await import("shaka-player/dist/shaka-player.compiled");
+      shaka.default.polyfill.installAll();
+
+      if (!shaka.default.Player.isBrowserSupported()) return false;
+
+      const player = new shaka.default.Player();
+      shakaPlayerRef.current = player;
+      player.attach(videoRef.current);
+
+      const src = `${STREAM_HOST_IP}/${apiPath}`;
+      await player.load(src);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [contentSlug]);
+
+  useEffect(() => {
+    if (previewStatus === "success") {
+      void loadShakaPlayer().then((ok) => {
+        if (!ok) setPreviewStatus("failed");
+      });
+    }
+
+    return () => {
+      if (shakaPlayerRef.current) {
+        try {
+          (shakaPlayerRef.current as { destroy: () => void }).destroy();
+        } catch { /* ignore */ }
+        shakaPlayerRef.current = null;
+      }
+    };
+  }, [previewStatus, loadShakaPlayer]);
 
   const fetchFromTMDB = async (overrideId?: number) => {
     const idToUse = overrideId ?? tmdbId;
@@ -217,6 +278,16 @@ export function useContentModal({
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  const setCover = (value: string) => {
+    setCoverError(false);
+    setField("cover", value);
+  };
+
+  const setBackground = (value: string) => {
+    setBackgroundError(false);
+    setField("background", value);
+  };
+
   const decrementContainerPosition = () => {
     setFormData((prev) => ({
       ...prev,
@@ -232,7 +303,62 @@ export function useContentModal({
   };
 
   const toggleComingSoon = () => {
+    if (previewStatus === "success") return;
     setFormData((prev) => ({ ...prev, comingSoon: !prev.comingSoon }));
+  };
+
+  const MAX_PREVIEW_RETRIES = 3;
+
+  const handlePreview = async () => {
+    if (!contentSlug || previewStatus === "loading") return;
+
+    setPreviewStatus("loading");
+    setPreviewRetries(0);
+
+    const apiPath = `${contentSlug}/manifest.mpd`;
+
+    for (let attempt = 1; attempt <= MAX_PREVIEW_RETRIES; attempt++) {
+      setPreviewRetries(attempt);
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+
+        let ip = API_HOST_IP;
+        try {
+          const res = await fetch(`${ip}/${apiPath}`, { method: "HEAD", signal: controller.signal });
+          if (!res.ok) throw new Error();
+        } catch {
+          ip = API_HOST_IP;
+        }
+        clearTimeout(timeout);
+
+        const checkRes = await fetch(`${STREAM_HOST_IP}/${apiPath}`, { method: "HEAD" });
+        if (checkRes.ok) {
+          setPreviewStatus("success");
+          setFormData((prev) => ({ ...prev, comingSoon: false }));
+          return;
+        }
+      } catch {
+        // continue to next attempt
+      }
+    }
+
+    setPreviewStatus("failed");
+  };
+
+  const resetPreview = () => {
+    setPreviewStatus("idle");
+    setPreviewRetries(0);
+    if (shakaPlayerRef.current) {
+      try {
+        (shakaPlayerRef.current as { destroy: () => void }).destroy();
+      } catch { /* ignore */ }
+      shakaPlayerRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.removeAttribute("src");
+      videoRef.current.load();
+    }
   };
 
   return {
@@ -243,11 +369,20 @@ export function useContentModal({
     error,
     containers,
     genres,
+    contentSlug,
+    previewStatus,
+    previewRetries,
+    coverError,
+    backgroundError,
+    videoRef,
+    shakaPlayerRef,
     setTmdbId,
     setTrailerDuration,
     endTimeStr,
     setEndTimeStr,
     setField,
+    setCover,
+    setBackground,
     fetchFromTMDB,
     toggleGenre,
     handleSubmit,
@@ -255,5 +390,7 @@ export function useContentModal({
     decrementContainerPosition,
     incrementContainerPosition,
     toggleComingSoon,
+    handlePreview,
+    resetPreview,
   };
 }

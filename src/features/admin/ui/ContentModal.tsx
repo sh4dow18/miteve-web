@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
-import { ImageOff, X, Save, Info, Timer } from "lucide-react";
+import { ImageOff, X, Save, Info, Timer, Play, RefreshCw, Film } from "lucide-react";
 import { GetTmdbImage } from "@/shared/api/tmdb";
 import { Genre, ShortContent, ContentRequest, MiniContainer } from "@/entities/content/model/types";
 import { useContentModal } from "@/features/admin/model/modals/useContentModal";
@@ -31,11 +30,19 @@ export function ContentModal({
     formData,
     loadingTMDB,
     error,
+    contentSlug,
+    previewStatus,
+    previewRetries,
+    coverError,
+    backgroundError,
+    videoRef,
     setTmdbId,
     setTrailerDuration,
     endTimeStr,
     setEndTimeStr,
     setField,
+    setCover,
+    setBackground,
     fetchFromTMDB,
     toggleGenre,
     handleSubmit,
@@ -43,10 +50,9 @@ export function ContentModal({
     decrementContainerPosition,
     incrementContainerPosition,
     toggleComingSoon,
+    handlePreview,
+    resetPreview,
   } = useContentModal({ item, onSave, containers, genres });
-
-  const [coverError, setCoverError] = useState(false);
-  const [backgroundError, setBackgroundError] = useState(false);
 
   return (
     <motion.div
@@ -196,7 +202,7 @@ export function ContentModal({
                 <input
                   type="text"
                   value={formData.cover}
-                  onChange={(e) => { setField("cover", e.target.value); setCoverError(false); }}
+                  onChange={(e) => setCover(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
                 />
                 {formData.cover && (
@@ -226,7 +232,7 @@ export function ContentModal({
                 <input
                   type="text"
                   value={formData.background}
-                  onChange={(e) => { setField("background", e.target.value); setBackgroundError(false); }}
+                  onChange={(e) => setBackground(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-800 rounded border border-gray-700 focus:border-white focus:outline-none"
                 />
                 {formData.background && (
@@ -251,6 +257,94 @@ export function ContentModal({
               </div>
             </div>
           </div>
+
+          {/* Grupo 2.5: Previsualizador */}
+          {formData.typeId === 1 && formData.title.trim() && (
+            <div className="bg-cyan-600/10 border border-cyan-600/20 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-cyan-400 mb-3 flex items-center gap-2">
+                <Film className="w-4 h-4" />
+                Previsualizador
+              </h3>
+
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 bg-gray-800 rounded border border-gray-700 px-4 py-3">
+                  <span className="text-xs text-gray-500 block mb-1">Archivo esperado en el servidor:</span>
+                  <code className="text-sm text-cyan-300 break-all">{contentSlug}/manifest.mpd</code>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  {previewStatus === "success" ? (
+                    <button
+                      type="button"
+                      onClick={() => { resetPreview(); }}
+                      className="flex items-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-sm"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Resetear
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void handlePreview()}
+                      disabled={previewStatus === "loading"}
+                      className="flex items-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-sm"
+                    >
+                      {previewStatus === "loading" ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          Intento {previewRetries}/3
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4" />
+                          Previsualizar
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-3">
+                Presione <strong>Previsualizar</strong> cuando el archivo esté listo en el servidor de streaming.
+              </p>
+
+              {previewStatus === "success" && (
+                <div className="rounded overflow-hidden border border-gray-700 bg-black">
+                  <video
+                    ref={videoRef}
+                    className="w-full max-h-[360px]"
+                    controls
+                    playsInline
+                  />
+                </div>
+              )}
+
+              {previewStatus === "failed" && (
+                <div className="flex flex-col items-center justify-center gap-3 py-6 bg-gray-800/50 rounded border border-red-600/30">
+                  <Image
+                    src="/no-image.png"
+                    alt="No se pudo obtener el contenido"
+                    width={120}
+                    height={120}
+                    className="object-contain opacity-50"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <p className="text-sm text-red-400 font-medium">No se pudo obtener el contenido</p>
+                  <p className="text-xs text-gray-500 text-center max-w-xs">
+                    El archivo <code className="text-red-300">{contentSlug}/manifest.mpd</code> no fue encontrado en el servidor después de 3 intentos.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { resetPreview(); void handlePreview(); }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-sm"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reintentar
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Grupo 3: Configuración del contenido */}
           <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-4">
@@ -410,18 +504,25 @@ export function ContentModal({
               />
             </div>
 
-            <div className="mt-4 flex items-center justify-between p-4 bg-gray-800/50 rounded">
+            <div className={`mt-4 flex items-center justify-between p-4 rounded ${previewStatus === "success" ? "bg-green-600/10 border border-green-600/20" : "bg-gray-800/50"}`}>
               <div>
                 <p className="font-medium">Próximamente</p>
                 <p className="text-sm text-gray-400">
-                  Marcar este contenido como próximo estreno
+                  {previewStatus === "success"
+                    ? "El contenido está disponible en el servidor"
+                    : "Marcar este contenido como próximo estreno"}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={toggleComingSoon}
+                disabled={previewStatus === "success"}
                 className={`relative w-14 h-7 rounded-full transition-colors ${
-                  formData.comingSoon ? "bg-green-600" : "bg-gray-600"
+                  previewStatus === "success"
+                    ? "bg-green-600 cursor-not-allowed opacity-70"
+                    : formData.comingSoon
+                      ? "bg-green-600"
+                      : "bg-gray-600"
                 }`}
               >
                 <div
