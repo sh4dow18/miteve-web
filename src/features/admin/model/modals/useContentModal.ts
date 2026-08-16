@@ -7,6 +7,10 @@ import {
   ShortContent,
 } from "@/entities/content/model/types";
 import { secondsToTime, timeToSeconds } from "@/shared/lib/utils";
+import {
+  getAgeFromReleaseDates,
+  getAgeFromContentRatings,
+} from "@/shared/lib/tmdbRating";
 
 interface UseContentModalParams {
   item: ShortContent | null;
@@ -75,6 +79,13 @@ export function useContentModal({
 
       const year = (data.release_date || data.first_air_date || "").split("-")[0];
 
+      let age = -1;
+      if (formData.typeId === 1 && data.release_dates?.results) {
+        age = getAgeFromReleaseDates(data.release_dates.results);
+      } else if (formData.typeId === 2 && data.content_ratings?.results) {
+        age = getAgeFromContentRatings(data.content_ratings.results);
+      }
+
       setFormData((prev) => ({
         ...prev,
         title: data.title || data.name || "",
@@ -84,6 +95,7 @@ export function useContentModal({
         rating: Number(data.vote_average) || 0,
         cover: data.poster_path || "",
         background: data.backdrop_path || "",
+        age: age >= 0 ? age : prev.age,
       }));
     } catch (tmdbError) {
       setError(

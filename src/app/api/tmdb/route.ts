@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   if (QUERY) {
     url = `https://api.themoviedb.org/3/search/${TYPE}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(QUERY)}&language=es-MX&page=1`;
   } else {
-    url = `https://api.themoviedb.org/3/${TYPE}/${ID}?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images`;
+    url = `https://api.themoviedb.org/3/${TYPE}/${ID}?api_key=${TMDB_API_KEY}&language=es-MX&append_to_response=videos,images,release_dates,content_ratings`;
   }
 
   const RESPONSE = await fetch(url);
