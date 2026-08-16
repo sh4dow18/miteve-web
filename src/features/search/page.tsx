@@ -4,6 +4,7 @@ import { Search, X } from "lucide-react";
 import Link from "next/link";
 import { Tag } from "lucide-react";
 import { SearchResultsGrid } from "@/features/search/ui/SearchResultsGrid";
+import { SearchDefaultGrid } from "@/features/search/ui/SearchDefaultGrid";
 import { useSearchPage } from "@/features/search/model/useSearchPage";
 
 export default function SearchPage() {
@@ -20,6 +21,7 @@ export default function SearchPage() {
     resultLabel,
     showClearButton,
     showEmptyState,
+    hasSubmittedQuery,
   } = useSearchPage();
 
   return (
@@ -62,22 +64,28 @@ export default function SearchPage() {
         </Link>
       </div>
 
-      <p className="mt-6 text-xl font-semibold text-slate-200">{resultLabel}</p>
+      {!hasSubmittedQuery ? (
+        <SearchDefaultGrid />
+      ) : (
+        <>
+          <p className="mt-6 text-xl font-semibold text-slate-200">{resultLabel}</p>
 
-      {error && <p className="mt-3 text-red-400">{error}</p>}
+          {error && <p className="mt-3 text-red-400">{error}</p>}
 
-      {showEmptyState && (
-        <p className="mt-10 rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-slate-300">
-          No encontramos resultados para la busqueda actual.
-        </p>
+          {showEmptyState && (
+            <p className="mt-10 rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-slate-300">
+              No encontramos resultados para la busqueda actual.
+            </p>
+          )}
+
+          <div className="mt-6">
+            <SearchResultsGrid
+              results={results}
+              onMoveUpFromFirstRow={focusSearchInput}
+            />
+          </div>
+        </>
       )}
-
-      <div className="mt-6">
-        <SearchResultsGrid
-          results={results}
-          onMoveUpFromFirstRow={focusSearchInput}
-        />
-      </div>
     </div>
   );
 }
