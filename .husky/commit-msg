@@ -1,4 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-npx --no-install commitlint --edit "$1"
+export PATH="/home/sh4dow18/Apps/node-v24.15.0-linux-x64/bin:$PATH"
+commitlint --edit "$1"
