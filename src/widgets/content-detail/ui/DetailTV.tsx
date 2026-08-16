@@ -22,6 +22,7 @@ interface Props {
 }
 
 export default function DetailTV({ content, initialSeason }: Props) {
+  const { cwEntry, removing, remove } = useContinueWatchingEntry(content.id);
   const {
     seasonsList,
     isMuted,
@@ -30,8 +31,8 @@ export default function DetailTV({ content, initialSeason }: Props) {
     selectSeason,
     currentSeasonData,
     playContent,
-  } = useDetail({ content, initialSeason });
-  const { cwId, removing, remove } = useContinueWatchingEntry(content.id);
+    playButtonLabel,
+  } = useDetail({ content, initialSeason, cwEntry });
   const { items: recommendations } = useRecommendations(content.id);
   const {
     scrollContainerRef: recoScrollRef,
@@ -125,9 +126,9 @@ export default function DetailTV({ content, initialSeason }: Props) {
                 className="flex w-full sm:w-auto items-center justify-center gap-3 bg-white text-black px-6 py-3 sm:px-8 sm:py-4 rounded text-base sm:text-xl font-semibold"
               >
                 <Play className="w-7 h-7" fill="currentColor" />
-                {content.comingSoon ? "Próximamente" : "Reproducir"}
+                {playButtonLabel}
               </button>
-              {cwId && (
+              {cwEntry && (
                 <button
                   onClick={remove}
                   disabled={removing}
