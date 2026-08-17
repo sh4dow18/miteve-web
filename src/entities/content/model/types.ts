@@ -265,5 +265,6 @@ export interface SuggestedContentReportResponse {
   userEmail: string;
   statusId: number;
   statusName: string;
+  tmdbId: number | null;
   rejectionReason: string | null;
 }

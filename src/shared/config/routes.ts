@@ -138,6 +138,18 @@ export const ROUTES_LIST: Route[] = [
     },
   },
   {
+    path: "browse/[id]",
+    title: "Explorar",
+    summary: "Detalle del contenido de TMDB para solicitud.",
+    Icon: Clapperboard,
+    inSitemap: false,
+    inHome: false,
+    metadata: {
+      title: "Explorar Contenido",
+      description: "Detalle del contenido de TMDB para solicitud.",
+    },
+  },
+  {
     path: "player/[id]",
     title: "Reproductor",
     summary: "Aqui se puede visualizar el contenido seleccionado.",
