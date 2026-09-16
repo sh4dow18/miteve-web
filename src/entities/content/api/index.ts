@@ -105,10 +105,76 @@ export async function FindAllContainers(): Promise<MiniContainer[]> {
 }
 
 export async function FindContainerById(id: number, typeId: number): Promise<Container | null> {
-  const response = await fetch(`${API_HOST_IP}/containers/type/${typeId}`);
-  if (!response.ok) return null;
-  const containers: Container[] = await response.json();
-  return containers.find((c) => c.id === id) ?? null;
+  // Intento 1: tipo solicitado
+  try {
+    const res = await fetch(`${API_HOST_IP}/containers/type/${typeId}`);
+    if (res.ok) {
+      const containers: Container[] = await res.json();
+      const found = containers.find((c) => c.id === id);
+      if (found) return found;
+    }
+  } catch { /* ignore */ }
+
+  // Intento 2: otro tipo (contenedores mixtos no aparecen en el filtro por tipo)
+  try {
+    const otherType = typeId === 1 ? 2 : 1;
+    const res2 = await fetch(`${API_HOST_IP}/containers/type/${otherType}`);
+    if (res2.ok) {
+      const containers2: Container[] = await res2.json();
+      const found2 = containers2.find((c) => c.id === id);
+      if (found2) return found2;
+    }
+  } catch { /* ignore */ }
+
+  // Fallback 3: contenedor mixto (ej: Amantes del Misterio id 13 tiene movies + tv-shows)
+  // Se excluye de ambos /type/* por el query NOT EXISTS, así que lo reconstruimos
+  // via /containers + detalle de contenidos. Ver ContainerRepository.kt:13
+  console.log(`[DEBUG] FindContainerById fallback mixto para containerId=${id} typeId=${typeId}`);
+  try {
+    const allRes = await fetch(`${API_HOST_IP}/containers`);
+    if (!allRes.ok) return null;
+    const all: MiniContainer[] = await allRes.json();
+    const meta = all.find((c) => c.id === id);
+    if (!meta) return null;
+
+    // Obtener ids de todos los contenidos (paginado)
+    const pageRes = await fetch(`${API_HOST_IP}/contents?page=0&size=9999`);
+    if (!pageRes.ok) return { id: meta.id, name: meta.name, elementsList: [] };
+    const pageData = await pageRes.json();
+    const shorts: ShortContent[] = Array.isArray(pageData) ? pageData : (pageData.content ?? []);
+    // Fetch detalles en paralelo (limitado) para filtrar por container
+    const details = await Promise.all(
+      shorts.map((s) =>
+        fetch(`${API_HOST_IP}/contents/${encodeURIComponent(s.id)}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null)
+      )
+    );
+    const elements: Container["elementsList"] = details
+      .filter((d): d is Content => !!d && d.container?.id === id)
+      .map((d) => ({
+        id: d.position ?? 0,
+        position: d.position ?? 0,
+        content: {
+          id: d.id,
+          cover: d.cover,
+          title: d.title,
+          trailer: d.trailer,
+          age: d.age,
+        },
+      }))
+      .sort((a, b) => a.position - b.position);
+
+    console.log(`[DEBUG] FindContainerById mixto reconstruido containerId=${id} elements=${elements.length}`, elements.map(e=>`${e.position}:${e.content.title}`));
+    return {
+      id: meta.id,
+      name: meta.name,
+      elementsList: elements,
+    };
+  } catch (e) {
+    console.log(`[DEBUG] FindContainerById fallback error`, e);
+    return null;
+  }
 }
 
 export async function FindAllGenres(): Promise<Genre[]> {

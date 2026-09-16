@@ -212,7 +212,9 @@ export function useContentModal({
             : [],
           typeId: existingContent.type === "movie" ? 1 : 2,
           containerId: existingContent.container?.id || 0,
-          containerPosition: existingContent.position || 0,
+          // Backend guarda position 1-based (1..N), frontend usa índice 0-based para DnD.
+          // Convertimos a 0-based para que el slider refleje el orden real del contenedor.
+          containerPosition: existingContent.position ? Math.max(0, existingContent.position - 1) : 0,
           endTime: existingContent.endTime ?? null,
         });
       } catch {
@@ -245,8 +247,18 @@ export function useContentModal({
     const endTimeSecs = endTimeStr.trim() ? timeToSeconds(endTimeStr) : null;
 
     setError(null);
+    // Convertir índice 0-based del DnD a posición 1-based que espera el backend.
+    // Si no tiene contenedor, se envía 0 (sin posición).
+    const backendPosition = formData.containerId > 0 ? formData.containerPosition + 1 : 0;
+    console.log("[DEBUG] handleSubmit - conversión posición", {
+      containerId: formData.containerId,
+      frontendIndex_0based: formData.containerPosition,
+      backendPosition_1based: backendPosition,
+      titulo: formData.title,
+    });
     onSave({
       ...formData,
+      containerPosition: backendPosition,
       tagline: formData.tagline !== "" ? formData.tagline : null,
       note: formData.note !== "" ? formData.note : null,
       trailerDuration: trailerSeconds !== null ? trailerSeconds : 0,
