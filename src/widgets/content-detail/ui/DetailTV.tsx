@@ -11,6 +11,7 @@ import { useDetail } from "@/widgets/content-detail/model/useDetail";
 import { useContinueWatchingEntry } from "@/widgets/content-detail/model/useContinueWatchingEntry";
 import { useRecommendations } from "@/widgets/content-detail/model/useRecommendations";
 import { FavoriteButton } from "@/shared/ui/FavoriteButton";
+import { BulkDownloadButton } from "@/widgets/download";
 import { ContentCardTV } from "@/shared/ui/ContentCardTV";
 import { useContentRow } from "@/widgets/content-row/model/useContentRow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -195,6 +196,26 @@ export default function DetailTV({ content, initialSeason }: Props) {
                 </button>
               ))}
             </div>
+
+            {selectedSeason !== undefined && currentSeasonData && (
+              <div className="mb-8 flex flex-wrap items-center gap-3">
+                <BulkDownloadButton
+                  contentId={content.id}
+                  contentTitle={content.title}
+                  cover={content.cover}
+                  seasonNumber={selectedSeason}
+                  episodes={currentSeasonData.episodesList.map((ep) => ({
+                    episodeNumber: ep.episodeNumber,
+                    title: ep.title,
+                    cover: ep.cover,
+                  }))}
+                  className="px-5 py-3 rounded text-sm font-medium"
+                />
+                <p className="text-xs text-gray-500">
+                  Descarga un rango (ej. 1–10). Si algún capítulo falta, se descargarán los demás.
+                </p>
+              </div>
+            )}
 
             <div className="flex flex-col gap-0">
               {currentSeasonData.episodesList.map((episode, index) => (

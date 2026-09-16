@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css"
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Miteve",
@@ -21,6 +22,7 @@ export default function RootLayout({
         <div className="min-h-screen bg-[#141414] text-white">
           <main>{children}</main>
         </div>
+        <Toaster richColors position="top-center" closeButton />
         {/* Service Worker registration for PWA offline support */}
         <script
           dangerouslySetInnerHTML={{

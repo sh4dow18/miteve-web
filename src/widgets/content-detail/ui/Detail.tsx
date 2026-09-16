@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Content } from "@/entities/content/model/types";
 import { useDetail } from "@/widgets/content-detail/model/useDetail";
 import { useContinueWatchingEntry } from "@/widgets/content-detail/model/useContinueWatchingEntry";
-import { DownloadButton } from "@/widgets/download";
+import { DownloadButton, BulkDownloadButton } from "@/widgets/download";
 import { FavoriteButton } from "@/shared/ui/FavoriteButton";
 import { useRecommendations } from "@/widgets/content-detail/model/useRecommendations";
 import { ContentCard } from "@/shared/ui/ContentCard";
@@ -238,6 +238,27 @@ export default function Detail({ content, initialSeason }: Props) {
                 </button>
               ))}
             </div>
+
+            {/* Descarga masiva de temporada / rango */}
+            {selectedSeason !== undefined && currentSeasonData && (
+              <div className="mb-8 flex flex-wrap items-center gap-3">
+                <BulkDownloadButton
+                  contentId={content.id}
+                  contentTitle={content.title}
+                  cover={content.cover}
+                  seasonNumber={selectedSeason}
+                  episodes={currentSeasonData.episodesList.map((ep) => ({
+                    episodeNumber: ep.episodeNumber,
+                    title: ep.title,
+                    cover: ep.cover,
+                  }))}
+                  className="px-5 py-3 rounded text-sm font-medium"
+                />
+                <p className="text-xs text-gray-500">
+                  Descarga un rango (ej. 1–10). Si algún capítulo falta, se descargarán los demás y se avisará al final.
+                </p>
+              </div>
+            )}
 
             {/* Lista de episodios */}
             <div className="flex flex-col gap-0">
