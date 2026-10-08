@@ -25,6 +25,22 @@ declare global {
   }
 }
 
+// Tipos para los prefijos webkit de Safari / iOS (sin lib DOM oficial)
+type WebkitVideoElement = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitExitFullscreen?: () => void;
+  webkitDisplayingFullscreen?: boolean;
+};
+
+type WebkitContainer = HTMLDivElement & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+};
+
+type WebkitDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => void;
+};
+
 interface UsePlayerParams {
   content?: Content | null;
   tvShow?: {
@@ -1097,25 +1113,188 @@ export function usePlayer({
 
   const toggleFullscreen = () => {
     const c = containerRef.current;
+    const v = videoRef.current as WebkitVideoElement | null;
     if (!c) return;
-    type LockableOrientation = ScreenOrientation & {
-      lock?: (type: string) => Promise<void>;
-      unlock?: () => void;
+
+    const doc = document as WebkitDocument;
+    const containerEl = c as WebkitContainer;
+
+    const nativeFsElement =
+      document.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+    const isFakeFs = c.dataset.fakeFullscreen === "true";
+    const isVideoNativeFs = v?.webkitDisplayingFullscreen === true;
+
+    const lockLandscape = () => {
+      try {
+        type LockableOrientation = ScreenOrientation & {
+          lock?: (type: string) => Promise<void>;
+        };
+        const orientation =
+          typeof screen !== "undefined"
+            ? (screen.orientation as LockableOrientation | undefined)
+            : undefined;
+        orientation?.lock?.("landscape")?.catch(() => {});
+      } catch {
+        /* iOS no soporta orientation.lock: se ignora */
+      }
     };
-    const orientation = screen.orientation as LockableOrientation;
-    if (!document.fullscreenElement) {
+    const unlockOrientation = () => {
+      try {
+        type UnlockableOrientation = ScreenOrientation & {
+          unlock?: () => void;
+        };
+        const orientation =
+          typeof screen !== "undefined"
+            ? (screen.orientation as UnlockableOrientation | undefined)
+            : undefined;
+        orientation?.unlock?.();
+      } catch {
+        /* noop */
+      }
+    };
+
+    const enterFakeFullscreen = () => {
+      if (c.dataset.fakeFullscreen === "true") return;
+      c.dataset.fakeFullscreen = "true";
+      c.dataset.prevBodyOverflow = document.body.style.overflow;
+      c.dataset.prevDocOverflow = document.documentElement.style.overflow;
+      c.dataset.prevPosition = c.style.position;
+      c.dataset.prevInset = c.style.inset;
+      c.dataset.prevZIndex = c.style.zIndex;
+      c.dataset.prevWidth = c.style.width;
+      c.dataset.prevHeight = c.style.height;
+      c.dataset.prevMinHeight = c.style.minHeight;
+      c.dataset.prevBackground = c.style.background;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      c.style.position = "fixed";
+      c.style.inset = "0";
+      c.style.zIndex = "9999";
+      c.style.width = "100vw";
+      c.style.height = "100dvh";
+      c.style.minHeight = "100dvh";
+      c.style.background = "#000";
       if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "-1");
-      c.requestFullscreen()
-        .then(() => {
-          orientation.lock?.("landscape")?.catch(() => {});
-        })
-        .catch(() => {});
+      try {
+        c.focus({ preventScroll: true } as FocusOptions);
+      } catch {
+        c.focus();
+      }
+      lockLandscape();
       setVideoStates((p) => ({ ...p, fullscreen: true }));
-    } else {
-      document.exitFullscreen();
-      orientation.unlock?.();
+    };
+
+    const exitFakeFullscreen = () => {
+      delete c.dataset.fakeFullscreen;
+      document.body.style.overflow = c.dataset.prevBodyOverflow ?? "";
+      document.documentElement.style.overflow = c.dataset.prevDocOverflow ?? "";
+      c.style.position = c.dataset.prevPosition ?? "";
+      c.style.inset = c.dataset.prevInset ?? "";
+      c.style.zIndex = c.dataset.prevZIndex ?? "";
+      c.style.width = c.dataset.prevWidth ?? "";
+      c.style.height = c.dataset.prevHeight ?? "";
+      c.style.minHeight = c.dataset.prevMinHeight ?? "";
+      c.style.background = c.dataset.prevBackground ?? "";
+      unlockOrientation();
       setVideoStates((p) => ({ ...p, fullscreen: false }));
+    };
+
+    // ── SALIR ──────────────────────────────────────────────
+    if (nativeFsElement || isFakeFs || isVideoNativeFs) {
+      if (isFakeFs) {
+        exitFakeFullscreen();
+        return;
+      }
+      if (isVideoNativeFs && v?.webkitExitFullscreen) {
+        try {
+          v.webkitExitFullscreen();
+        } catch {
+          /* noop */
+        }
+        return;
+      }
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      } else if (typeof doc.webkitExitFullscreen === "function") {
+        try {
+          doc.webkitExitFullscreen();
+        } catch {
+          /* noop */
+        }
+      }
+      unlockOrientation();
+      // El estado se sincroniza vía fullscreenchange/webkitfullscreenchange.
+      // Fallback por si el evento no dispara (iOS antiguo):
+      setVideoStates((p) => ({ ...p, fullscreen: false }));
+      return;
     }
+
+    // ── ENTRAR ─────────────────────────────────────────────
+    // 1) Fullscreen API estándar (Android, desktop, iPad)
+    const requestContainerFs =
+      typeof c.requestFullscreen === "function"
+        ? c.requestFullscreen.bind(c)
+        : typeof containerEl.webkitRequestFullscreen === "function"
+          ? containerEl.webkitRequestFullscreen.bind(containerEl)
+          : null;
+
+    if (requestContainerFs) {
+      if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "-1");
+      try {
+        const result = requestContainerFs() as Promise<void> | void;
+        if (
+          result &&
+          typeof (result as Promise<void>).then === "function"
+        ) {
+          (result as Promise<void>)
+            .then(() => {
+              lockLandscape();
+            })
+            .catch(() => {
+              // El request nativo falló (p. ej. iOS lo rechaza):
+              // si el vídeo soporta fullscreen nativo de iOS, usarlo;
+              // si no, fallback CSS para no dejar el botón muerto.
+              const stillOutside =
+                !document.fullscreenElement &&
+                !(document as WebkitDocument).webkitFullscreenElement;
+              if (!stillOutside) return;
+              if (
+                v &&
+                typeof v.webkitEnterFullscreen === "function"
+              ) {
+                try {
+                  v.webkitEnterFullscreen();
+                  return;
+                } catch {
+                  /* cae al fake */
+                }
+              }
+              enterFakeFullscreen();
+            });
+        } else {
+          lockLandscape();
+        }
+        // No se marca fullscreen aquí: lo confirman los eventos
+        // fullscreenchange / webkitfullscreenchange.
+        return;
+      } catch {
+        // Sigue a los fallbacks de iOS
+      }
+    }
+
+    // 2) iOS iPhone: el contenedor no soporta requestFullscreen.
+    //    El vídeo sí expone webkitEnterFullscreen → pantalla completa real.
+    if (v && typeof v.webkitEnterFullscreen === "function") {
+      try {
+        v.webkitEnterFullscreen();
+        return;
+      } catch {
+        /* cae al fake */
+      }
+    }
+
+    // 3) Último recurso: pseudo-fullscreen CSS (conserva controles propios)
+    enterFakeFullscreen();
   };
 
   const saveCwTime = useCallback((time: number) => {
@@ -1245,16 +1424,57 @@ export function usePlayer({
           break;
       }
     };
-    const onFS = () =>
+    const onFS = () => {
+      const d = document as WebkitDocument;
+      const nativeEl =
+        document.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+      const isFake =
+        containerRef.current?.dataset.fakeFullscreen === "true";
+      const isVideoNative =
+        (videoRef.current as WebkitVideoElement | null)
+          ?.webkitDisplayingFullscreen === true;
       setVideoStates((p) => ({
         ...p,
-        fullscreen: !!document.fullscreenElement,
+        fullscreen: !!nativeEl || isFake || isVideoNative,
       }));
+    };
+    const onVideoBeginFs = () =>
+      setVideoStates((p) => ({ ...p, fullscreen: true }));
+    const onVideoEndFs = () => {
+      const d = document as WebkitDocument;
+      const nativeEl =
+        document.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+      const isFake =
+        containerRef.current?.dataset.fakeFullscreen === "true";
+      setVideoStates((p) => ({
+        ...p,
+        fullscreen: !!nativeEl || isFake,
+      }));
+    };
     document.addEventListener("keydown", onKey);
     document.addEventListener("fullscreenchange", onFS);
+    document.addEventListener("webkitfullscreenchange", onFS);
+    const vidEl = videoRef.current as WebkitVideoElement | null;
+    vidEl?.addEventListener?.(
+      "webkitbeginfullscreen" as keyof HTMLVideoElementEventMap,
+      onVideoBeginFs as EventListener
+    );
+    vidEl?.addEventListener?.(
+      "webkitendfullscreen" as keyof HTMLVideoElementEventMap,
+      onVideoEndFs as EventListener
+    );
     return () => {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("fullscreenchange", onFS);
+      document.removeEventListener("webkitfullscreenchange", onFS);
+      vidEl?.removeEventListener?.(
+        "webkitbeginfullscreen" as keyof HTMLVideoElementEventMap,
+        onVideoBeginFs as EventListener
+      );
+      vidEl?.removeEventListener?.(
+        "webkitendfullscreen" as keyof HTMLVideoElementEventMap,
+        onVideoEndFs as EventListener
+      );
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasSubtitles, qualityMenuOpen]);
@@ -1313,6 +1533,18 @@ export function usePlayer({
     };
     VIDEO.addEventListener("progress", update);
     return () => VIDEO.removeEventListener("progress", update);
+  }, []);
+
+  // ─── Limpieza del pseudo-fullscreen iOS al desmontar ─────────────────────────
+  useEffect(() => {
+    const C = containerRef.current;
+    return () => {
+      if (C?.dataset.fakeFullscreen === "true") {
+        document.body.style.overflow = C.dataset.prevBodyOverflow ?? "";
+        document.documentElement.style.overflow =
+          C.dataset.prevDocOverflow ?? "";
+      }
+    };
   }, []);
 
   const fmt = (t: number) => {
