@@ -228,10 +228,11 @@ type ShakaPlayer = {
   addEventListener: (event: string, callback: (event: unknown) => void) => void;
   getVariantTracks: () => VariantTrack[];
   load: (source: string) => Promise<void>;
+  retryStreaming?: () => Promise<boolean> | boolean;
 };
 
 type QualityCapablePlayer = ShakaPlayer & {
-  configure: (config: { abr: { enabled: boolean } }) => void;
+  configure: (config: Record<string, unknown>) => void;
   selectVariantTrack: (
     track: VariantTrack,
     clearBuffer?: boolean,
@@ -245,6 +246,10 @@ type VariantTrack = {
   bandwidth: number;
   height: number | null;
   type: string;
+  videoCodec?: string | null;
+  audioCodec?: string | null;
+  frameRate?: number | null;
+  mimeType?: string | null;
 };
 
 type QualityOption = {
@@ -263,6 +268,55 @@ function formatHms(t: number) {
     2,
     "0"
   )}:${String(s).padStart(2, "0")}`;
+}
+
+// ─── Modo supervivencia low-end (cajas MiMo / AV1 por software) ───────────────
+// AV1 sin decodificador hardware en cajas de 1-2GB vive al límite: cualquier
+// pico de CPU/RAM (cambio de variante con clearBuffer, ABR subiendo a FHD o
+// 30s de buffer) congela el WebView y Android mata la app (ANR/OOM).
+// Estas ayudas detectan la caja débil y la dejan clavada en la variante más
+// liviana con buffers cortos, sin vaciar el buffer al cambiar de calidad.
+function isLowEndDevice(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined")
+    return false;
+  try {
+    try {
+      if (localStorage.getItem("miteve-force-lowend") === "1") return true;
+    } catch {
+      /* storage no disponible */
+    }
+    const ua = (navigator.userAgent || "").toLowerCase();
+    if (
+      /mimo|mibox|mi box|s905|s905x|s905w|allwinner|rk3229|rk3318|h313|android.*box|aosp.*tv/.test(
+        ua
+      )
+    )
+      return true;
+    const dm = (navigator as Navigator & { deviceMemory?: number })
+      .deviceMemory;
+    if (typeof dm === "number" && dm <= 3) return true;
+    const cores = (navigator as Navigator & { hardwareConcurrency?: number })
+      .hardwareConcurrency;
+    const isTvLike =
+      /android|aft|tv|crkey|googletv|tizen|webos/.test(ua) ||
+      (typeof window !== "undefined" && !!window.AndroidApp);
+    if (isTvLike && typeof cores === "number" && cores <= 4) return true;
+  } catch {
+    /* noop */
+  }
+  return false;
+}
+
+function pickLowestVariant(tracks: VariantTrack[]): VariantTrack | null {
+  const variants = tracks.filter((t) => t.type === "variant");
+  if (variants.length === 0) return null;
+  return (
+    [...variants].sort(
+      (a, b) =>
+        (a.height ?? Number.MAX_SAFE_INTEGER) -
+          (b.height ?? Number.MAX_SAFE_INTEGER) || a.bandwidth - b.bandwidth
+    )[0] ?? null
+  );
 }
 
 export function usePlayer({
@@ -342,6 +396,15 @@ export function usePlayer({
   const [hasSubtitles, setHasSubtitles] = useState(false);
   const navigatingRef = useRef(false);
   const loadRequestIdRef = useRef(0);
+  // Cache del modo supervivencia: se calcula una vez por montaje.
+  const lowEndRef = useRef<boolean | null>(null);
+  const getLowEnd = () => {
+    if (lowEndRef.current === null) lowEndRef.current = isLowEndDevice();
+    return lowEndRef.current;
+  };
+  // Watchdog anti-congelamiento para AV1 por software (máx 3 rescates).
+  const stallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stallRetriesRef = useRef(0);
 
   // ─── Continue-watching tracking ───────────────────────────────────────────────
   const playedSecondsRef = useRef(0);
@@ -531,7 +594,19 @@ export function usePlayer({
   const selectAutoQuality = useCallback(() => {
     const player = shakaPlayerRef.current as QualityCapablePlayer | null;
     if (!player) return;
-    player.configure({ abr: { enabled: true } });
+    // En caja débil el "Automático" se capa a SD para que el ABR nunca
+    // salte a un FHD AV1 que la congelaría.
+    if (lowEndRef.current) {
+      player.configure({
+        abr: {
+          enabled: true,
+          defaultBandwidthEstimate: 600000,
+          restrictions: { maxHeight: 480, maxBandwidth: 1500000 },
+        },
+      });
+    } else {
+      player.configure({ abr: { enabled: true } });
+    }
     setIsAutoQuality(true);
     setQualityMenuOpen(false);
     syncQualityState(player.getVariantTracks());
@@ -546,7 +621,10 @@ export function usePlayer({
     if (!selectedTrack) return;
 
     player.configure({ abr: { enabled: false } });
-    player.selectVariantTrack(selectedTrack, true);
+    // En caja débil NO vaciar el buffer: el flush + re-append de AV1 por
+    // software es lo que pega el WebView y provoca el cierre (ANR/OOM).
+    const clearBuffer = !lowEndRef.current;
+    player.selectVariantTrack(selectedTrack, clearBuffer);
     setIsAutoQuality(false);
     setQualityMenuOpen(false);
     syncQualityState(player.getVariantTracks());
@@ -752,11 +830,18 @@ export function usePlayer({
         return;
       }
 
-      const speed = await speedTest();
+      // En caja débil se omite el speedTest (ahorra CPU/red y arranque):
+      // se asume red lenta y se clava el SD desde el inicio.
+      const lowEndDevice = getLowEnd();
+      const speed = lowEndDevice ? 0 : await speedTest();
       if (!isCurrentRequest()) return;
 
       const slow = speed < 4;
-      const lowQ = profileSettingsRef.current?.lowQuality || videoStates.resolution === "SD" || slow;
+      const lowQ =
+        lowEndDevice ||
+        profileSettingsRef.current?.lowQuality ||
+        videoStates.resolution === "SD" ||
+        slow;
 
       const API = `${
         tvShow
@@ -818,6 +903,39 @@ export function usePlayer({
                 if (!isCurrentRequest()) {
                   await player.destroy();
                   return;
+                }
+
+                // ── Supervivencia low-end / AV1 por software ─────────────────
+                // Buffers cortos (menos RAM), tope en 480p y ABR arrancando
+                // conservador. Sin esto el ABR puede subir a FHD AV1 y la
+                // caja MiMo se congela y Android la cierra.
+                if (lowEndDevice) {
+                  try {
+                    (player as unknown as QualityCapablePlayer).configure({
+                      streaming: {
+                        bufferingGoal: 12,
+                        rebufferingGoal: 4,
+                        bufferBehind: 15,
+                        segmentPrefetchLimit: 1,
+                        retryParameters: {
+                          timeout: 15000,
+                          maxAttempts: 4,
+                          baseDelay: 500,
+                          backoffFactor: 2,
+                        },
+                      },
+                      abr: {
+                        enabled: true,
+                        defaultBandwidthEstimate: 600000,
+                        restrictions: {
+                          maxHeight: 480,
+                          maxBandwidth: 1500000,
+                        },
+                      },
+                    });
+                  } catch {
+                    /* config no crítica */
+                  }
                 }
 
                 // ── Calidad en tiempo real ──────────────────────────────────
@@ -941,15 +1059,18 @@ export function usePlayer({
                 const tracks = player.getVariantTracks();
                 syncQualityState(tracks);
 
-                if (profileSettingsRef.current?.lowQuality) {
-                  // Force lowest-resolution variant and disable ABR
-                  const variantTracks = tracks.filter((t) => t.type === "variant");
-                  const sdTrack = variantTracks.sort(
-                    (a, b) => (a.height ?? 0) - (b.height ?? 0)
-                  )[0];
+                if (profileSettingsRef.current?.lowQuality || lowEndDevice) {
+                  // Clavar la variante más liviana (menor alto + menor bitrate)
+                  // y apagar el ABR: en AV1 por software cualquier salto a una
+                  // variante mayor congela la caja débil.
+                  const sdTrack = pickLowestVariant(tracks);
                   if (sdTrack) {
                     player.configure({ abr: { enabled: false } });
-                    player.selectVariantTrack(sdTrack, true);
+                    // Sin clearBuffer en low-end: evita el flush que pega el WebView.
+                    (player as unknown as QualityCapablePlayer).selectVariantTrack(
+                      sdTrack,
+                      !lowEndDevice
+                    );
                     setIsAutoQuality(false);
                     setVideoStates((p) => ({ ...p, resolution: "SD" }));
                     // Re-sync so the quality menu shows the forced track as selected
@@ -1017,6 +1138,54 @@ export function usePlayer({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, offlineUri]);
+
+  // ─── Watchdog anti-pegue solo low-end ──────────────────────────────────────
+  // Si el AV1 por software se queda en "waiting" >10s, intenta un rescate
+  // suave (play + retryStreaming) en vez de dejar el spinner pegado hasta
+  // el ANR. Máximo 3 intentos por contenido para no entrar en loop.
+  useEffect(() => {
+    stallRetriesRef.current = 0;
+    if (stallTimerRef.current) {
+      clearTimeout(stallTimerRef.current);
+      stallTimerRef.current = null;
+    }
+    const VIDEO = videoRef.current;
+    if (!VIDEO || !getLowEnd()) return;
+    const scheduleRescue = () => {
+      if (stallTimerRef.current) clearTimeout(stallTimerRef.current);
+      stallTimerRef.current = setTimeout(() => {
+        if (stallRetriesRef.current >= 3) return;
+        if (VIDEO.paused || VIDEO.readyState >= 3) return;
+        stallRetriesRef.current += 1;
+        try {
+          const p = shakaPlayerRef.current;
+          p?.retryStreaming?.();
+        } catch {
+          /* noop */
+        }
+        VIDEO.play().catch(() => {});
+      }, 10000);
+    };
+    const onWait = () => scheduleRescue();
+    const onPlayable = () => {
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+        stallTimerRef.current = null;
+      }
+    };
+    VIDEO.addEventListener("waiting", onWait);
+    VIDEO.addEventListener("playing", onPlayable);
+    VIDEO.addEventListener("canplay", onPlayable);
+    return () => {
+      VIDEO.removeEventListener("waiting", onWait);
+      VIDEO.removeEventListener("playing", onPlayable);
+      VIDEO.removeEventListener("canplay", onPlayable);
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+        stallTimerRef.current = null;
+      }
+    };
+  }, [content?.id, tvShow?.season, tvShow?.episode.episodeNumber]);
 
   useEffect(() => {
     const VIDEO = videoRef.current;
