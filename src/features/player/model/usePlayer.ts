@@ -465,21 +465,6 @@ export function usePlayer({
     }
   }, []);
 
-  async function speedTest(): Promise<number> {
-    const results: number[] = [];
-    for (let i = 0; i < 2; i++) {
-      const start = performance.now();
-      const res = await fetch(
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/320px-Pierre-Person.jpg",
-        { cache: "no-store" }
-      );
-      await res.blob();
-      const secs = (performance.now() - start) / 1000;
-      results.push((0.105 / secs) * 8);
-    }
-    return Math.max(...results);
-  }
-
   useEffect(() => {
     navigatingRef.current = false;
   }, [content?.id, tvShow?.episode.episodeNumber, tvShow?.season]);
@@ -830,18 +815,37 @@ export function usePlayer({
         return;
       }
 
-      // En caja débil se omite el speedTest (ahorra CPU/red y arranque):
-      // se asume red lenta y se clava el SD desde el inicio.
+      // El player siempre arranca en Automático (ABR activado).
+      // Solo se fija SD manual si el perfil tiene "lowQuality".
+      // No se usa speedTest ni el estado anterior: el ABR decide según la red real.
       const lowEndDevice = getLowEnd();
-      const speed = lowEndDevice ? 0 : await speedTest();
+      if (!profileSettingsRef.current) {
+        try {
+          const mainProfile = getMainProfile();
+          if (mainProfile) {
+            const token = getToken();
+            const headers: HeadersInit = token
+              ? { Authorization: `Bearer ${token}` }
+              : {};
+            const r = await fetch(`${API_HOST_IP}/profiles/${mainProfile.id}`, {
+              headers,
+            });
+            if (r.ok && isCurrentRequest()) {
+              const data = (await r.json()) as ProfileInfo;
+              profileSettingsRef.current = {
+                autoSkip: data.autoSkip,
+                lowQuality: data.lowQuality,
+                disableSubtitles: data.disableSubtitles,
+              };
+            }
+          }
+        } catch {
+          /* sin perfil: se arranca en Automático por defecto */
+        }
+      }
       if (!isCurrentRequest()) return;
 
-      const slow = speed < 4;
-      const lowQ =
-        lowEndDevice ||
-        profileSettingsRef.current?.lowQuality ||
-        videoStates.resolution === "SD" ||
-        slow;
+      const forceSD = profileSettingsRef.current?.lowQuality === true;
 
       const API = `${
         tvShow
@@ -851,7 +855,7 @@ export function usePlayer({
       setIsAutoQuality(true);
       setQualityMenuOpen(false);
       setQualityOptions([]);
-      setVideoStates((p) => ({ ...p, resolution: lowQ ? "SD" : "HD" }));
+      setVideoStates((p) => ({ ...p, resolution: forceSD ? "SD" : "HD" }));
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 200);
@@ -1059,10 +1063,9 @@ export function usePlayer({
                 const tracks = player.getVariantTracks();
                 syncQualityState(tracks);
 
-                if (profileSettingsRef.current?.lowQuality || lowEndDevice) {
-                  // Clavar la variante más liviana (menor alto + menor bitrate)
-                  // y apagar el ABR: en AV1 por software cualquier salto a una
-                  // variante mayor congela la caja débil.
+                if (profileSettingsRef.current?.lowQuality === true) {
+                  // Perfil con "calidad reducida": clavar la variante más
+                  // liviana (menor alto + menor bitrate) y apagar el ABR.
                   const sdTrack = pickLowestVariant(tracks);
                   if (sdTrack) {
                     player.configure({ abr: { enabled: false } });
