@@ -1,0 +1,53 @@
+name: "📋 Generar Tarea"
+description: "Tarea general o mejora para MiTeVe-Web"
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descripción"
+      description: "Descripción de la tarea"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "Tareas"
+      description: "Lista de subtareas"
+      placeholder: |
+        - [ ] Tarea 1
+        - [ ] Tarea 2
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: objetivo
+    attributes:
+      label: "Objetivo"
+      description: "Ruta(s) / objetivo(s) afectado(s). Selecciona uno o varios."
+      options:
+        - label: "Home"
+        - label: "Search"
+        - label: "Player"
+        - label: "Downloads"
+        - label: "Profile"
+        - label: "Admin"
+        - label: "Auth"
+        - label: "API"
+        - label: "SEO"
+        - label: "UI"
+        - label: "General"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reportado_por
+    attributes:
+      label: "Reportado por"
+      description: "¿Quién reporta el issue?"
+      options:
+        - MiTeVe Team
+        - QA
+        - Usuario
+    validations:
+      required: true
